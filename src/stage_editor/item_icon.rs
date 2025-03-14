@@ -11,6 +11,7 @@ pub fn add_item_icon(
     mut commands: Commands,
     query: Query<Entity, With<ItemIcon>>,
     editor_con: Res<EditorController>,
+    
 ) {
     let mut first_item = true;
     for e in &query {

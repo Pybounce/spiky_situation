@@ -32,8 +32,8 @@ pub fn try_enter_stage(
     mut build_event_writer: EventWriter<BuildStageEvent>
 ) {
     if input.just_released(KeyCode::Space) {
-        load_event_writer.send(LoadStageEvent {stage_id: 5});
-        build_event_writer.send(BuildStageEvent {stage_id: 5});
+        load_event_writer.send(LoadStageEvent {stage_id: 0});
+        build_event_writer.send(BuildStageEvent {stage_id: 0});
     }
 }
 
