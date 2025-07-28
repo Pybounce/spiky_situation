@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{common::death::DeathMarker, local_player::LocalPlayer, stage::stage_objects::StageObject};
+use crate::{builders::player_builders::PlayerBuilder, common::death::DeathMarker, local_player::LocalPlayer, stage::stage_objects::StageObject};
 
 use super::spawner::LocalPlayerSpawner;
 
@@ -9,6 +9,17 @@ use super::spawner::LocalPlayerSpawner;
 pub struct Respawnable {
     pub translation: Vec3,
     pub delay_in_seconds: f64
+}
+
+pub fn spawn_player_corpse(
+    mut commands: Commands,
+    query: Query<&Transform, (With<LocalPlayer>, With<DeathMarker>)>,
+    player_builder: Res<PlayerBuilder>
+) {
+    for transform in &query {
+        let mut corpse = commands.spawn(());
+        player_builder.build_player_corpse(&mut corpse, transform.translation + Vec3::new(0.0, 0.0, 100.0));
+    }
 }
 
 pub fn trigger_dead_local_player_respawn(

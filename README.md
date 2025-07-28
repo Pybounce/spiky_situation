@@ -134,6 +134,8 @@ Then we go through the rest and if they have triggers, we can set the correct en
 - The individual types are sub varients of those options
 - Clicking with one will set it, and will randomise the seed
   - So if you want to set a new seed, just click again
+- Do I refactory the tilemap stuff and then I can make the background fully tilemapped.
+  - Then the clouds are just tiles etc
 
 ## Clean Editor Hotbar
 
