@@ -149,6 +149,7 @@ Then we go through the rest and if they have triggers, we can set the correct en
 
 - [ ] Vines
 - [ ] Bushes
+      ~
 
 #### Snow
 
