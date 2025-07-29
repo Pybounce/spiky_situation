@@ -68,7 +68,7 @@ fn build_stage_editor(
     mut app_state: ResMut<NextState<AppState>>,
 ) {
     let object_atlas: Handle<Image> = asset_server.load("object_tilemap.png");
-    let ground_atlas: Handle<Image> = asset_server.load("tilemap.png");
+    let ground_atlas: Handle<Image> = asset_server.load("ground_grass.png");
     
     let editor_controller: EditorController;
 
@@ -82,7 +82,7 @@ fn build_stage_editor(
         }
     }
     else {
-        editor_controller = EditorController::new(100, &object_atlas, &ground_atlas);
+        editor_controller = EditorController::new(stage_editor_load_details.new_stage_id, &object_atlas, &ground_atlas);
     }
 
     commands.insert_resource(editor_controller);

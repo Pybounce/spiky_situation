@@ -1,4 +1,4 @@
-use bevy::{math::{Quat, Rect, Vec2}, prelude::{Commands, Component, Entity, Query, Res, With}, sprite::{Sprite, SpriteBundle}, time::{Time, Timer, TimerMode}, transform::{bundles::TransformBundle, components::Transform}, utils::default};
+use bevy::{math::{Quat, Rect, Vec2, Vec3}, prelude::{Commands, Component, Entity, Query, Res, With}, sprite::{Sprite, SpriteBundle}, time::{Time, Timer, TimerMode}, transform::{bundles::TransformBundle, components::Transform}, utils::default};
 use bevy_rapier2d::prelude::{ActiveEvents, Collider, CollisionGroups, GravityScale, Group, LockedAxes, RigidBody, Sensor, Velocity};
 
 use crate::{common::{animated_sprite::SpriteAnimator, physics::fragile::{Fragile, FragileShield}}, ground::Ground, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE_HALF}, StageAssets}};
@@ -56,13 +56,13 @@ pub fn tick_saw_shooters(
             ActiveEvents::COLLISION_EVENTS,
             LockedAxes::ROTATION_LOCKED,
             SpriteBundle {
-                texture: stage_assets.stage_object_tilemap_handle.clone(),
+                texture: stage_assets.stage_objects_handle.clone(),
                 sprite: Sprite {
                     custom_size: Some(Vec2::new(16.0, 16.0)),
                     rect: Some(atlas_rects[0]),
                     ..default()
                 },
-                transform: Transform::from_translation(transform.translation),
+                transform: Transform::from_translation(transform.translation - Vec3::new(0.0, 0.0, 1.0)),
                 ..default()
             }, 
             SpriteAnimator::new(30, atlas_rects.clone())));

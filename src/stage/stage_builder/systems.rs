@@ -40,15 +40,22 @@ pub fn try_build_stage(
     }
 
     let stage_asset = stage_assets.get(&stage_builder_data.stage_handle);
-    let tilemap_handle: Handle<Image> = asset_server.load("tilemap.png");
+    let ground_grass_handle: Handle<Image> = asset_server.load("ground_grass.png");
+    let ground_snow_handle: Handle<Image> = asset_server.load("ground_snow.png");
     let object_tilemap_handle: Handle<Image> = asset_server.load("object_tilemap.png");
 
     match stage_asset {
         Some(stage) => {
+            let ground_tiles_handle = match stage.terrain_theme {
+                super::stage_asset::TerrainTheme::Grass => ground_grass_handle,
+                super::stage_asset::TerrainTheme::Snow => ground_snow_handle,
+                super::stage_asset::TerrainTheme::Sand => ground_grass_handle,
+            };
             commands.insert_resource(StageAssets {
-                stage_object_tilemap_handle: object_tilemap_handle.clone()
+                stage_objects_handle: object_tilemap_handle.clone(),
+                ground_tiles_handle: ground_tiles_handle.clone()
             });
-            let stage_creator = StageCreator::new(&stage, &tilemap_handle, &object_tilemap_handle);
+            let stage_creator = StageCreator::new(&stage, &ground_tiles_handle, &object_tilemap_handle);
             if stage_creator.build(&mut commands) {
                 commands.insert_resource(CurrentStageData {
                     stage_id: stage.id,

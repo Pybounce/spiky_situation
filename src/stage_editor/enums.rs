@@ -14,6 +14,7 @@ pub enum EditorItem {
     IntervalBlock { variant: IntervalBlockVariant } = 8,
     SawShooter { rotation: f32 } = 9,
     Goal = 10,
+    TerrainTheme { variant: TerrainThemeVarient } = 11
 }
 
 impl EditorItem {
@@ -29,13 +30,14 @@ impl EditorItem {
             EditorItem::LockBlock { .. } => EditorItem::IntervalBlock { variant: IntervalBlockVariant::On },
             EditorItem::IntervalBlock { .. } => EditorItem::SawShooter { rotation: 0.0 },
             EditorItem::SawShooter { .. } => EditorItem::Goal,
-            EditorItem::Goal => EditorItem::Ground,
+            EditorItem::Goal => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass },
+            EditorItem::TerrainTheme { .. } => EditorItem::Ground,
         }
     }
     pub fn cycle_prev(&self) -> Self {
         match self {
             EditorItem::SawShooter { .. } => EditorItem::IntervalBlock { variant: IntervalBlockVariant::On },
-            EditorItem::Ground => EditorItem::Goal,
+            EditorItem::Ground => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass },
             EditorItem::IntervalBlock { .. } => EditorItem::LockBlock { variant: LockBlockVariant::One },
             EditorItem::LockBlock { .. } => EditorItem::HalfSaw { rotation: 0.0 },
             EditorItem::HalfSaw { .. } => EditorItem::PhantomBlock,
@@ -45,6 +47,7 @@ impl EditorItem {
             EditorItem::Spike { .. } => EditorItem::Key { variant: KeyVariant::One },
             EditorItem::Key { .. } => EditorItem::Ground,
             EditorItem::Goal { .. } => EditorItem::SawShooter { rotation: 0.0 },
+            EditorItem::TerrainTheme { .. } => EditorItem::Goal,
         }
     }
     pub fn cycle_next_variant(&self) -> Self {
@@ -60,6 +63,7 @@ impl EditorItem {
             EditorItem::IntervalBlock { variant } => EditorItem::IntervalBlock { variant: variant.cycle_next() },
             EditorItem::SawShooter { rotation } => EditorItem::SawShooter { rotation: *rotation },
             EditorItem::Goal => EditorItem::Goal,
+            EditorItem::TerrainTheme { variant } => EditorItem::TerrainTheme { variant: variant.cycle_next() },
         }
     }
     pub fn cycle_prev_variant(&self) -> Self {
@@ -75,6 +79,7 @@ impl EditorItem {
             EditorItem::IntervalBlock { variant } => EditorItem::IntervalBlock { variant: variant.cycle_prev() },
             EditorItem::SawShooter { rotation } => EditorItem::SawShooter { rotation: *rotation },
             EditorItem::Goal => EditorItem::Goal,
+            EditorItem::TerrainTheme { variant } => EditorItem::TerrainTheme { variant: variant.cycle_prev() },
         }
     }
 
@@ -92,6 +97,7 @@ impl EditorItem {
             EditorItem::IntervalBlock { .. } => return false,
             EditorItem::SawShooter { rotation } => rotate_quater_bounded(rotation),
             EditorItem::Goal => return false,
+            EditorItem::TerrainTheme { .. } => return false,
         };
         return true;
     }
@@ -108,6 +114,7 @@ impl EditorItem {
             EditorItem::IntervalBlock { .. } => 0.0,
             EditorItem::SawShooter { rotation } => *rotation,
             EditorItem::Goal => 0.0,
+            EditorItem::TerrainTheme { .. } => 0.0,
         }
     }
 }
@@ -118,6 +125,34 @@ fn rotate_quater_bounded(r: &mut f32) {
         *r = std::f32::consts::PI * 2.0;
     }
 }
+
+
+#[derive(Default, Copy, Clone, Debug)]
+pub enum TerrainThemeVarient {
+    #[default]
+    Grass,
+    Snow,
+    Sand,
+}
+
+impl TerrainThemeVarient {
+    pub fn cycle_next(&self) -> Self {
+        match self {
+            TerrainThemeVarient::Grass => TerrainThemeVarient::Snow,
+            TerrainThemeVarient::Snow => TerrainThemeVarient::Sand,
+            TerrainThemeVarient::Sand => TerrainThemeVarient::Grass
+        }
+    }
+    pub fn cycle_prev(&self) -> Self {
+        match self {
+            TerrainThemeVarient::Grass => TerrainThemeVarient::Sand,
+            TerrainThemeVarient::Snow => TerrainThemeVarient::Grass,
+            TerrainThemeVarient::Sand => TerrainThemeVarient::Snow
+        }
+    }
+}
+
+
 
 #[derive(Default, Copy, Clone, Debug)]
 pub enum KeyVariant {

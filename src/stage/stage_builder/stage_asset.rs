@@ -13,6 +13,7 @@ use super::stage_creator::TILE_SIZE;
 #[derive(Asset, TypePath, Debug, Deserialize, Serialize)]
 pub struct Stage {
     pub id: usize,
+    pub terrain_theme: TerrainTheme,
     pub ground_tiles: Vec<GroundTile>,
     pub spikes: Vec<Spike>,
     pub half_saws: Vec<HalfSaw>,
@@ -47,8 +48,16 @@ impl Stage {
             grid_height: grid_size.y as usize,
             spawn_grid_pos: Vec2::default(),
             goal_grid_pos: Vec2::new(100.0 * TILE_SIZE, 0.0),
+            terrain_theme: TerrainTheme::Grass,
         }
     }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum TerrainTheme {
+    Grass,
+    Snow,
+    Sand,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

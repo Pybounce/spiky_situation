@@ -5,6 +5,19 @@ use bevy_rapier2d::prelude::CollidingEntities;
 pub struct DeathMarker;
 
 #[derive(Component)]
+pub struct DelayedDeathMarker {
+    delay: Timer
+}
+
+impl DelayedDeathMarker {
+    pub fn from_secs(delay: f32) -> Self {
+        return Self {
+            delay: Timer::from_seconds(delay, TimerMode::Once)
+        }
+    }
+}
+
+#[derive(Component)]
 pub struct Killable;
 
 pub fn despawn_death_marked(
@@ -13,6 +26,19 @@ pub fn despawn_death_marked(
 ) {
     for e in &query {
         commands.entity(e).despawn();
+    }
+}
+
+pub fn delay_death_marked(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut DelayedDeathMarker), Without<DeathMarker>>,
+    time: Res<Time>
+) {
+    for (e, mut delayed_death_marker) in &mut query {
+        delayed_death_marker.delay.tick(time.delta());
+        if delayed_death_marker.delay.finished() {
+            commands.entity(e).try_insert(DeathMarker);
+        }
     }
 }
 
