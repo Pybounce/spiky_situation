@@ -119,7 +119,6 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
 
 fn build_far_background(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
 
-    println!("asd");
     let index = map_surrounding_ground_bitmask_to_atlas_index(u8::MAX);
     let upper_left = Vec2::new((index as f32 % TILEMAP_SIZE as f32) as f32 * TILEMAP_TILE_SIZE, (index / TILEMAP_SIZE) as f32 * TILEMAP_TILE_SIZE);
     let lower_right = Vec2::new(upper_left.x + TILEMAP_TILE_SIZE , upper_left.y + TILEMAP_TILE_SIZE);
@@ -136,7 +135,6 @@ fn build_far_background(stage_creator: &StageCreator, commands: &mut Commands) -
         stage_creator.stage.grid_height as f32 * TILE_SIZE * 10.0,
         1.0);
     commands.spawn(background);
-    println!("{:?}", sprite_rect);
 
     return true;
 }
