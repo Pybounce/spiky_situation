@@ -1,7 +1,7 @@
 use bevy::{math::{Quat, Rect, Vec2, Vec3}, prelude::{Commands, Component, Entity, Query, Res, With}, sprite::{Sprite, SpriteBundle}, time::{Time, Timer, TimerMode}, transform::{bundles::TransformBundle, components::Transform}, utils::default};
 use bevy_rapier2d::prelude::{ActiveEvents, Collider, CollisionGroups, GravityScale, Group, LockedAxes, RigidBody, Sensor, Velocity};
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::fragile::{Fragile, FragileShield}}, ground::Ground, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE_HALF}, StageAssets}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::fragile::{Fragile, FragileShield}}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE_HALF}, StageAssets}, stage_objects::StageObject}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -49,23 +49,31 @@ pub fn tick_saw_shooters(
     for (mut saw_shooter, transform) in &mut query {
         saw_shooter.timer.tick(time.delta());
         if saw_shooter.timer.just_finished() {
-            commands.spawn((SmallSaw, Fragile, FragileShield, InstantKiller, Collider::ball(0.3 * 16.0), Velocity::linear((transform.rotation * Vec2::new(0.0, 100.0).extend(0.0)).truncate()),
-            Sensor,
-            RigidBody::Dynamic,
-            GravityScale(0.0),
-            ActiveEvents::COLLISION_EVENTS,
-            LockedAxes::ROTATION_LOCKED,
-            SpriteBundle {
-                texture: stage_assets.stage_objects_handle.clone(),
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(16.0, 16.0)),
-                    rect: Some(atlas_rects[0]),
+            commands.spawn((
+                SmallSaw, 
+                Fragile, 
+                FragileShield, 
+                InstantKiller, 
+                Collider::ball(0.3 * 16.0), 
+                Velocity::linear((transform.rotation * Vec2::new(0.0, 100.0).extend(0.0)).truncate()),
+                Sensor,
+                RigidBody::Dynamic,
+                GravityScale(0.0),
+                ActiveEvents::COLLISION_EVENTS,
+                LockedAxes::ROTATION_LOCKED,
+                SpriteBundle {
+                    texture: stage_assets.stage_objects_handle.clone(),
+                    sprite: Sprite {
+                        custom_size: Some(Vec2::new(16.0, 16.0)),
+                        rect: Some(atlas_rects[0]),
+                        ..default()
+                    },
+                    transform: Transform::from_translation(transform.translation - Vec3::new(0.0, 0.0, 1.0)),
                     ..default()
-                },
-                transform: Transform::from_translation(transform.translation - Vec3::new(0.0, 0.0, 1.0)),
-                ..default()
-            }, 
-            SpriteAnimator::new(30, atlas_rects.clone())));
+                }, 
+                SpriteAnimator::new(30, atlas_rects.clone()),
+                StageObject
+            ));
         }
     }
 }

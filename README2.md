@@ -1,3 +1,13 @@
+// loading/unloading stages right now is stupid
+// for one, I can't preload multiple stages
+// 2, I can't reload a stage since when deleting old, it finds the diff between stageobjects of stageId A and B, and they're the same if it's just reloading the stage
+// also would be cool to have a curtain on reload, and even a wait amount so I can have some animation?
+// wait amount would be good for curtain also, wait until curtain is drawn, then reload etc
+
+// possible fix is to have TearDownStageEvent that removes all stages, then another event for ReplaceStageEvent, this will call teardown and then call build/load??
+
+// Should not ever really have 2 stages at the same time, so maybe BuildStage is the external event that will unload, and then build another on top
+
 #### ToDo Next
 
 - Stage data and loading layout
@@ -39,3 +49,5 @@
   - Since the raycast doesn't then correctly set you (LIKELY WOULD SOLVE THE ABOVE BUG TOO)
 - Saw projectiles break when hitting keys.
   - Probably need to add some more collision layers etc
+- Checkpoints do nothing
+  - I changed it so when you die the whole level is rebuilt, so now checkpoints don't do a thing.

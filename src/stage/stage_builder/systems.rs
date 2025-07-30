@@ -11,11 +11,9 @@ pub fn unload_old_stage(
     stage_builder_data: Res<StageBuilderData>,
 ) {
     for (e, sp) in &stage_piece_query {
-        if sp.stage_id != stage_builder_data.stage_id {
-            commands.entity(e).despawn();
-            commands.remove_resource::<CurrentStageData>();
-        }
+        commands.entity(e).despawn();
     }
+    commands.remove_resource::<CurrentStageData>();
 }
 
 pub fn try_build_stage(

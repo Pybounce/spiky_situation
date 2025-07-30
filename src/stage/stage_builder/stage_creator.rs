@@ -112,7 +112,7 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
             ..default()
         }
     )
-    .insert(StageObject { stage_id: stage_creator.stage.id });
+    .insert(StageObject);
 
     return true;
 }
