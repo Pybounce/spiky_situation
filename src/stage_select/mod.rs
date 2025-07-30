@@ -8,8 +8,8 @@ pub struct StageSelectPlugin;
 impl Plugin for StageSelectPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_systems(OnEnter(AppState::StageSelect), display_stage_select)
-        .add_systems(Update, (try_enter_stage, try_enter_stage_editor).run_if(in_state(AppState::StageSelect)));
+        .add_systems(OnEnter(AppState::MainMenu), display_stage_select)
+        .add_systems(Update, (try_enter_stage, try_enter_stage_editor).run_if(in_state(AppState::MainMenu)));
     }
 }
 
@@ -23,7 +23,7 @@ pub fn display_stage_select(
         text: Text::from_section("Stage Select", TextStyle::default()),
         ..default()
     })
-    .insert(DespawnOnStateExit::App(AppState::StageSelect));
+    .insert(DespawnOnStateExit::App(AppState::MainMenu));
 }
 
 pub fn try_enter_stage(

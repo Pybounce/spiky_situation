@@ -48,7 +48,7 @@ pub fn read_stage_build_failed_events(
 ) {
     for _ in event_reader.read() {
         game_state.set(GameState::NA);
-        app_state.set(AppState::StageSelect);
+        app_state.set(AppState::MainMenu);
         stage_builder_state.set(StageBuilderState::NotBuilding);
     }
 }

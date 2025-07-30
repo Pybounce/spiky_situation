@@ -18,7 +18,7 @@ impl Plugin for StatesPlugin {
 pub enum AppState {
     Game,
     #[default]
-    StageSelect,
+    MainMenu,
     StageEditor
 }
 
