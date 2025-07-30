@@ -4,6 +4,12 @@
   - Effects so many things including game architecture and stage editor
 - Get singleplayer working before doing multiplayer
 
+#### Stage Data
+
+- Directory style
+- Any levels under "custom" should be found on the workshop under workshop/playertag/levelname
+- Chapters just consist of pointers to levels, some are premade for you but you can make your own.
+
 #### ToDo
 
 - Stage data layout
