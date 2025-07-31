@@ -1,6 +1,8 @@
 
 use bevy::prelude::*;
 
+use crate::common::states::{AppState, DespawnOnStateExit};
+
 #[derive(Resource)]
 pub struct CurrentRun {
     lives_remaining: u32,
@@ -34,4 +36,55 @@ impl CurrentRun {
     pub fn remove_life(&mut self) {
         self.lives_remaining = self.lives_remaining.saturating_sub(1);
     }
+}
+
+#[derive(Component)]
+pub struct LivesRemainingText;
+
+#[derive(Component)]
+pub struct StagesCompleteText;
+
+pub fn update_lives_remaining_text(
+    mut query: Query<&mut Text, With<LivesRemainingText>>,
+    current_run_opt: Option<Res<CurrentRun>>
+) {
+    if let Some(current_run) = current_run_opt {
+        for mut text in &mut query {
+            text.sections[0].value = current_run.lives_remaining().to_string();
+        }
+    }
+}
+
+pub fn update_stages_complete(
+    mut query: Query<&mut Text, With<StagesCompleteText>>,
+    current_run_opt: Option<Res<CurrentRun>>
+) {
+    if let Some(current_run) = current_run_opt {
+        for mut text in &mut query {
+            text.sections[0].value = current_run.stages_complete.to_string();
+        }
+    }
+}
+
+pub fn add_current_run_ui(
+    mut commands: Commands
+) {
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section("-", TextStyle::default()),
+            transform: Transform::from_translation(Vec3::new(0.0, 0.0, 20.0)),
+            ..default()
+        },
+        LivesRemainingText
+    ))
+    .insert(DespawnOnStateExit::App(AppState::Game));
+    
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section("-", TextStyle::default()),
+            ..default()
+        },
+        StagesCompleteText
+    ))
+    .insert(DespawnOnStateExit::App(AppState::Game));
 }
