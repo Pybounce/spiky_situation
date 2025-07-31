@@ -6,7 +6,7 @@ pub struct CurrentRun {
     lives_remaining: u32,
     stages_complete: u32,
     stage_ids: Vec<usize>,
-    stage_index: usize
+    stage_index: usize,
 }
 
 
@@ -27,5 +27,11 @@ impl CurrentRun {
     }
     pub fn current_stage_id(&self) -> usize {
         return self.stage_ids[self.stage_index];
+    }
+    pub fn lives_remaining(&self) -> u32 {
+        return self.lives_remaining;
+    }
+    pub fn remove_life(&mut self) {
+        self.lives_remaining = self.lives_remaining.saturating_sub(1);
     }
 }
