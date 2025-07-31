@@ -13,6 +13,7 @@
 - GameDb just needs endpoints like save_endless_run(current_run), delete_endless_run(current_run_id)
 - Possibly also some highscore bs
 - Ids can be save slots I guess?
+- For colour palletes, will eventually need a way to convert texture to BevyImage, then add that to asset server and get a Handle - very annoying but whatever
 
 #### ToDo
 
