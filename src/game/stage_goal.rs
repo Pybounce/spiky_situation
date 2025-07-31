@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{game::current_run::CurrentRun, local_player::LocalPlayer, stage::{stage_builder::{events::{BuildStageEvent, LoadStageEvent}, CurrentStageData}, stage_objects::goal::StageGoal}};
+use crate::{game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::{BuildStageEvent, LoadStageEvent}, CurrentStageData}, stage_objects::goal::StageGoal}};
 
 #[derive(Event)]
 pub struct GoalReached {
@@ -33,7 +33,7 @@ pub fn next_staged_if_goal_reached(
     mut load_event_writer: EventWriter<LoadStageEvent>,
     mut build_event_writer: EventWriter<BuildStageEvent>,
     mut event_reader: EventReader<GoalReached>,
-    mut current_run: ResMut<CurrentRun>
+    mut current_run: ResMut<EndlessRun>
 ) {
     if let Some(stage_data) = stage_data_opt {
         let mut build_event_raised = false;

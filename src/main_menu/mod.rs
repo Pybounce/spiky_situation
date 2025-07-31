@@ -2,7 +2,7 @@ use std::{fs, path::Path};
 
 use bevy::{prelude::*, scene::ron::from_str};
 
-use crate::{common::states::{AppState, DespawnOnStateExit}, game::current_run::CurrentRun, stage::stage_builder::events::{BuildStageEvent, LoadStageEvent}, stage_editor::StageEditorLoadDetails};
+use crate::{common::states::{AppState, DespawnOnStateExit}, game::endless::components::EndlessRun, stage::stage_builder::events::{BuildStageEvent, LoadStageEvent}, stage_editor::StageEditorLoadDetails};
 
 
 pub struct StageSelectPlugin;
@@ -36,7 +36,7 @@ pub fn try_enter_stage(
 ) {
     if input.just_released(KeyCode::Space) {
         let stage_ids = get_stage_ids();
-        let current_run = CurrentRun::new(stage_ids, 10);
+        let current_run = EndlessRun::new(stage_ids, 10);
 
         load_event_writer.send(LoadStageEvent {stage_id: current_run.current_stage_id() });
         build_event_writer.send(BuildStageEvent {stage_id: current_run.current_stage_id() });

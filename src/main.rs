@@ -38,6 +38,7 @@ pub mod wall;
 pub mod stage_editor;
 mod debugging;
 pub mod builders;
+pub mod databases;
 
 fn main() {
     let winit_settings = WinitSettings {

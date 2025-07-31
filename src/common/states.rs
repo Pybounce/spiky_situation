@@ -9,10 +9,17 @@ impl Plugin for StatesPlugin {
         .init_state::<GameState>()
         .init_state::<NetworkingState>()
         .init_state::<StageEditorState>()
+        .add_sub_state::<GameMode>()
         .add_systems(Update, check_state_transitions);
     }
 }
 
+#[derive(SubStates, Clone, PartialEq, Eq, Hash, Debug, Default)]
+#[source(AppState = AppState::Game)]
+pub enum GameMode {
+    #[default]
+    Endless
+}
 
 #[derive(States, Debug, Hash, Eq, PartialEq, Clone, Default)]
 pub enum AppState {
