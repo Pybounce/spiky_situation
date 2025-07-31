@@ -32,7 +32,7 @@ fn load_stage_editor_assets(
     asset_server: Res<AssetServer>
 ) {
     stage_editor_load_details.template_stage_handle = match stage_editor_load_details.template_stage_id {
-        Some(template_stage_id) => asset_server.load(format!("stage_{}.stage", template_stage_id)).into(),
+        Some(template_stage_id) => asset_server.load(format!("stages/stage_{}.stage", template_stage_id)).into(),
         None => None,
     };
 }

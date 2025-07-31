@@ -63,7 +63,7 @@ pub fn read_stage_load_events(
 ) {
     for preload_event in event_reader.read() {
         stage_builder_data.stage_id = preload_event.stage_id;
-        stage_builder_data.stage_handle = asset_server.load(format!("stage_{}.stage", preload_event.stage_id));
+        stage_builder_data.stage_handle = asset_server.load(format!("stages/stage_{}.stage", preload_event.stage_id));
     }
 }
 

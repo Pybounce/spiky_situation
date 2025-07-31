@@ -4,6 +4,7 @@ use stage_goal::{check_goal_reached, next_staged_if_goal_reached, GoalReached};
 use crate::common::states::{AppState, GameState};
 
 pub mod stage_goal;
+pub mod current_run;
 
 pub struct GamePlugin;
 
