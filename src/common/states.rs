@@ -18,7 +18,7 @@ impl Plugin for StatesPlugin {
 pub enum AppState {
     Game,
     #[default]
-    StageSelect,
+    MainMenu,
     StageEditor
 }
 
@@ -82,6 +82,7 @@ fn check_state_transitions(
         match state_lifetime {
             DespawnOnStateExit::App(x) => {
                 for ste in &app_state_events {
+                    if ste.entered == ste.exited { continue; }
                     if let Some(exit_state) = &ste.exited {
                         if exit_state == x {
                             commands.entity(entity).despawn();
@@ -91,6 +92,7 @@ fn check_state_transitions(
             }
             DespawnOnStateExit::Game(x) => {
                 for ste in &game_state_events {
+                    if ste.entered == ste.exited { continue; }
                     if let Some(exit_state) = &ste.exited {
                         if exit_state == x {
                             commands.entity(entity).despawn();
@@ -101,6 +103,7 @@ fn check_state_transitions(
             DespawnOnStateExit::Networking(x) => {
                 for ste in &networking_state_events {
                     if let Some(exit_state) = &ste.exited {
+                        if ste.entered == ste.exited { continue; }
                         if exit_state == x {
                             commands.entity(entity).despawn();
                         }
@@ -117,6 +120,7 @@ fn check_state_transitions(
         match state_lifetime {
             DespawnOnStateEnter::App(x) => {
                 for ste in &app_state_events {
+                    if ste.entered == ste.exited { continue; }
                     if let Some(exit_state) = &ste.entered {
                         if exit_state == x {
                             commands.entity(entity).despawn();
@@ -126,6 +130,7 @@ fn check_state_transitions(
             }
             DespawnOnStateEnter::Game(x) => {
                 for ste in &game_state_events {
+                    if ste.entered == ste.exited { continue; }
                     if let Some(exit_state) = &ste.entered {
                         if exit_state == x {
                             commands.entity(entity).despawn();
@@ -135,6 +140,7 @@ fn check_state_transitions(
             }
             DespawnOnStateEnter::Networking(x) => {
                 for ste in &networking_state_events {
+                    if ste.entered == ste.exited { continue; }
                     if let Some(exit_state) = &ste.entered {
                         if exit_state == x {
                             commands.entity(entity).despawn();

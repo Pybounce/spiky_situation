@@ -26,7 +26,7 @@ impl SpikeFactory {
                 RigidBody::Fixed,
                 InstantKiller,
                 Spike,
-                StageObject { stage_id: stage_creator.stage.id }
+                StageObject
             ));
         });
 

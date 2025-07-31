@@ -12,6 +12,4 @@ pub mod phantom_block;
 pub mod saw_shooter;
 
 #[derive(Component)]
-pub struct StageObject {
-    pub stage_id: usize
-}
+pub struct StageObject;

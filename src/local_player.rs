@@ -65,7 +65,6 @@ impl LocalPlayerBundle {
         let mut p = LocalPlayerBundle::default();
         p.sprite_bundle.transform.translation = pos;
         p.respawnable.translation = pos;
-        p.stage_object.stage_id = stage_id;
         return p;
     }
 }
@@ -134,7 +133,7 @@ impl Default for LocalPlayerBundle {
                 translation: Vec3::default(),
                 delay_in_seconds: PLAYER_RESPAWN_DELAY,
             },
-            stage_object: StageObject { stage_id: usize::max_value() },
+            stage_object: StageObject,
             killable: Killable,
             wallable_marker: Wallable,
             dash_controller: DashController::default(),

@@ -1,14 +1,8 @@
 #### ToDo Next
 
-- Stage data and loading layout
-  - Effects so many things including game architecture and stage editor
-- Get singleplayer working before doing multiplayer
-
-#### Stage Data
-
-- Directory style
-- Any levels under "custom" should be found on the workshop under workshop/playertag/levelname
-- Chapters just consist of pointers to levels, some are premade for you but you can make your own.
+- [ ] Save system
+  - Will need to be able to save/load stages from assets and also from custom.
+  - Will need to get player save files from somewhere other than assets too.
 
 #### ToDo
 
@@ -39,3 +33,13 @@
   - Since the raycast doesn't then correctly set you (LIKELY WOULD SOLVE THE ABOVE BUG TOO)
 - Saw projectiles break when hitting keys.
   - Probably need to add some more collision layers etc
+- Checkpoints do nothing
+  - I changed it so when you die the whole level is rebuilt, so now checkpoints don't do a thing.
+
+#### Gamemodes
+
+- [ ] Life Based
+  - Given a certain amount of lives at the start
+  - See how many stages you can beat before you lose them all
+  - **IDEA** --> If you beat the par time on a stage, you get a life
+  - _QoL_ --> Timer only starts when you leave spawn tile? / Or can reset the map without loss of life if you're within 5 tiles of spawn

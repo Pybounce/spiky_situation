@@ -32,7 +32,7 @@ fn load_stage_editor_assets(
     asset_server: Res<AssetServer>
 ) {
     stage_editor_load_details.template_stage_handle = match stage_editor_load_details.template_stage_id {
-        Some(template_stage_id) => asset_server.load(format!("stage_{}.stage", template_stage_id)).into(),
+        Some(template_stage_id) => asset_server.load(format!("stages/stage_{}.stage", template_stage_id)).into(),
         None => None,
     };
 }
@@ -46,13 +46,13 @@ fn check_stage_editor_loaded(
     if let Some(handle) = &stage_editor_load_details.template_stage_handle {
         match asset_server.load_state(handle) {
             bevy::asset::LoadState::NotLoaded => {
-                app_state.set(AppState::StageSelect);
+                app_state.set(AppState::MainMenu);
                 return;
             },
             bevy::asset::LoadState::Loading => { return; },
             bevy::asset::LoadState::Loaded => (),
             bevy::asset::LoadState::Failed(_) => {
-                app_state.set(AppState::StageSelect);
+                app_state.set(AppState::MainMenu);
                 return;
             },
         }
@@ -76,7 +76,7 @@ fn build_stage_editor(
         match stage_assets.get(handle) {
             Some(stage) => {editor_controller = EditorController::from_stage(stage, stage.id, &object_atlas, &ground_atlas); },
             None => {
-                app_state.set(AppState::StageSelect);
+                app_state.set(AppState::MainMenu);
                 return;
             },
         }

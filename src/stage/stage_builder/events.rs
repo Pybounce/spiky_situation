@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::common::states::{AppState, GameState};
+use crate::{common::states::{AppState, GameState}, game::game_over::GameOver};
 
 use super::{StageBuilderData, StageBuilderState};
 
@@ -42,14 +42,10 @@ pub fn read_stage_build_complete_events(
 
 pub fn read_stage_build_failed_events(
     mut event_reader: EventReader<StageBuildFailedEvent>,
-    mut game_state: ResMut<NextState<GameState>>,
-    mut app_state: ResMut<NextState<AppState>>,
-    mut stage_builder_state: ResMut<NextState<StageBuilderState>>,
+    mut game_over_event_writer: EventWriter<GameOver>
 ) {
     for _ in event_reader.read() {
-        game_state.set(GameState::NA);
-        app_state.set(AppState::StageSelect);
-        stage_builder_state.set(StageBuilderState::NotBuilding);
+        game_over_event_writer.send(GameOver);
     }
 }
 
@@ -63,7 +59,7 @@ pub fn read_stage_load_events(
 ) {
     for preload_event in event_reader.read() {
         stage_builder_data.stage_id = preload_event.stage_id;
-        stage_builder_data.stage_handle = asset_server.load(format!("stage_{}.stage", preload_event.stage_id));
+        stage_builder_data.stage_handle = asset_server.load(format!("stages/stage_{}.stage", preload_event.stage_id));
     }
 }
 

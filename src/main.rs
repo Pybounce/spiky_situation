@@ -15,13 +15,13 @@ mod networking;
 use local_player::{load_player_sprite, update_player_look_direction};
 use networking::{networked_players::{remove_disconnected_players, spawn_new_players}, GameNetworkingPlugin};
 
-mod stage_select;
+mod main_menu;
 use obstacles::check_insta_kill_collisions;
 use player::{common::check_player_out_of_bounds, dash_controller::{apply_dashing, start_dashing}, death::trigger_dead_local_player_respawn, horizontal_movement_controller::{move_airbourne_horizontal_controller, move_ground_horizontal_controller}, jump_controller::{apply_wall_friction, begin_player_jump, check_jump_fall_states, is_coyote_grounded, maintain_player_jump, update_last_grounded}, look_state::{update_player_airborn_look_state, update_player_grounded_look_state}, physics_controller::apply_physics_controller_limits, spawner::spawn_local_players, wall_jump_controller::{add_wall_stuck, begin_player_wall_jump, remove_wall_stuck, update_wall_stuck, update_wall_stuck_time}};
 use ground::check_grounded;
 use stage::{stage_builder::StageBuilderPlugin, stage_objects::{interval_block::{stop_interval_block_crush, tick_interval_blocks}, lock_block::read_lock_block_triggers, phantom_block::{check_phantom_block_touched, tick_phantom_block}, saw_shooter::tick_saw_shooters}};
 use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, StageEditorPlugin};
-use stage_select::StageSelectPlugin;
+use main_menu::StageSelectPlugin;
 use wall::check_touching_wall;
 
 use crate::{builders::player_builders::init_player_builder, player::death::spawn_player_corpse};

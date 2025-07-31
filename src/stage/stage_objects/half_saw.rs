@@ -28,7 +28,7 @@ impl SawFactory {
                 RigidBody::Fixed,
                 InstantKiller,
                 HalfSaw,
-                StageObject { stage_id: stage_creator.stage.id },
+                StageObject,
             ));
         });
         match &saw_asset.movement_path_opt {

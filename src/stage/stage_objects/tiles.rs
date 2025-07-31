@@ -49,7 +49,7 @@ impl TileBundle {
                 },
                 ..default()
             },
-            stage_marker: StageObject { stage_id: stage_creator.stage.id },
+            stage_marker: StageObject,
         }
         
     }
