@@ -1,24 +1,6 @@
-// loading/unloading stages right now is stupid
-// for one, I can't preload multiple stages
-// 2, I can't reload a stage since when deleting old, it finds the diff between stageobjects of stageId A and B, and they're the same if it's just reloading the stage
-// also would be cool to have a curtain on reload, and even a wait amount so I can have some animation?
-// wait amount would be good for curtain also, wait until curtain is drawn, then reload etc
-
-// possible fix is to have TearDownStageEvent that removes all stages, then another event for ReplaceStageEvent, this will call teardown and then call build/load??
-
-// Should not ever really have 2 stages at the same time, so maybe BuildStage is the external event that will unload, and then build another on top
-
 #### ToDo Next
 
-- Stage data and loading layout
-  - Effects so many things including game architecture and stage editor
-- Get singleplayer working before doing multiplayer
-
-#### Stage Data
-
-- Directory style
-- Any levels under "custom" should be found on the workshop under workshop/playertag/levelname
-- Chapters just consist of pointers to levels, some are premade for you but you can make your own.
+-
 
 #### ToDo
 
@@ -51,3 +33,11 @@
   - Probably need to add some more collision layers etc
 - Checkpoints do nothing
   - I changed it so when you die the whole level is rebuilt, so now checkpoints don't do a thing.
+
+#### Gamemodes
+
+- [ ] Life Based
+  - Given a certain amount of lives at the start
+  - See how many stages you can beat before you lose them all
+  - **IDEA** --> If you beat the par time on a stage, you get a life
+  - _QoL_ --> Timer only starts when you leave spawn tile? / Or can reset the map without loss of life if you're within 5 tiles of spawn
