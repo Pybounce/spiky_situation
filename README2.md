@@ -60,3 +60,19 @@
 - [ ] Gamemodes
 - [ ] Save system
 - [ ] Error handling
+
+#### Art
+
+GENERAL
+
+- Potentially need to increase size to 32x32 for better animations and such?
+- Pixel art
+- White flashing when collecting/dying etc
+
+KEY + LOCKS
+
+- Key moves up and down hovering
+- Collecting could have it rise up flashing white, then exlpode?
+- Locks would need to break and then the block explodes or something?
+- The lock could also explode so it says within the same tile - unlocks then explode
+- Locks unlock at the same time?? Or slowly over time?
