@@ -14,17 +14,8 @@ impl Plugin for GamePlugin {
         app
         .add_event::<GoalReached>()
         .add_event::<GameOver>()
-        .add_systems(OnEnter(GameMode::Endless), (add_endless_mode_ui, something))
-        .add_systems(OnEnter(AppState::Game), (something2))
+        .add_systems(OnEnter(GameMode::Endless), add_endless_mode_ui)
         .add_systems(Update, (read_game_over_events, check_goal_reached, next_staged_if_goal_reached).run_if(in_state(AppState::Game)).run_if(in_state(GameState::Playing)))
         .add_systems(Update, (save_endless_game, check_death_endless_mode, update_endless_lives_remaining_text, update_endless_stages_complete).run_if(in_state(GameMode::Endless)));
     }
-}
-
-
-pub fn something() {
-    println!("enter endless");
-}
-pub fn something2() {
-    println!("enter game");
 }

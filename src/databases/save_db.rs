@@ -12,7 +12,7 @@ pub struct SaveDb {
 
 
 impl SaveDb {
-    pub fn save_endless(&mut self, endless_run: &EndlessRun) {
+    pub fn save_endless(&self, endless_run: &EndlessRun) {
         let game_save = GameSave::Endless(endless_run.clone());
         if let Some(proj_dirs) = ProjectDirs::from("com", "Skybounce", "Platformer") {
             let path = proj_dirs.config_dir().join("save_files");
@@ -24,6 +24,12 @@ impl SaveDb {
             
             use std::io::Write;
             file.write_all(&bytes).expect("failed to save endless");
+        }
+    }
+    pub fn delete_game_save(&self) {
+        if let Some(proj_dirs) = ProjectDirs::from("com", "Skybounce", "Platformer") {
+            let path = proj_dirs.config_dir().join("save_files").join("game_save.dat");
+            let _ = std::fs::remove_file(&path);  
         }
     }
 
