@@ -15,7 +15,7 @@ pub struct Respawnable {
 
 pub fn spawn_player_corpse(
     mut commands: Commands,
-    query: Query<&Transform, (With<LocalPlayer>, With<DeathMarker>)>,
+    query: Query<&Transform, (With<LocalPlayer>, Added<DeathMarker>)>,
     player_builder: Res<PlayerBuilder>
 ) {
     for transform in &query {
@@ -23,38 +23,3 @@ pub fn spawn_player_corpse(
         player_builder.build_player_corpse(&mut corpse, transform.translation + Vec3::new(0.0, 0.0, 100.0));
     }
 }
-
-pub fn trigger_dead_local_player_respawn(
-    //mut commands: Commands,
-    query: Query<&Respawnable, (With<LocalPlayer>, With<DeathMarker>)>,
-    //time: Res<Time>,
-    stage_data_opt: Option<Res<CurrentStageData>>,
-    mut load_event_writer: EventWriter<LoadStageEvent>,
-    mut build_event_writer: EventWriter<BuildStageEvent>,
-    mut current_run_opt: Option<ResMut<EndlessRun>>,
-    mut game_over_event_writer: EventWriter<GameOver>
-) {
-
-    if let Some(stage_data) = stage_data_opt {
-        if let Ok(_) = &query.get_single()  {
-            if let Some(current_run) = current_run_opt.as_mut() {
-                if current_run.lives_remaining() == 0 {
-                    game_over_event_writer.send(GameOver);
-                }
-                else {
-                    current_run.remove_life();
-                    load_event_writer.send(LoadStageEvent {stage_id: stage_data.stage_id});
-                    build_event_writer.send(BuildStageEvent {stage_id: stage_data.stage_id});
-                }
-            }
-        }
-    }
-
-    //for respawnable in &query {
-    //    commands.spawn((LocalPlayerSpawner {
-    //        spawn_time: time.elapsed_seconds_f64() + respawnable.delay_in_seconds,
-    //        translation: respawnable.translation,
-    //    }, StageObject));
-    //}
-}
-

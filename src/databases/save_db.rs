@@ -1,5 +1,7 @@
 
-use bevy::prelude::*;
+use bevy::{prelude::*, scene::ron};
+use directories::ProjectDirs;
+use serde::{Deserialize, Serialize};
 
 use crate::game::endless::components::EndlessRun;
 
@@ -10,8 +12,19 @@ pub struct SaveDb {
 
 
 impl SaveDb {
-    pub fn save_endless(&mut self, endless_run: EndlessRun) {
-        todo!();
+    pub fn save_endless(&mut self, endless_run: &EndlessRun) {
+        let game_save = GameSave::Endless(endless_run.clone());
+        if let Some(proj_dirs) = ProjectDirs::from("com", "Skybounce", "Platformer") {
+            let path = proj_dirs.config_dir().join("save_files");
+            let mut bytes: Vec<u8> = vec![];
+            ron::ser::to_writer(&mut bytes, &game_save).unwrap();
+
+            let _ = std::fs::create_dir_all(&path);
+            let mut file = std::fs::File::create(&path.join("game_save.dat")).expect("failed to create file for endless save");       
+            
+            use std::io::Write;
+            file.write_all(&bytes).expect("failed to save endless");
+        }
     }
 
 }
@@ -21,22 +34,19 @@ impl SaveDb {
 pub fn init_save_db(
     mut commands: Commands
 ) {
-
+    commands.insert_resource(SaveDb {});
 }
 
-
+#[derive(Serialize, Deserialize)]
 pub enum GameSave {
-    Endless(EndlessGameSave)
+    Endless(EndlessRun)
 }
 
-pub struct EndlessGameSave {
 
-}
-
-pub struct SaveSlot {
-    pub slot_id: u32,
-    pub save_data: GameSave
-}
+//pub struct SaveSlot {
+//    pub slot_id: u32,
+//    pub save_data: GameSave
+//}
 
 #[derive(Event)]
 pub struct SaveGame;

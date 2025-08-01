@@ -1,9 +1,10 @@
 
 
 use bevy::prelude::*;
+use serde::{Deserialize, Serialize};
 
 
-#[derive(Resource)]
+#[derive(Resource, Clone, Serialize, Deserialize)]
 pub struct EndlessRun {
     lives_remaining: u32,
     stages_complete: u32,

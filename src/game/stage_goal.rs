@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::{BuildStageEvent, LoadStageEvent}, CurrentStageData}, stage_objects::goal::StageGoal}};
+use crate::{databases::save_db::SaveGame, game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::{BuildStageEvent, LoadStageEvent}, CurrentStageData}, stage_objects::goal::StageGoal}};
 
 #[derive(Event)]
 pub struct GoalReached {
@@ -33,12 +33,14 @@ pub fn next_staged_if_goal_reached(
     mut load_event_writer: EventWriter<LoadStageEvent>,
     mut build_event_writer: EventWriter<BuildStageEvent>,
     mut event_reader: EventReader<GoalReached>,
-    mut current_run: ResMut<EndlessRun>
+    mut current_run: ResMut<EndlessRun>,
+    mut save_writer: EventWriter<SaveGame>,
 ) {
     if let Some(stage_data) = stage_data_opt {
         let mut build_event_raised = false;
         for event in event_reader.read() {
             if event.stage_id == stage_data.stage_id && !build_event_raised {
+                save_writer.send(SaveGame);
                 current_run.complete_stage();
                 load_event_writer.send(LoadStageEvent {stage_id: current_run.current_stage_id() });
                 build_event_writer.send(BuildStageEvent {stage_id: current_run.current_stage_id() });
