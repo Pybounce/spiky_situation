@@ -1,10 +1,7 @@
-use std::{fs, path::Path};
 
 use bevy::prelude::*;
 
-use crate::{builders::player_builders::PlayerBuilder, common::death::DeathMarker, game::{endless::components::EndlessRun, game_over::GameOver}, local_player::LocalPlayer, stage::{stage_builder::{events::{BuildStageEvent, LoadStageEvent}, CurrentStageData}, stage_objects::StageObject}};
-
-use super::spawner::LocalPlayerSpawner;
+use crate::{builders::player_builders::PlayerBuilder, common::death::DeathMarker, local_player::LocalPlayer};
 
 
 #[derive(Component)]

@@ -4,7 +4,7 @@ use bevy::{ecs::system::EntityCommands, prelude::*};
 use crate::{common::states::{AppState, DespawnOnStateExit}, databases::save_db::{GameSave, SaveDb}, game::endless::components::EndlessRun, main_menu::{get_stage_ids, StartGame}};
 
 #[derive(Component)]
-pub struct ContinueGameBUtton;
+pub struct ContinueGameButton;
 
 #[derive(Component)]
 pub struct NewGameButton;
@@ -30,7 +30,7 @@ pub fn check_new_game_interaction(
 }
 
 pub fn check_continue_game_interaction(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>, With<ContinueGameBUtton>)>,
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>, With<ContinueGameButton>)>,
     mut start_game_writer: EventWriter<StartGame>,
     save_db: Res<SaveDb>
 ) {
@@ -103,7 +103,7 @@ pub fn build_main_menu_ui(
 
 
 
-pub fn build_existing_endless_save_button(entity_commands: &mut EntityCommands, endless_run: &EndlessRun) {
+pub fn build_existing_endless_save_button(entity_commands: &mut EntityCommands, _endless_run: &EndlessRun) {
     entity_commands.try_insert(ButtonBundle {
         style: Style {
             width: Val::Px(150.0),
@@ -123,5 +123,5 @@ pub fn build_existing_endless_save_button(entity_commands: &mut EntityCommands, 
                 ..default()
             },
         )).insert(DespawnOnStateExit::App(AppState::MainMenu));
-    }).insert(DespawnOnStateExit::App(AppState::MainMenu)).insert(ContinueGameBUtton);
+    }).insert(DespawnOnStateExit::App(AppState::MainMenu)).insert(ContinueGameButton);
 }

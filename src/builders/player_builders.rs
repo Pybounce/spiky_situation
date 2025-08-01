@@ -1,7 +1,7 @@
 use bevy::{ecs::system::EntityCommands, prelude::*};
 use bevy_rapier2d::prelude::{RigidBody, Velocity};
 
-use crate::{common::{death::DelayedDeathMarker, physics::gravity::Gravity}, local_player::{PLAYER_GRAVITY_ACCELERATION, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, stage::stage_builder::stage_creator::TILE_SIZE};
+use crate::{common::{death::DelayedDeathMarker, physics::gravity::Gravity}, local_player::PLAYER_SIZE, stage::stage_builder::stage_creator::TILE_SIZE};
 
 #[derive(Resource)]
 pub struct PlayerBuilder {
