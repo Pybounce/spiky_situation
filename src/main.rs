@@ -21,7 +21,7 @@ use player::{common::check_player_out_of_bounds, dash_controller::{apply_dashing
 use ground::check_grounded;
 use stage::{stage_builder::StageBuilderPlugin, stage_objects::{interval_block::{stop_interval_block_crush, tick_interval_blocks}, lock_block::read_lock_block_triggers, phantom_block::{check_phantom_block_touched, tick_phantom_block}, saw_shooter::tick_saw_shooters}};
 use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, StageEditorPlugin};
-use main_menu::StageSelectPlugin;
+use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
 use crate::{builders::player_builders::init_player_builder, databases::save_db::{init_save_db, SaveGame}, player::death::spawn_player_corpse};
@@ -69,7 +69,7 @@ fn main() {
         }).set(ImagePlugin::default_nearest()))
         .add_plugins(StatesPlugin)
         .add_plugins(StageBuilderPlugin)
-        .add_plugins(StageSelectPlugin)
+        .add_plugins(MainMenuPlugin)
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
         .add_plugins(GameNetworkingPlugin)
@@ -78,7 +78,7 @@ fn main() {
         //.add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
         //.add_plugins(RapierDebugRenderPlugin::default())
-        .add_systems(Startup, (init_save_db, spawn_camera, init_player_builder))
+        .add_systems(PreStartup, (init_save_db, spawn_camera, init_player_builder))
         .add_systems(Update, (handle_zoom_change, move_camera, spawn_new_players, remove_disconnected_players))
         .add_systems(Update, (check_touching_wall, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, shake, check_insta_kill_collisions, spawn_local_players, check_grounded, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))
         .add_systems(Update, (apply_physics_controller_limits, add_wall_stuck, update_wall_stuck, remove_wall_stuck))

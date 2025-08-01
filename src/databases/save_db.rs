@@ -26,11 +26,25 @@ impl SaveDb {
             file.write_all(&bytes).expect("failed to save endless");
         }
     }
+    
     pub fn delete_game_save(&self) {
         if let Some(proj_dirs) = ProjectDirs::from("com", "Skybounce", "Platformer") {
             let path = proj_dirs.config_dir().join("save_files").join("game_save.dat");
             let _ = std::fs::remove_file(&path);  
         }
+    }
+
+    pub fn get_existing_save(&self) -> Option<GameSave> {
+        if let Some(proj_dirs) = ProjectDirs::from("com", "Skybounce", "Platformer") {
+            let path = proj_dirs.config_dir().join("save_files").join("game_save.dat");
+            if let Ok(bytes) = std::fs::read(path) {
+                if let Ok(save) = ron::de::from_bytes::<GameSave>(&bytes) {
+                    return Some(save);
+                }
+            }
+        }
+
+        return None;
     }
 
 }
