@@ -54,3 +54,9 @@
   - See how many stages you can beat before you lose them all
   - **IDEA** --> If you beat the par time on a stage, you get a life
   - _QoL_ --> Timer only starts when you leave spawn tile? / Or can reset the map without loss of life if you're within 5 tiles of spawn
+
+#### Refactors
+
+- [ ] Gamemodes
+- [ ] Save system
+- [ ] Error handling
