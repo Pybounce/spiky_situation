@@ -1,47 +1,48 @@
 use std::{fs, path::Path};
 
-use bevy::{prelude::*, scene::ron::from_str};
+use bevy::prelude::*;
 
-use crate::{common::states::{AppState, DespawnOnStateExit}, game::current_run::CurrentRun, stage::stage_builder::events::{BuildStageEvent, LoadStageEvent}, stage_editor::StageEditorLoadDetails};
+use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction}, stage::stage_builder::events::{BuildStageEvent, LoadStageEvent}, stage_editor::StageEditorLoadDetails};
 
+pub mod ui;
 
-pub struct StageSelectPlugin;
+pub struct MainMenuPlugin;
 
-impl Plugin for StageSelectPlugin {
+impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_systems(OnEnter(AppState::MainMenu), display_stage_select)
-        .add_systems(Update, (try_enter_stage, try_enter_stage_editor).run_if(in_state(AppState::MainMenu)));
+        .add_event::<StartGame>()
+        .add_systems(OnEnter(AppState::MainMenu), build_main_menu_ui)
+        .add_systems(Update, (try_start_game, check_new_game_interaction, check_continue_game_interaction, try_enter_stage_editor).run_if(in_state(AppState::MainMenu)));
     }
 }
 
 
-
-
-pub fn display_stage_select(
-    mut commands: Commands
-) {
-    commands.spawn(Text2dBundle {
-        text: Text::from_section("Press some shit to start a new run", TextStyle::default()),
-        ..default()
-    })
-    .insert(DespawnOnStateExit::App(AppState::MainMenu));
+#[derive(Event)]
+pub enum StartGame {
+    Endless(EndlessRun)
 }
 
-pub fn try_enter_stage(
-    input: Res<ButtonInput<KeyCode>>,
+pub fn try_start_game(
+    mut start_game_reader: EventReader<StartGame>,
     mut load_event_writer: EventWriter<LoadStageEvent>,
     mut build_event_writer: EventWriter<BuildStageEvent>,
     mut commands: Commands
 ) {
-    if input.just_released(KeyCode::Space) {
-        let stage_ids = get_stage_ids();
-        let current_run = CurrentRun::new(stage_ids, 10);
+    let mut game_started = false;
+    for event in start_game_reader.read() {
+        if game_started { continue; }
+        match event {
+            StartGame::Endless(endless_run) => {
+                load_event_writer.send(LoadStageEvent {stage_id: endless_run.current_stage_id() });
+                build_event_writer.send(BuildStageEvent {stage_id: endless_run.current_stage_id() });
 
-        load_event_writer.send(LoadStageEvent {stage_id: current_run.current_stage_id() });
-        build_event_writer.send(BuildStageEvent {stage_id: current_run.current_stage_id() });
+                commands.insert_resource(endless_run.clone());
+                game_started = true;
+            },
+        }
+        
 
-        commands.insert_resource(current_run);
     }
 }
 
