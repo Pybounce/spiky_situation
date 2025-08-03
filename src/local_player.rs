@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{common::{death::Killable, physics::gravity::Gravity}, ground::Groundable, networking::networked_players::NetworkedPlayer, player::{dash_controller::{DashController, DASH_COOLDOWN, DASH_DURATION, DASH_KEY, DASH_SPEED}, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, look_state::PlayerLookState, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{death::Killable, physics::gravity::Gravity}, ground::Groundable, player::{dash_controller::{DashController, DASH_COOLDOWN, DASH_DURATION, DASH_KEY, DASH_SPEED}, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, look_state::PlayerLookState, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 
 pub const FORCE_MUL: f32 = TILE_SIZE / 16.0;
 
@@ -144,7 +144,7 @@ impl Default for LocalPlayerBundle {
 
 pub fn load_player_sprite(
     asset_server: Res<AssetServer>,
-    mut query: Query<(Entity, &mut Sprite), Or<(With<LocalPlayer>, With<NetworkedPlayer>)>>,
+    mut query: Query<(Entity, &mut Sprite), With<LocalPlayer>>,
     mut commands: Commands
 ) {
     let tilemap: Handle<Image> = asset_server.load("object_tilemap.png");

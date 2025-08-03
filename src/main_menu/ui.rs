@@ -69,7 +69,6 @@ pub fn build_main_menu_ui(
             ..Default::default()
         })
         .with_children(|parent| {
-
             if let Some(existing_save) = save_db.get_existing_save() {
                 let mut btn = parent.spawn(());
                 match existing_save {
