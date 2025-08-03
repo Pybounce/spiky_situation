@@ -1,19 +1,9 @@
 #### ToDo Next
 
-- [ ] Save system
-  - Will need to be able to save/load stages from assets and also from custom.
-  - Will need to get player save files from somewhere other than assets too.
-
-#### Save System
-
-- Make GameDb a resource
-- Make some structs like EndlessSave etc
-- Will need to be able to save .stage, or redo it in some way
-- Would be good to have custom stages in here too but for now, can skip
-- GameDb just needs endpoints like save_endless_run(current_run), delete_endless_run(current_run_id)
-- Possibly also some highscore bs
-- Ids can be save slots I guess?
-- For colour palletes, will eventually need a way to convert texture to BevyImage, then add that to asset server and get a Handle - very annoying but whatever
+- [ ] Camera Bounds
+- [ ] Think about changing colour themes
+  - Doing this every level could be jarring
+  - Even though the levels will have a Stage Complete screen in between
 
 #### ToDo
 
