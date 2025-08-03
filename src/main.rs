@@ -1,7 +1,7 @@
 
 
 use bevy::{
-    asset::AssetMetaCheck, prelude::*, winit::{ UpdateMode, WinitSettings }
+    asset::AssetMetaCheck, prelude::*, sprite::Material2dPlugin, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;
@@ -23,7 +23,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, databases::save_db::{init_save_db, SaveGame}, player::death::spawn_player_corpse};
+use crate::{builders::player_builders::init_player_builder, databases::save_db::{init_save_db, SaveGame}, player::death::spawn_player_corpse, shaders::background_shader::BackgroundMaterial};
 
 mod common;
 
@@ -38,6 +38,7 @@ pub mod stage_editor;
 mod debugging;
 pub mod builders;
 pub mod databases;
+pub mod shaders;
 
 fn main() {
     let winit_settings = WinitSettings {
@@ -73,6 +74,7 @@ fn main() {
         .add_plugins(GamePlugin)
         .add_plugins(GameNetworkingPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_event::<SaveGame>()
         //.add_plugins(DebugPlugin)
         .init_resource::<MouseData>()

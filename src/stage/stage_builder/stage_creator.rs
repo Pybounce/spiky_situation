@@ -1,7 +1,7 @@
-use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::{MaterialMesh2dBundle, Mesh2dHandle}};
 
 pub const TILE_SIZE: f32 = 16.0;
 pub const TILE_SIZE_HALF: f32 = TILE_SIZE / 2.0;
@@ -13,7 +13,10 @@ const OBJECT_TILE_TILEMAP_SIZE: f32 = 16.0;
 pub struct StageCreator<'a> {
     pub stage: &'a Stage, 
     pub tilemap: &'a Handle<Image>,
-    pub object_tilemap: &'a Handle<Image>
+    pub object_tilemap: &'a Handle<Image>,
+
+    pub background_quad_mesh: &'a Handle<Mesh>,
+    pub background_material: &'a Handle<BackgroundMaterial>
 }
 
 pub enum ObjectAtlasIndices {
@@ -48,11 +51,13 @@ pub enum ObjectAtlasIndices {
 
 impl<'a> StageCreator<'a> {
 
-    pub fn new(stage: &'a Stage, tilemap: &'a Handle<Image>, object_tilemap: &'a Handle<Image>) -> Self {
+    pub fn new(stage: &'a Stage, tilemap: &'a Handle<Image>, object_tilemap: &'a Handle<Image>, background_quad_mesh: &'a Handle<Mesh>, background_material: &'a Handle<BackgroundMaterial>) -> Self {
         StageCreator {
             stage,
             tilemap,
-            object_tilemap
+            object_tilemap,
+            background_material,
+            background_quad_mesh
         }
     }
 
@@ -98,19 +103,29 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
     stage_creator.stage.grid_height as f32 / 2.0);
     
     commands.spawn(
-        SpriteBundle {
-            transform: Transform {
-                scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
-                translation: Vec3::new(grid_pos.x * TILE_SIZE, grid_pos.y * TILE_SIZE, -10.0),
+        MaterialMesh2dBundle {
+                mesh: Mesh2dHandle(stage_creator.background_quad_mesh.clone()),
+                material: stage_creator.background_material.clone(),
+                transform: Transform { 
+                    translation: Vec3::new(grid_pos.x * TILE_SIZE, grid_pos.y * TILE_SIZE, -10.0), 
+                    scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
+                    ..default()
+                },
                 ..default()
-            },
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(1.0, 1.0)),
-                color: Color::linear_rgb(100.0 / 255.0, 170.0 / 255.0, 170.0 / 255.0),
-                ..default()
-            },
-            ..default()
-        }
+        },
+        //SpriteBundle {
+        //    transform: Transform {
+        //        scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
+        //        translation: Vec3::new(grid_pos.x * TILE_SIZE, grid_pos.y * TILE_SIZE, -10.0),
+        //        ..default()
+        //    },
+        //    sprite: Sprite {
+        //        custom_size: Some(Vec2::new(1.0, 1.0)),
+        //        color: Color::linear_rgb(100.0 / 255.0, 170.0 / 255.0, 170.0 / 255.0),
+        //        ..default()
+        //    },
+        //    ..default()
+        //}
     )
     .insert(StageObject);
 

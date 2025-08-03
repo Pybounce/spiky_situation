@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::stage::stage_objects::StageObject;
+use crate::{shaders::background_shader::BackgroundMaterial, stage::stage_objects::StageObject};
 
 use super::{events::{StageBuildCompleteEvent, StageBuildFailedEvent}, stage_asset::Stage, stage_creator::{StageCreator, TILE_SIZE}, CurrentStageData, StageAssets, StageBuilderData};
 
@@ -22,7 +22,9 @@ pub fn try_build_stage(
     stage_builder_data: Res<StageBuilderData>,
     stage_assets: Res<Assets<Stage>>,
     mut complete_event_writer: EventWriter<StageBuildCompleteEvent>,
-    mut failed_event_writer: EventWriter<StageBuildFailedEvent>
+    mut failed_event_writer: EventWriter<StageBuildFailedEvent>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<BackgroundMaterial>>
 ) {
     match asset_server.load_state(&stage_builder_data.stage_handle) {
         bevy::asset::LoadState::NotLoaded => {
@@ -53,7 +55,11 @@ pub fn try_build_stage(
                 stage_objects_handle: object_tilemap_handle.clone(),
                 ground_tiles_handle: ground_tiles_handle.clone()
             });
-            let stage_creator = StageCreator::new(&stage, &ground_tiles_handle, &object_tilemap_handle);
+
+            let background_mesh = meshes.add(Mesh::from(Rectangle::default()));
+            let background_mat = materials.add(BackgroundMaterial {});
+
+            let stage_creator = StageCreator::new(&stage, &ground_tiles_handle, &object_tilemap_handle, &background_mesh, &background_mat);
             if stage_creator.build(&mut commands) {
                 commands.insert_resource(CurrentStageData {
                     stage_id: stage.id,
