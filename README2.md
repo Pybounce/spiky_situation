@@ -30,6 +30,7 @@
   - Then can have an animation constantly playing, and at the end, fire a projectile by adding a component or SOMETHING idk
   - Wouldn't want to constantly add/remove since it would change topology too much
   - Could have ProjectileShooter, and then another component named Shoot that is SparseStorage
+- HOWEVER: If I have 2 components on an entity with the same Timer stuff and I tick them both, then really, it should be fine. It should stay in sync and even if not, stages are short lived
 
 #### ToDo
 
