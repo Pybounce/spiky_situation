@@ -44,7 +44,7 @@ pub fn refresh_editor_renderer(
     if renderer.full_refresh == false { return; }
 
     for entity in existing_items.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     for grid_pos in editor_controller.stage_grid.keys() {
@@ -55,22 +55,21 @@ pub fn refresh_editor_renderer(
             _ => editor_controller.object_atlas.clone(),
         };
 
-        commands.spawn(SpriteBundle {
-            texture: atlas,
-            sprite: Sprite {
+        commands.spawn((
+            Sprite {
+                image: atlas,
                 custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
                 rect: Some(EditorRenderer::get_item_icon_atlas_rect(&editor_item)),
                 ..default()
             },
-            transform: Transform { 
+            Transform { 
                 translation: editor_controller.grid_pos_to_world_grid_pos(*grid_pos), 
                 rotation: Quat::from_rotation_z(editor_item.get_rotation()), 
                 ..default()
             },
-            ..default()
-        })
-        .insert(RenderedEditorItem)
-        .insert(DespawnOnStateExit::App(AppState::StageEditor));
+            RenderedEditorItem,
+            DespawnOnStateExit::App(AppState::StageEditor)
+        ));
 
     }
 

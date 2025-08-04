@@ -44,7 +44,7 @@ pub fn move_offset_movers(
     for (mut t, mut om) in &mut query {
 
         let target_delta = om.delta();
-        let mut delta = target_delta.normalize_or_zero() * om.speed * time.delta_seconds();
+        let mut delta = target_delta.normalize_or_zero() * om.speed * time.delta_secs();
         if target_delta.length() < delta.length() {
             delta = target_delta;
         }

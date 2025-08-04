@@ -24,7 +24,7 @@ impl SpringFactory {
         )).with_children(|parent| {
             parent.spawn((
                 Collider::cuboid(TILE_SIZE_HALF * 0.9, TILE_SIZE_HALF * 0.2),
-                TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)),
+                Transform::from_xyz(0.0, 0.0, 0.0),
                 CollisionGroups::new(Group::GROUP_3, Group::ALL),
                 ActiveEvents::COLLISION_EVENTS,
                 RigidBody::Fixed,
@@ -34,12 +34,12 @@ impl SpringFactory {
                 },
                 StageObject,
                 AnimateOnTouch {
-                    animator_entity: parent.parent_entity(),
+                    animator_entity: parent.target_entity(),
                 }
             ));
             parent.spawn((
                 Collider::cuboid(TILE_SIZE_HALF, TILE_SIZE_HALF * 0.4),
-                TransformBundle::from(Transform::from_xyz(0.0, -TILE_SIZE_HALF, 0.0)),
+                Transform::from_xyz(0.0, -TILE_SIZE_HALF, 0.0),
                 CollisionGroups::new(Group::GROUP_1, Group::ALL),
                 ActiveEvents::COLLISION_EVENTS,
                 RigidBody::Fixed,

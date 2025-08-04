@@ -1,7 +1,7 @@
 
 use std::default;
 
-use bevy::{prelude::*, utils::hashbrown::HashMap};
+use bevy::{platform::collections::HashMap, prelude::*};
 
 use super::super::{controller::{EditorController, EDITOR_TILEMAP_SIZE}, enums::{EditorItem, IntervalBlockVariant, KeyVariant, LockBlockVariant}};
 

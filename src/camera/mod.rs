@@ -1,5 +1,5 @@
 
-use bevy::{core_pipeline::bloom::BloomSettings, input::mouse::MouseWheel, prelude::*};
+use bevy::{input::mouse::MouseWheel, prelude::*};
 use bevy_rapier2d::prelude::*;
 
 use crate::local_player::LocalPlayer;
@@ -11,35 +11,25 @@ const CAMERA_ZOOM_MIN: u32 = 1;
 pub fn spawn_camera(mut commands: Commands) {
 
     commands
-        .spawn(Camera2dBundle {
-            projection : OrthographicProjection {
+        .spawn((
+            Camera2d::default(),
+            Projection::Orthographic(OrthographicProjection {
                 far: 1000.,
                 near: -1000.,
                 scale: 1.0 / (CAMERA_ZOOM as f32),
-                ..default()
+                viewport_origin: Vec2::new(0.5, 0.5),
+                scaling_mode: bevy::render::camera::ScalingMode::WindowSize,
+                area: Default::default(),
+            }),
+            Transform::default(),
+            Velocity::default(),
+            RigidBody::Dynamic,
+            PixelPerfectTranslation {
+                translation: Vec3::default(),
+                factor: CAMERA_ZOOM as u32
             },
-            camera: Camera {
-                //clear_color: ClearColorConfig::Custom(Color::linear_rgb(222.0, 1.0, 201.0)),
-               // hdr: true,
-                ..default()
-            },
-            transform: Transform {
-                translation: Vec3::new(0.0, 0.0, 0.0),
-                ..default()
-            },
-            ..default()
-        })
-        .insert(BloomSettings {
-            intensity: 0.0,
-            ..default()
-        })
-        .insert(Velocity::default())
-        .insert(RigidBody::Dynamic)
-        .insert(PixelPerfectTranslation {
-            translation: Vec3::default(),
-            factor: CAMERA_ZOOM as u32
-        });
-
+            Msaa::Off
+        ));
 }
 
 pub fn move_camera(
@@ -47,15 +37,15 @@ pub fn move_camera(
     player_query: Query<&Transform, (With<LocalPlayer>, Without<Camera>)>,
     time: Res<Time>
 ) {
-    let mut ct = camera_query.single_mut();
-    let pt = player_query.get_single();
+    let mut ct = camera_query.single_mut().unwrap();
+    let pt = player_query.single();
     match pt {
         Ok(pt) => {
             let distance = ct.translation.truncate().distance(pt.translation.truncate());
             let speed = distance * 2.5;
             let dir = (pt.translation - ct.translation).truncate().normalize_or_zero();
 
-            let delta = time.delta_seconds() * speed * dir;
+            let delta = time.delta_secs() * speed * dir;
             ct.translation += delta.extend(0.0);
         }
         Err(_) => (),
@@ -87,7 +77,7 @@ pub struct PixelPerfectTranslation {
 
 pub fn handle_zoom_change(
     mut mouse_wheel_events: EventReader<MouseWheel>,
-    mut camera_query: Query<(&mut PixelPerfectTranslation, &mut OrthographicProjection), With<Camera>>,
+    mut camera_query: Query<(&mut PixelPerfectTranslation, &mut Projection), With<Camera>>,
 ) {
     for mouse_wheel_event in mouse_wheel_events.read() {
         for (mut pixel_translation, mut projection) in &mut camera_query {
@@ -97,7 +87,9 @@ pub fn handle_zoom_change(
                 false => pixel_translation.factor - 1,
             }.clamp(CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX);
 
-            projection.scale = 1.0 / (new_zoom as f32);
+            if let Projection::Orthographic(ref mut ortho) = *projection {
+                ortho.scale = 1.0 / (new_zoom as f32);
+            };
             pixel_translation.factor = new_zoom;
         }
     }

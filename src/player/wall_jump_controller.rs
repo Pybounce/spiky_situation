@@ -56,7 +56,7 @@ pub fn begin_player_wall_jump(
             }; 
             g.current_force = 0.0;
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time
-            jc.last_jump_pressed_time = time.elapsed_seconds_f64(); //todo: wrapped??
+            jc.last_jump_pressed_time = time.elapsed_secs_f64(); //todo: wrapped??
         }
     }
 } 
@@ -72,9 +72,9 @@ pub fn update_wall_stuck_time(
             TouchingWall::Right => mc.right_key,
         };
         if !input.pressed(push_away_key) {
-            wall_stuck.last_unstuck_time = time.elapsed_seconds_f64();
+            wall_stuck.last_unstuck_time = time.elapsed_secs_f64();
         }
-        else if time.elapsed_seconds_f64() - wall_stuck.last_unstuck_time >= wall_stickable.wall_stick_time {
+        else if time.elapsed_secs_f64() - wall_stuck.last_unstuck_time >= wall_stickable.wall_stick_time {
             commands.entity(e).remove::<WallStuck>();
         }
     }
@@ -90,7 +90,7 @@ pub fn update_wall_stuck(
             (TouchingWall::Right, TouchingWall::Right) => continue,
             _ => {
                 ws.touching_wall = *tw;
-                ws.last_unstuck_time = time.elapsed_seconds_f64();
+                ws.last_unstuck_time = time.elapsed_secs_f64();
             }
         };
     }
@@ -104,7 +104,7 @@ pub fn add_wall_stuck(
     for (e, tw) in &mut query {
         commands.entity(e).try_insert(WallStuck {
             touching_wall: *tw,
-            last_unstuck_time: time.elapsed_seconds_f64(),
+            last_unstuck_time: time.elapsed_secs_f64(),
         });
     }
 }

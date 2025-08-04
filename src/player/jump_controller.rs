@@ -34,7 +34,7 @@ pub fn apply_wall_friction(
             // we want to simulate grabbing the wall
             // which would only happen when sliding down
             // sliding up should be fast
-            v.linvel.y -= wjc.friction_coefficient * v.linvel.y.powi(2) * v.linvel.y.signum() * time.delta_seconds();
+            v.linvel.y -= wjc.friction_coefficient * v.linvel.y.powi(2) * v.linvel.y.signum() * time.delta_secs();
         }
     }
 }
@@ -46,7 +46,7 @@ pub fn maintain_player_jump(
 ) {
     for (mut jc, mut g) in &mut query {
         if input.pressed(jc.key) 
-        && time.elapsed_seconds_f64() - jc.last_jump_pressed_time < jc.duration 
+        && time.elapsed_secs_f64() - jc.last_jump_pressed_time < jc.duration 
         && jc.last_jump_released_time < jc.last_jump_pressed_time {
 
         }
@@ -54,7 +54,7 @@ pub fn maintain_player_jump(
             g.current_force = g.max_force;
         }
         if input.just_released(jc.key) {
-            jc.last_jump_released_time = time.elapsed_seconds_f64(); //todo: wrapped??
+            jc.last_jump_released_time = time.elapsed_secs_f64(); //todo: wrapped??
         }
     }
 }
@@ -69,7 +69,7 @@ pub fn begin_player_jump(
             g.current_force = 0.0;
             v.linvel.y = jc.force;
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time
-            jc.last_jump_pressed_time = time.elapsed_seconds_f64(); //todo: wrapped??
+            jc.last_jump_pressed_time = time.elapsed_secs_f64(); //todo: wrapped??
         }
     }
 }
@@ -80,7 +80,7 @@ pub fn is_coyote_grounded(
     mut commands: Commands
 ) {
     for (e, jc) in &query {
-        if time.elapsed_seconds_f64() - jc.last_grounded < jc.coyote_time {
+        if time.elapsed_secs_f64() - jc.last_grounded < jc.coyote_time {
             commands.entity(e).try_insert(CoyoteGrounded);
         }
         else {
@@ -94,7 +94,7 @@ pub fn update_last_grounded(
     time: Res<Time>
 ) {
     for mut jc in &mut query {
-        jc.last_grounded = time.elapsed_seconds_f64(); //todo: wrapped??
+        jc.last_grounded = time.elapsed_secs_f64(); //todo: wrapped??
     }
 }
 

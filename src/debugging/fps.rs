@@ -5,24 +5,15 @@ pub struct FPSUI;
 
 pub fn setup_fps_stuff(mut commands: Commands) {
     commands.insert_resource(FrameRate::new(60));
-    commands
-        .spawn(Text2dBundle {
-            text: Text::from_sections([
-                TextSection::new("FPS   ", TextStyle {
-                    font_size: 32.0,
-                    color: Color::linear_rgba(1.0, 1.0, 1.0, 0.5),
-                    ..Default::default()
-                }),
-                TextSection::from_style(TextStyle {
-                    font_size: 32.0,
-                    color: Color::linear_rgba(1.0, 1.0, 1.0, 0.5),
-                    ..Default::default()
-                }),
-            ]),
-            transform: Transform::from_xyz(0.0, 0.0, 100.0),
+    commands.spawn((
+        Node {
+            position_type: PositionType::Absolute,
             ..default()
-        })
-        .insert(FPSUI);
+        },
+        Text::default(),
+        FPSUI
+    ));
+
 }
 
 pub fn update_fps_ui(
@@ -30,11 +21,11 @@ pub fn update_fps_ui(
     time: Res<Time>,
     mut frame_rate: ResMut<FrameRate>
 ) {
-    let mut text = query.single_mut();
+    let mut text = query.single_mut().unwrap();
 
-    frame_rate.update(time.delta_seconds_f64());
+    frame_rate.update(time.delta_secs_f64());
 
-    text.sections[1].value = format!("{:.2}", frame_rate.average_fps()).to_string();
+    text.0 = format!("FPS: {:.2}", frame_rate.average_fps()).to_string();
 }
 
 #[derive(Resource, Default)]

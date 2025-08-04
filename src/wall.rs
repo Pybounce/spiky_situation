@@ -19,8 +19,9 @@ pub fn check_touching_wall(
     mut commands: Commands,
     mut wallable_query: Query<(Entity, &mut Transform, &mut Velocity, Option<&TouchingWall>), With<Wallable>>,
     _wall_query: Query<(), With<Wall>>,
-    rapier_context: Res<RapierContext>
+    rapier_write_context: WriteRapierContext
 ) {
+    let rapier_context = rapier_write_context.single().unwrap();
     for (entity, mut transform, mut velocity, tw_opt) in &mut wallable_query {
         let mut new_left_collision = false;
         let mut new_right_collision = false;

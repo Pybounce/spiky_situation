@@ -87,12 +87,10 @@ fn build_stage_editor(
 
     commands.insert_resource(editor_controller);
     commands.insert_resource(EditorRenderer::new());
-
-    commands.spawn(Text2dBundle {
-        text: Text::from_section("Stage Editor", TextStyle::default()),
-        ..default()
-    })
-    .insert(DespawnOnStateExit::App(AppState::StageEditor));
+    commands.spawn((
+        Text::new("Stage Editor"),
+        DespawnOnStateExit::App(AppState::StageEditor)
+    ));
 
 }
 
@@ -179,7 +177,7 @@ fn move_camera(
     }
 
     for mut ppt in &mut query {
-        ppt.translation += direction * CAMERA_MOVE_SPEED * time.delta_seconds();
+        ppt.translation += direction * CAMERA_MOVE_SPEED * time.delta_secs();
     }
 }
 

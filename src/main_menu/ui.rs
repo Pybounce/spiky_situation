@@ -57,16 +57,13 @@ pub fn build_main_menu_ui(
     save_db: Res<SaveDb>
 ) {
 
-    commands.spawn(NodeBundle {
-            style: Style {
-                justify_content: JustifyContent::Center, 
-                align_items: AlignItems::Center,         
-                flex_direction: FlexDirection::Column,   
-                width: Val::Percent(100.0), 
-                height: Val::Percent(100.0), 
-                ..Default::default()
-            },
-            ..Default::default()
+    commands.spawn(Node {
+            justify_content: JustifyContent::Center, 
+            align_items: AlignItems::Center,         
+            flex_direction: FlexDirection::Column,   
+            width: Val::Percent(100.0), 
+            height: Val::Percent(100.0), 
+            ..default()
         })
         .with_children(|parent| {
             if let Some(existing_save) = save_db.get_existing_save() {
@@ -77,50 +74,47 @@ pub fn build_main_menu_ui(
             }
 
 
-            parent.spawn(ButtonBundle {
-                style: Style {
+            parent.spawn((
+                Node {
                     width: Val::Px(150.0),
                     height: Val::Px(65.0),
                     margin: UiRect::all(Val::Px(10.0)),
-                    ..Default::default()
+                    
+                    ..default()
                 },
-                background_color: BackgroundColor(Color::srgb_u8(200, 200, 200)),
-                ..Default::default()
-            })
-            .with_children(|btn| {
-                btn.spawn(TextBundle::from_section(
-                    "New Game",
-                    TextStyle {
-                        font_size: 24.0,
-                        color: Color::WHITE,
-                        ..default()
-                    },
-                )).insert(DespawnOnStateExit::App(AppState::MainMenu));
-            }).insert(DespawnOnStateExit::App(AppState::MainMenu)).insert(NewGameButton);
+                BackgroundColor(Color::srgb_u8(200, 200, 200)),
+                Button,
+                Text::new("New Game"),
+                TextFont {
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+                DespawnOnStateExit::App(AppState::MainMenu),
+                NewGameButton
+            ));
         }).insert(DespawnOnStateExit::App(AppState::MainMenu));
 }
 
 
 
 pub fn build_existing_endless_save_button(entity_commands: &mut EntityCommands, _endless_run: &EndlessRun) {
-    entity_commands.try_insert(ButtonBundle {
-        style: Style {
+    entity_commands.try_insert((
+        Button,
+        ContinueGameButton,
+        Node {
             width: Val::Px(150.0),
             height: Val::Px(65.0),
             margin: UiRect::all(Val::Px(10.0)),
-            ..Default::default()
+            ..default()
         },
-        background_color: BackgroundColor(Color::srgb_u8(200, 200, 200)),
-        ..Default::default()
-    })
-    .with_children(|btn| {
-        btn.spawn(TextBundle::from_section(
-            "Continue Game",
-            TextStyle {
-                font_size: 24.0,
-                color: Color::WHITE,
-                ..default()
-            },
-        )).insert(DespawnOnStateExit::App(AppState::MainMenu));
-    }).insert(DespawnOnStateExit::App(AppState::MainMenu)).insert(ContinueGameButton);
+        BackgroundColor(Color::srgb_u8(200, 200, 200)),
+        Text::new("Continue Game"),
+        TextFont {
+            font_size: 24.0,
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        DespawnOnStateExit::App(AppState::MainMenu)
+    ));
 }
