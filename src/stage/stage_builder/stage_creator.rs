@@ -1,7 +1,7 @@
 use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
-use bevy::{prelude::*, sprite::{MaterialMesh2dBundle, Mesh2dHandle}};
+use bevy::prelude::*;
 
 pub const TILE_SIZE: f32 = 16.0;
 pub const TILE_SIZE_HALF: f32 = TILE_SIZE / 2.0;
@@ -102,33 +102,16 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
     let grid_pos = Vec2::new(stage_creator.stage.grid_width as f32 / 2.0, 
     stage_creator.stage.grid_height as f32 / 2.0);
     
-    commands.spawn(
-        MaterialMesh2dBundle {
-                mesh: Mesh2dHandle(stage_creator.background_quad_mesh.clone()),
-                material: stage_creator.background_material.clone(),
-                transform: Transform { 
-                    translation: Vec3::new(grid_pos.x * TILE_SIZE, grid_pos.y * TILE_SIZE, -10.0), 
-                    scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
-                    ..default()
-                },
-                ..default()
+    commands.spawn((
+        Mesh2d(stage_creator.background_quad_mesh.clone()),
+        MeshMaterial2d(stage_creator.background_material.clone()),
+        Transform { 
+            translation: Vec3::new(grid_pos.x * TILE_SIZE, grid_pos.y * TILE_SIZE, -10.0), 
+            scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
+            ..default()
         },
-        //SpriteBundle {
-        //    transform: Transform {
-        //        scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
-        //        translation: Vec3::new(grid_pos.x * TILE_SIZE, grid_pos.y * TILE_SIZE, -10.0),
-        //        ..default()
-        //    },
-        //    sprite: Sprite {
-        //        custom_size: Some(Vec2::new(1.0, 1.0)),
-        //        color: Color::linear_rgb(100.0 / 255.0, 170.0 / 255.0, 170.0 / 255.0),
-        //        ..default()
-        //    },
-        //    ..default()
-        //}
-    )
-    .insert(StageObject);
-
+        StageObject
+    ));
     return true;
 }
 
@@ -144,8 +127,8 @@ fn build_far_background(stage_creator: &StageCreator, commands: &mut Commands) -
         Vec2::new(stage_creator.stage.grid_width as f32 / 2.0, 
         stage_creator.stage.grid_height as f32 / 2.0), 
         sprite_rect, 0.0, stage_creator.tilemap);
-    background.sprite_bundle.transform.translation.z = -20.0;
-    background.sprite_bundle.transform.scale = Vec3::new(
+        background.transform.translation.z = -20.0;
+        background.transform.scale = Vec3::new(
         stage_creator.stage.grid_width as f32 * TILE_SIZE * 10.0,
         stage_creator.stage.grid_height as f32 * TILE_SIZE * 10.0,
         1.0);

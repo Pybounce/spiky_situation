@@ -13,16 +13,13 @@ impl PlayerBuilder {
         let player_corpse_rect = Rect::new(TILE_SIZE * 1.0, TILE_SIZE, TILE_SIZE * 2.0, TILE_SIZE * 2.0);
 
         entity_commands.try_insert((
-            SpriteBundle {
-            sprite: Sprite {
-                    custom_size: Some(Vec2::new(1.0, 1.0)),
-                    rect: Some(player_corpse_rect),
-                    ..default()
-                },
-            transform: Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(pos),
-            texture: self.player_atlas.clone(),
-            ..default()
+            Sprite {
+                custom_size: Some(Vec2::new(1.0, 1.0)),
+                rect: Some(player_corpse_rect),
+                image: self.player_atlas.clone(),
+                ..default()
             },
+            Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(pos),
             DelayedDeathMarker::from_secs(5.0),
             RigidBody::Dynamic,
             Velocity::linear(Vec2::new(0.0, 200.0)),

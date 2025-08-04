@@ -20,7 +20,7 @@ impl SpikeFactory {
         ).with_children(|parent| {
             parent.spawn((
                 Collider::cuboid(TILE_SIZE_HALF * 0.8, TILE_SIZE_HALF * 0.8),
-                TransformBundle::from(Transform::from_xyz(0.0, -(TILE_SIZE_HALF * 0.2), 0.0)),
+                Transform::from_xyz(0.0, -(TILE_SIZE_HALF * 0.2), 0.0),
                 CollisionGroups::new(Group::GROUP_2, Group::ALL),
                 ActiveEvents::COLLISION_EVENTS,
                 RigidBody::Fixed,
@@ -32,21 +32,18 @@ impl SpikeFactory {
 
     }
     pub fn spawn_editor_icon(commands: &mut Commands, grid_pos: IVec2, rotation: f32, atlas: &Handle<Image>, atlas_rect: Rect) -> Entity {
-        commands.spawn(
-            SpriteBundle {
-                transform: Transform {
-                    rotation: Quat::from_rotation_z(rotation),
-                    translation: Vec3::new((grid_pos.x as f32 * TILE_SIZE) + TILE_SIZE_HALF, (grid_pos.y as f32 * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
-                    ..default()
-                },
-                texture: atlas.clone(),
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
-                    rect: Some(atlas_rect),
-                    ..default()
-                },
+        commands.spawn((
+            Transform {
+                rotation: Quat::from_rotation_z(rotation),
+                translation: Vec3::new((grid_pos.x as f32 * TILE_SIZE) + TILE_SIZE_HALF, (grid_pos.y as f32 * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
+                ..default()
+            },
+            Sprite {
+                image: atlas.clone(),
+                custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+                rect: Some(atlas_rect),
                 ..default()
             }
-        ).id()
+        )).id()
     }
 }

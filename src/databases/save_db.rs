@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::endless::components::EndlessRun;
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct SaveDb {
 
 }
@@ -50,12 +50,6 @@ impl SaveDb {
 }
 
 
-
-pub fn init_save_db(
-    mut commands: Commands
-) {
-    commands.insert_resource(SaveDb {});
-}
 
 #[derive(Serialize, Deserialize)]
 pub enum GameSave {

@@ -8,7 +8,8 @@ use crate::{ground::Ground, stage::{stage_builder::stage_creator::{StageCreator,
 
 #[derive(Bundle)]
 pub struct TileBundle {
-    pub sprite_bundle: SpriteBundle,
+    pub sprite: Sprite,
+    pub transform: Transform,
     stage_marker: StageObject
 }
 
@@ -35,18 +36,15 @@ pub struct GroundTileBundle {
 impl TileBundle {
     pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect, tile_rotation: f32, image_handle: &Handle<Image>) -> Self {
         TileBundle {
-            sprite_bundle: SpriteBundle {
-                transform: Transform {
-                    rotation: Quat::from_rotation_z(tile_rotation),
-                    translation: Vec3::new((grid_pos.x * TILE_SIZE) + TILE_SIZE_HALF, (grid_pos.y * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
-                    ..default()
-                },
-                texture: image_handle.clone(),
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
-                    rect: Some(atlas_rect),
-                    ..default()
-                },
+            transform: Transform {
+                rotation: Quat::from_rotation_z(tile_rotation),
+                translation: Vec3::new((grid_pos.x * TILE_SIZE) + TILE_SIZE_HALF, (grid_pos.y * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
+                ..default()
+            },
+            sprite: Sprite {
+                image: image_handle.clone(),
+                custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+                rect: Some(atlas_rect),
                 ..default()
             },
             stage_marker: StageObject,

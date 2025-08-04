@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{common::{death::Killable, physics::gravity::Gravity}, ground::Groundable, networking::networked_players::NetworkedPlayer, player::{dash_controller::{DashController, DASH_COOLDOWN, DASH_DURATION, DASH_KEY, DASH_SPEED}, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, look_state::PlayerLookState, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{death::Killable, physics::gravity::Gravity}, ground::Groundable, player::{dash_controller::{DashController, DASH_COOLDOWN, DASH_DURATION, DASH_KEY, DASH_SPEED}, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, look_state::PlayerLookState, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 
 pub const FORCE_MUL: f32 = TILE_SIZE / 16.0;
 
@@ -35,7 +35,8 @@ pub struct LocalPlayer;
 #[derive(Bundle)]
 pub struct LocalPlayerBundle {
     local_player_marker: LocalPlayer,
-    sprite_bundle: SpriteBundle,
+    sprite: Sprite,
+    transform: Transform,
     rigid_body: RigidBody,
     ccd: Ccd,
     collider: Collider,
@@ -62,7 +63,7 @@ pub struct LocalPlayerBundle {
 impl LocalPlayerBundle {
     pub fn new(pos: Vec3, stage_id: usize) -> Self {
         let mut p = LocalPlayerBundle::default();
-        p.sprite_bundle.transform.translation = pos;
+        p.transform.translation = pos;
         p.respawnable.translation = pos;
         return p;
     }
@@ -71,13 +72,8 @@ impl Default for LocalPlayerBundle {
     fn default() -> Self {
         LocalPlayerBundle {
             local_player_marker: LocalPlayer,
-            sprite_bundle: SpriteBundle {
-                transform: Transform {
-                    scale: PLAYER_SIZE.extend(1.0),
-                    ..default()
-                },
-                ..default()
-            },
+            sprite: Sprite::default(),
+            transform: Transform::from_scale(PLAYER_SIZE.extend(1.0)),
             rigid_body: RigidBody::Dynamic,
             ccd: Ccd::enabled(),
             collider: Collider::ball(0.5),
@@ -144,14 +140,13 @@ impl Default for LocalPlayerBundle {
 
 pub fn load_player_sprite(
     asset_server: Res<AssetServer>,
-    mut query: Query<(Entity, &mut Sprite), Or<(With<LocalPlayer>, With<NetworkedPlayer>)>>,
-    mut commands: Commands
+    mut query: Query<&mut Sprite, With<LocalPlayer>>,
 ) {
     let tilemap: Handle<Image> = asset_server.load("object_tilemap.png");
     let player_rect = Rect::new(TILE_SIZE * 2.0, TILE_SIZE, TILE_SIZE * 3.0, TILE_SIZE * 2.0);
 
-    for (e, mut s) in &mut query {
-        commands.entity(e).try_insert(tilemap.clone());
+    for mut s in &mut query {
+        s.image = tilemap.clone();
         s.rect = Some(player_rect);
         s.custom_size = Some(Vec2::new(1.0, 1.0));
     }

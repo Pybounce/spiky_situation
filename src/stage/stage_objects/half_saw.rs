@@ -22,7 +22,7 @@ impl SawFactory {
         e.with_children(|parent| {
             parent.spawn((
                 Collider::ball(TILE_SIZE_HALF * 0.9),
-                TransformBundle::from(Transform::from_xyz(0.0, -TILE_SIZE_HALF, 0.0)),
+                Transform::from_xyz(0.0, -TILE_SIZE_HALF, 0.0),
                 CollisionGroups::new(Group::GROUP_2, Group::ALL),
                 ActiveEvents::COLLISION_EVENTS,
                 RigidBody::Fixed,

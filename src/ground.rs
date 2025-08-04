@@ -14,8 +14,9 @@ pub struct Grounded;
 pub fn check_grounded(
     mut commands: Commands,
     mut wallable_query: Query<(Entity, &mut Transform, &mut Velocity), With<Groundable>>,
-    rapier_context: Res<RapierContext>
+    rapier_write_context: WriteRapierContext
 ) {
+    let rapier_context = rapier_write_context.single().unwrap();
     for (entity, mut transform, mut velocity) in &mut wallable_query {
         let mut ground_collision = false;
 

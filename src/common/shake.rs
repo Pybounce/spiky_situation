@@ -19,7 +19,7 @@ pub fn shake(
 
 
         if let Some(d) = s.duration {
-            s.duration = Some(d - time.delta_seconds_f64());
+            s.duration = Some(d - time.delta_secs_f64());
             if s.duration.unwrap() <= 0.0 {
                 t.translation -= s.current_offset.extend(0.0);
                 commands.entity(e).remove::<Shake>();
@@ -27,7 +27,7 @@ pub fn shake(
             }
         }
 
-        s.current_delay -= time.delta_seconds_f64();
+        s.current_delay -= time.delta_secs_f64();
         
         if s.current_delay <= 0.0 {
             s.current_delay = s.shake_delay;

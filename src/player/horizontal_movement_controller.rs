@@ -25,10 +25,10 @@ pub fn move_ground_horizontal_controller(
 
         let mut change: f32 = 0.0;
         if input.pressed(con.right_key) {
-            change += con.acceleration * time.delta_seconds();
+            change += con.acceleration * time.delta_secs();
         }
         if input.pressed(con.left_key) {
-            change -= con.acceleration * time.delta_seconds();
+            change -= con.acceleration * time.delta_secs();
         }
 
         vel.linvel.x += change;
@@ -40,7 +40,7 @@ pub fn move_ground_horizontal_controller(
            vel.linvel.x -= vel.linvel.x.signum() * diff.abs().min(friction);
         } 
         if change.abs() < 0.01 {
-            let friction = con.deceleration * time.delta_seconds();
+            let friction = con.deceleration * time.delta_secs();
             vel.linvel.x -= vel.linvel.x.signum() * vel.linvel.x.abs().min(friction);
         }
     }
@@ -67,10 +67,10 @@ pub fn move_airbourne_horizontal_controller(
 
         let mut change: f32 = 0.0;
         if input.pressed(con.right_key) {
-            change += con.acceleration * time.delta_seconds();
+            change += con.acceleration * time.delta_secs();
         }
         if input.pressed(con.left_key) {
-            change -= con.acceleration * time.delta_seconds();
+            change -= con.acceleration * time.delta_secs();
         }
 
 
@@ -95,7 +95,7 @@ pub fn move_airbourne_horizontal_controller(
             vel.linvel.x -= vel.linvel.x.signum() * diff.abs().min(friction);
         } 
         if change.abs() < 0.01 {
-            let friction = con.deceleration * time.delta_seconds();
+            let friction = con.deceleration * time.delta_secs();
             vel.linvel.x -= vel.linvel.x.signum() * vel.linvel.x.abs().min(friction);
         }
 

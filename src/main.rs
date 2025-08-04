@@ -10,9 +10,7 @@ use camera::{handle_zoom_change, move_camera, move_pixel_perfect_translations, s
 use common::{animated_sprite::{animate_sprites, check_animate_on_touch}, checkpoint::check_checkpoint_reached, death::{check_touched_by_death, despawn_death_marked, delay_death_marked}, mouse::{update_mouse_data, MouseData}, offset_mover::move_offset_movers, physics::{bouncy::check_bouncy_collisions, fragile::break_fragiles, gravity::simulate_gravity}, shake::shake, states::StatesPlugin, triggers::{trigger_on_touch, TriggerEvent}};
 use game::GamePlugin;
 
-mod networking;
 use local_player::{load_player_sprite, update_player_look_direction};
-use networking::{networked_players::{remove_disconnected_players, spawn_new_players}, GameNetworkingPlugin};
 
 mod main_menu;
 use obstacles::check_insta_kill_collisions;
@@ -23,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, databases::save_db::{init_save_db, SaveGame}, player::death::spawn_player_corpse, shaders::background_shader::BackgroundMaterial};
+use crate::{builders::player_builders::init_player_builder, databases::save_db::{SaveDb, SaveGame}, player::death::spawn_player_corpse, shaders::background_shader::BackgroundMaterial};
 
 mod common;
 
@@ -62,7 +60,6 @@ fn main() {
     
     App::new()
         .insert_resource(winit_settings)
-        .insert_resource(Msaa::Off)
         .add_plugins(DefaultPlugins.set(window_settings).set(AssetPlugin {
             meta_check: AssetMetaCheck::Never,
             ..default()
@@ -72,17 +69,17 @@ fn main() {
         .add_plugins(MainMenuPlugin)
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
-        .add_plugins(GameNetworkingPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_event::<SaveGame>()
         //.add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
         //.add_plugins(RapierDebugRenderPlugin::default())
-        .add_systems(PreStartup, (init_save_db, spawn_camera, init_player_builder))
-        .add_systems(Update, (handle_zoom_change, move_camera, spawn_new_players, remove_disconnected_players))
-        .add_systems(Update, (check_touching_wall, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, shake, check_insta_kill_collisions, spawn_local_players, check_grounded, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))
+        .init_resource::<SaveDb>()
+        .add_systems(PreStartup, (spawn_camera, init_player_builder))
+        .add_systems(Update, (handle_zoom_change, move_camera))
         .add_systems(Update, (apply_physics_controller_limits, add_wall_stuck, update_wall_stuck, remove_wall_stuck))
+        .add_systems(Update, (check_touching_wall, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, shake, check_insta_kill_collisions, spawn_local_players, check_grounded, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))
         .add_systems(Update, (update_player_look_direction, load_player_sprite, simulate_gravity, check_checkpoint_reached, animate_sprites, move_pixel_perfect_translations))
         .add_systems(Update, (start_dashing, break_fragiles, tick_saw_shooters, move_offset_movers, tick_phantom_block, check_phantom_block_touched, stop_interval_block_crush, tick_interval_blocks, check_touched_by_death, read_lock_block_triggers, trigger_on_touch, check_bouncy_collisions, check_animate_on_touch, update_player_airborn_look_state, update_player_grounded_look_state, update_player_look_direction))
         .add_systems(Update, (refresh_editor_renderer, draw_editor, update_mouse_data))
