@@ -4,14 +4,32 @@
 - [ ] Think about changing colour themes
   - Doing this every level could be jarring
   - Even though the levels will have a Stage Complete screen in between
-- [ ] Collectable
-  - Components for MoveOnCollide and SoundOnCollide and FlashOnCollide
-  - These can all be used so collecting keys and hearts etc all do something when collected
-  - KillOnCollide(delay) is a good one too
-  - Can have a Resource for DelayedInserter that takes the method I
-    Insert(Entity, T (Component, Copy), Duration)
-  - This resource would keep track of the time passed and insert them (tryinsert?)
-  - This way I can have delayed death and animation and flashing etc etc etc
+
+#### Collectables
+
+- Components for MoveOnCollide and SoundOnCollide and FlashOnCollide
+- These can all be used so collecting keys and hearts etc all do something when collected
+- KillOnCollide(delay) is a good one too
+- Can have a Resource for DelayedInserter that takes the method I
+  Insert(Entity, T (Component, Copy), Duration)
+- This resource would keep track of the time passed and insert them (tryinsert?)
+- This way I can have delayed death and animation and flashing etc etc etc
+
+###### Insert/Remove OnCollide
+
+- Since this is common, things being animated/destroyed/whatever on collide, could have a resource for it
+- Maybe too much?
+
+###### Animation Insert/Remove
+
+- Like could have the animatorInserter take in components to insert/remove at timestamps during an animation
+- Then a system will look for <(Animator, AnimatorInserter)> and see if it should add/remove stuff that way
+- Can be used for destroying it, adding/removing collision for things like the phantom blocks
+- Potentially used for projectile firing!!!
+  - WAIT THIS IS GREAT
+  - Then can have an animation constantly playing, and at the end, fire a projectile by adding a component or SOMETHING idk
+  - Wouldn't want to constantly add/remove since it would change topology too much
+  - Could have ProjectileShooter, and then another component named Shoot that is SparseStorage
 
 #### ToDo
 
