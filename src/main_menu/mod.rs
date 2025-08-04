@@ -34,8 +34,8 @@ pub fn try_start_game(
         if game_started { continue; }
         match event {
             StartGame::Endless(endless_run) => {
-                load_event_writer.send(LoadStageEvent {stage_id: endless_run.current_stage_id() });
-                build_event_writer.send(BuildStageEvent {stage_id: endless_run.current_stage_id() });
+                load_event_writer.write(LoadStageEvent {stage_id: endless_run.current_stage_id() });
+                build_event_writer.write(BuildStageEvent {stage_id: endless_run.current_stage_id() });
 
                 commands.insert_resource(endless_run.clone());
                 game_started = true;
@@ -53,8 +53,8 @@ pub fn try_enter_stage_editor(
 ) {
     if input.just_released(KeyCode::KeyE) {
         commands.insert_resource(StageEditorLoadDetails {
-            template_stage_id: 5.into(),
-            new_stage_id: 5,
+            template_stage_id: 6.into(),
+            new_stage_id: 6,
             template_stage_handle: None
         });
         app_state.set(AppState::StageEditor);
