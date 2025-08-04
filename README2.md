@@ -4,6 +4,14 @@
 - [ ] Think about changing colour themes
   - Doing this every level could be jarring
   - Even though the levels will have a Stage Complete screen in between
+- [ ] Collectable
+  - Components for MoveOnCollide and SoundOnCollide and FlashOnCollide
+  - These can all be used so collecting keys and hearts etc all do something when collected
+  - KillOnCollide(delay) is a good one too
+  - Can have a Resource for DelayedInserter that takes the method I
+    Insert(Entity, T (Component, Copy), Duration)
+  - This resource would keep track of the time passed and insert them (tryinsert?)
+  - This way I can have delayed death and animation and flashing etc etc etc
 
 #### ToDo
 
