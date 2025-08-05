@@ -20,7 +20,7 @@ pub fn check_new_game_interaction(
         match interaction {
             Interaction::Pressed => {
                 let stage_ids = get_stage_ids();
-                let new_run = EndlessRun::new(stage_ids, 10);
+                let new_run = EndlessRun::new(stage_ids, 100);
                 start_game_writer.send(StartGame::Endless(new_run));
                 save_db.delete_game_save();
             }

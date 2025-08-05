@@ -33,7 +33,7 @@ impl EditorController {
             saved: false,
             object_atlas: object_atlas.clone(),
             ground_atlas: ground_atlas.clone(),
-            grid_size: IVec2::new(50, 20),
+            grid_size: IVec2::new(50, 50),
             stage_grid: HashMap::new(),
             version: 0,
             new_stage_id,
