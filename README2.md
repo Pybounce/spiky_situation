@@ -110,3 +110,14 @@ KEY + LOCKS
   - However, could just have a _PressAnyButtonToContinue_ or something.
   - Then the cursor is only used on the pause menu
 - There will be more UI for things like settings, and uploading/downloading stages
+
+**Position Based**
+
+- Have a resource containing a graph of selectable nodes
+- This graph is populated using triggers/observors
+- The resource has a currently selected node (Option)
+- If currently selected is None, then it just doesn't traverse
+  - When the pause menu comes up, it sets the currently selected etc
+- Optionally just have it be position based such that when you press a direction, it goes through all Selectables and checks there positions and works it out on the fly
+  - Would be better since you can press more unique directions but it's whatever
+- Bevy has some support for this kind of UI movement https://docs.rs/bevy/latest/bevy/input_focus/index.html
