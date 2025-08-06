@@ -93,3 +93,20 @@ KEY + LOCKS
 - Locks would need to break and then the block explodes or something?
 - The lock could also explode so it says within the same tile - unlocks then explode
 - Locks unlock at the same time?? Or slowly over time?
+
+#### Gamepad
+
+- Have a system that checks if a gamepad is being used, and if so add a Gamepad component to an entity.
+- Have a component for GamepadSelectedEntity that is moved around and marks the entity (usually a button etc), that the gamepad is currently selecting
+- Resource for selected is bad since it breaks with multiple gamepads (Selected(gamepad_id)) is better.
+- Could have GamepadSelectable marker, and then have some basic rules for traversing, such as getting the parent node and moving along/down etc etc - I don't fucking know
+
+**VIRTUAL CURSOR**
+
+- It's annoying yes, but there's VERY mininal UI
+- Can add movement speed (ie how far it goes when you press) and then also movement delay
+  - This would then let it work in a grid with (movement_speed = 2, delay = 0.5) or something like that.
+- Using a virtual cursor fucking sucks for everything, like when you end a level, and there's a button to continue and one to leave
+  - However, could just have a _PressAnyButtonToContinue_ or something.
+  - Then the cursor is only used on the pause menu
+- There will be more UI for things like settings, and uploading/downloading stages
