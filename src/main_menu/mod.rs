@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{env, fs, path::PathBuf};
 
 use bevy::prelude::*;
 
@@ -63,8 +63,17 @@ pub fn try_enter_stage_editor(
 
 /// Returns a vector of stageIds that match the stage query for the new run (order does not matter)
 fn get_stage_ids() -> Vec<usize> {
-    let path = "assets/stages";
-    let dir = Path::new(path);
+
+    let dir = if let Ok(manifest_dir) = env::var("BEVY_ASSET_ROOT") {
+        PathBuf::from(manifest_dir)
+    } else if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+        PathBuf::from(manifest_dir)
+    } else {
+        env::current_exe()
+            .map(|path| path.parent().map(ToOwned::to_owned).unwrap())
+            .unwrap()
+    }.join("assets").join("stages");
+
     let mut stages = Vec::<usize>::new();
 
     if let Ok(entries) = fs::read_dir(dir) {
