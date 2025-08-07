@@ -5,6 +5,32 @@
   - Doing this every level could be jarring
   - Even though the levels will have a Stage Complete screen in between
 
+#### Demo Checklist
+
+- [ ] Main menu UI
+  - [ ] Background
+  - [ ] Animated buttons
+    - On hover, have a slider come over that reveals "Continue" or something
+  - [ ] Save info (ie deaths etc)
+- [ ] Icons
+  - [ ] Deaths icon (maybe a skull)
+  - [ ] Lives icon (maybe a heart)
+- [ ] Death Animation
+  - [ ] Player death
+  - [ ] Saw death
+- [ ] Key animations
+  - [ ] Key
+  - [ ] Lock blocks
+- [ ] Audio
+  - [ ] Death
+  - [ ] Button selection
+  - [ ] Keys
+  - [ ] Stage complete?
+  - [ ] Backing track?
+- [ ] Stage Complete screen
+- [ ] Run Dead screen
+- [ ] More stages! :D
+
 #### Collectables
 
 - Components for MoveOnCollide and SoundOnCollide and FlashOnCollide
@@ -34,19 +60,6 @@
 
 #### ToDo
 
-- Stage data layout
-  - Directory based? ie chapter = ['stages/stage_1', 'stages/stage_2', 'stages/custom/my_stages/spike_death']
-  - Uses a lot more bytes
-  - Simple to load since you have the filepath
-- Stage sharing
-  - Could use steam workshop but it would only ever work for steam. But still come on...
-- Stage loading
-  - Ideally stage loading would be done from anywhere at any time with an event
-- Stage resetting
-  - Will need to reset the stage when the player dies (keys etc)
-- Backgrounds
-  - Backgrounds likely consist of a repeating pattern slightly moving, with colours
-  - So perhaps just have a 128x128 texture for the pattern, then a list of those to pick from?
 - Colours
   - Figure out the size of the colour pallete
   - Make the shader
@@ -77,6 +90,7 @@
 - [ ] Gamemodes
 - [ ] Save system
 - [ ] Error handling
+  - Use bevy's new error handling and create a logger resource
 
 #### Art
 
