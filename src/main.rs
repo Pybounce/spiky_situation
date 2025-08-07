@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, databases::save_db::{SaveDb, SaveGame}, player::death::spawn_player_corpse, shaders::background_shader::BackgroundMaterial};
+use crate::{builders::player_builders::init_player_builder, databases::save_db::{SaveDb, SaveGame}, player::death::{player_splat, spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, splat::SplatMaterial}};
 
 mod common;
 
@@ -71,6 +71,7 @@ fn main() {
         .add_plugins(GamePlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
+        .add_plugins(Material2dPlugin::<SplatMaterial>::default())
         .add_event::<SaveGame>()
         //.add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
@@ -84,7 +85,7 @@ fn main() {
         .add_systems(Update, (start_dashing, break_fragiles, tick_saw_shooters, move_offset_movers, tick_phantom_block, check_phantom_block_touched, stop_interval_block_crush, tick_interval_blocks, check_touched_by_death, read_lock_block_triggers, trigger_on_touch, check_bouncy_collisions, check_animate_on_touch, update_player_airborn_look_state, update_player_grounded_look_state, update_player_look_direction))
         .add_systems(Update, (refresh_editor_renderer, draw_editor, update_mouse_data))
         .add_systems(Update, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
-        .add_systems(Update, spawn_player_corpse)
+        .add_systems(Update, (spawn_player_corpse, player_splat))
         .add_event::<TriggerEvent>()
         .run();
 }
