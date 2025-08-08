@@ -141,3 +141,22 @@ KEY + LOCKS
 - If I want ccd on the player then I need a secondary collider as a sensor for other stuff
 - I could have the ccd collider be the parent object to the actual Player entity but it's messy
 - I could use colliderOf(Entity) but it currently doesn't work with CollidingEntities, which I use a lot.
+
+#### Splatter! :D
+
+**Saving to back wall**
+
+- Give each temporary decal a _Splat_ component
+- Have a system that periodically runs through them:
+  - Gets their Handle<Image> and Rect to find pixels
+  - Gets their position + rotation
+  - Updates any background canvases as it needs
+  - Deletes the Splat entity since it should now be reflected in the background (if there's a delay then I can sort that whenever)
+
+**Splat textures**
+
+- Have a fairly large texture (1280x1280)
+- Only create splats for _radial_, _up_, _up diagonal_
+- These splats can then be rotated by 90deg to create 8 compass directions, without rotating the pixels themselves
+- With a texture this size, should be able to create a lot of splats
+- For now can just hardcode Rect -> SplatData (ie type: radial/up/diagonal, size)
