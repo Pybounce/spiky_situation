@@ -1,7 +1,7 @@
 
 
 use bevy::{
-    asset::AssetMetaCheck, prelude::*, sprite::Material2dPlugin, winit::{ UpdateMode, WinitSettings }
+    asset::AssetMetaCheck, prelude::*, sprite::Material2dPlugin, window::PresentMode, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;
@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, databases::save_db::{SaveDb, SaveGame}, player::death::{player_splat, spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, splat::SplatMaterial}};
+use crate::{builders::player_builders::init_player_builder, databases::save_db::{SaveDb, SaveGame}, debugging::DebugPlugin, player::death::{player_splat, spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, splat::SplatMaterial}};
 
 mod common;
 
@@ -73,7 +73,7 @@ fn main() {
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
         .add_event::<SaveGame>()
-        //.add_plugins(DebugPlugin)
+        .add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
         //.add_plugins(RapierDebugRenderPlugin::default())
         .init_resource::<SaveDb>()
