@@ -137,6 +137,8 @@ impl Default for LocalPlayerBundle {
 }
 
 //TODO: Remove this trash below
+// Make a builder for the player, instead of using bundles
+// That way you can load in the tilemap immediately 
 
 pub fn load_player_sprite(
     asset_server: Res<AssetServer>,
