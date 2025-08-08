@@ -8,7 +8,7 @@ pub struct Wall;
 pub struct Wallable;
 
 /// varients describe the side of the wall, not which side the wall is on
-#[derive(Component, Copy, Clone)]
+#[derive(Component, Copy, Clone, PartialEq, Eq)]
 pub enum TouchingWall {
     Left,
     Right

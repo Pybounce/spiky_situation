@@ -4,7 +4,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::Velocity;
 
-use crate::{common::physics::gravity::Gravity, local_player::{FORCE_MUL, MAX_HORIZONTAL_SPEED}};
+use crate::{common::physics::gravity::Gravity, local_player::{FORCE_MUL, MAX_HORIZONTAL_SPEED}, wall::TouchingWall};
 
 use super::look_state::PlayerLookState;
 
@@ -59,15 +59,25 @@ pub fn start_dashing(
 }
 
 pub fn apply_dashing(
-    mut query: Query<(&mut DashController, &mut Velocity, &mut Gravity)>,
+    mut query: Query<(&mut DashController, &mut Velocity, &mut Gravity, Option<&TouchingWall>)>,
     time: Res<Time>
 ) {
-    for (mut dash_controller, mut velocity, mut gravity) in &mut query {
+    for (mut dash_controller, mut velocity, mut gravity, touching_wall_opt) in &mut query {
         dash_controller.duration_timer.tick(time.delta());
+
+        let mut force_finished = false;
+        if let Some(touching_wall) = touching_wall_opt {
+            if (dash_controller.dash_direction_sign > 0.0 && *touching_wall == TouchingWall::Left) || (dash_controller.dash_direction_sign < 0.0 && *touching_wall == TouchingWall::Right) {
+                let duration = dash_controller.duration_timer.duration();
+                dash_controller.duration_timer.set_elapsed(duration);
+                force_finished = true;
+            }
+        }
+
         if !dash_controller.duration_timer.finished() {
             velocity.linvel = Vec2::new(dash_controller.dash_direction_sign * dash_controller.dash_speed, 0.0);
         }
-        else if dash_controller.duration_timer.just_finished() {
+        else if dash_controller.duration_timer.just_finished() && !force_finished {
             velocity.linvel = Vec2::new(dash_controller.dash_direction_sign * dash_controller.dash_end_speed, 0.0);
             //gravity.current_force = 0.0;
         }
