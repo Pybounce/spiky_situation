@@ -135,3 +135,9 @@ KEY + LOCKS
 - Optionally just have it be position based such that when you press a direction, it goes through all Selectables and checks there positions and works it out on the fly
   - Would be better since you can press more unique directions but it's whatever
 - Bevy has some support for this kind of UI movement https://docs.rs/bevy/latest/bevy/input_focus/index.html
+
+#### Multiple Colliders
+
+- If I want ccd on the player then I need a secondary collider as a sensor for other stuff
+- I could have the ccd collider be the parent object to the actual Player entity but it's messy
+- I could use colliderOf(Entity) but it currently doesn't work with CollidingEntities, which I use a lot.
