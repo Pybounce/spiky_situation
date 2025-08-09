@@ -8,6 +8,8 @@ pub struct SplatMaterial {
     #[texture(1)]
     #[sampler(2)]
     pub texture: Handle<Image>,
+    #[uniform(3)]
+    pub uv_rect: Vec4,
 }
 
 impl Material2d for SplatMaterial {

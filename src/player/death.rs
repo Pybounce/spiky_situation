@@ -1,7 +1,7 @@
 
 use bevy::prelude::*;
 
-use crate::{builders::player_builders::PlayerBuilder, common::death::DeathMarker, local_player::LocalPlayer, shaders::splat::SplatMaterial};
+use crate::{builders::player_builders::PlayerBuilder, common::death::DeathMarker, databases::splat_db::SplatDb, local_player::LocalPlayer, shaders::splat::SplatMaterial};
 
 
 #[derive(Component)]
@@ -25,15 +25,17 @@ pub fn player_splat(
     mut commands: Commands,
     query: Query<&Transform, (With<LocalPlayer>, Added<DeathMarker>)>,
     mut materials: ResMut<Assets<SplatMaterial>>,
-    asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
-    time: Res<Time>
+    time: Res<Time>,
+    splat_db: Res<SplatDb>
 ) {
     for transform in &query {
-        let splat_tex = asset_server.load("splat.png");
+        let (splat_tex, splat_rect) = splat_db.random_radial();
+
         let splat_mat = materials.add(SplatMaterial {
             current_time: time.elapsed_secs(),
-            texture: splat_tex
+            texture: splat_tex,
+            uv_rect: Vec4::new(splat_rect.min.x, splat_rect.min.y, splat_rect.max.x, splat_rect.max.y),
         });
         let mesh = meshes.add(Mesh::from(Rectangle::default()));
 

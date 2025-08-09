@@ -13,11 +13,13 @@ var blood_texture: texture_2d<f32>;
 @group(2) @binding(2)
 var blood_sampler: sampler;
 
+@group(2) @binding(3)
+var<uniform> atlas_rect: vec4f;
 
 @fragment
 fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
 
-    let reveal_duration = 0.1;
+    let reveal_duration = 0.08;
     let time_passed = globals.time - current_time;
     let center = vec2<f32>(0.5, 0.5);
     let dist = distance(mesh.uv, center);
@@ -26,7 +28,7 @@ fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
         discard;
     }
 
-    let shifted_uv = mesh.uv;
+    let shifted_uv = mix(atlas_rect.xy, atlas_rect.zw, mesh.uv);
     let tex_color = textureSample(blood_texture, blood_sampler, shifted_uv);
 
 

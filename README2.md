@@ -160,3 +160,4 @@ KEY + LOCKS
 - These splats can then be rotated by 90deg to create 8 compass directions, without rotating the pixels themselves
 - With a texture this size, should be able to create a lot of splats
 - For now can just hardcode Rect -> SplatData (ie type: radial/up/diagonal, size)
+- _Greyscale_ texture containing time. Since it's low resolution I can have theh large time be multiple seconds. This way I can add _dripping_

@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, databases::save_db::{SaveDb, SaveGame}, debugging::DebugPlugin, player::death::{player_splat, spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, splat::SplatMaterial}};
+use crate::{builders::player_builders::init_player_builder, common::physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::{player_splat, spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, splat::SplatMaterial}};
 
 mod common;
 
@@ -86,7 +86,9 @@ fn main() {
         .add_systems(Update, (start_dashing, break_fragiles, tick_saw_shooters, move_offset_movers, tick_phantom_block, check_phantom_block_touched, stop_interval_block_crush, tick_interval_blocks, check_touched_by_death, read_lock_block_triggers, trigger_on_touch, check_bouncy_collisions, check_animate_on_touch, update_player_airborn_look_state, update_player_grounded_look_state, update_player_look_direction))
         .add_systems(Update, (refresh_editor_renderer, draw_editor, update_mouse_data))
         .add_systems(Update, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
-        .add_systems(Update, (spawn_player_corpse, player_splat))
+        .add_systems(Update, spawn_player_corpse)
+        .add_systems(Startup, init_splat_db)
+        .add_systems(Update, player_splat)
         .add_event::<CollisionRemapEvent>()
         .add_systems(Update, (raise_collision_remap_events, handle_collision_remap_events).chain())
         .add_event::<TriggerEvent>()
