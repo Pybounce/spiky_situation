@@ -1,7 +1,7 @@
 
 
 use bevy::{
-    asset::AssetMetaCheck, prelude::*, sprite::Material2dPlugin, window::PresentMode, winit::{ UpdateMode, WinitSettings }
+    asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::PresentMode, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;

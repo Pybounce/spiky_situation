@@ -1,5 +1,5 @@
 
-use bevy::prelude::*;
+use bevy::{image::{ImageLoaderSettings, ImageSampler}, prelude::*, render::render_resource::{Extent3d, TextureFormat}};
 
 
 #[derive(Resource)]
@@ -50,7 +50,10 @@ pub fn init_splat_db(
     mut commands: Commands,
     asset_server: Res<AssetServer>
 ) {
-    let splats: Handle<Image> = asset_server.load("splats.png");
+    let splats: Handle<Image> = asset_server.load_with_settings("splats.png", |settings: &mut ImageLoaderSettings| {
+        settings.is_srgb = false;
+    });
+
     let entries = vec![
         SplatEntry::new(Rect::new(0.0, 0.0, 64.0  / 1024.0, 64.0 / 1024.0), SplatType::Radial, SplatDirection::UpAndDiagonal)
     ];

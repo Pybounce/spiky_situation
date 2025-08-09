@@ -16,21 +16,19 @@ var blood_sampler: sampler;
 @group(2) @binding(3)
 var<uniform> atlas_rect: vec4f;
 
+
 @fragment
 fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
 
-    let reveal_duration = 0.08;
     let time_passed = globals.time - current_time;
-    let center = vec2<f32>(0.5, 0.5);
-    let dist = distance(mesh.uv, center);
-    let reveal_time = dist / 0.707 * reveal_duration;
-    if (time_passed < reveal_time) {
-        discard;
-    }
-
     let shifted_uv = mix(atlas_rect.xy, atlas_rect.zw, mesh.uv);
-    let tex_color = textureSample(blood_texture, blood_sampler, shifted_uv);
+    var tex_color = textureSample(blood_texture, blood_sampler, shifted_uv);
 
-
+    // ok this is stupid but basically for each number of r, that should give it an 10ms delay
+    if time_passed * 1000.0 < tex_color.r * 255.0 * 10.0 {
+        tex_color.a = 0.0;
+    }
+    tex_color = vec4f(0.3, 0.0, 0.0, tex_color.a);
     return tex_color;
+
 }
