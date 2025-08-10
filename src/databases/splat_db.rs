@@ -1,16 +1,19 @@
 
 use bevy::{image::{ImageLoaderSettings, ImageSampler}, prelude::*, render::render_resource::{Extent3d, TextureFormat}};
+use rand::{rngs::ThreadRng, Rng};
 
 
 #[derive(Resource)]
 pub struct SplatDb {
     atlas: Handle<Image>,
-    splat_entries: Vec<SplatEntry>
+    splat_entries: Vec<SplatEntry>,
 }
 
 impl SplatDb {
     pub fn random_radial(&self) -> (Handle<Image>, Rect) {
-        return (self.atlas.clone(), self.splat_entries[0].rect);
+        let mut rng = rand::thread_rng();
+        let index = rng.gen_range(0..self.splat_entries.len());
+        return (self.atlas.clone(), self.splat_entries[index].rect);
     }
 }
 
@@ -55,7 +58,8 @@ pub fn init_splat_db(
     });
 
     let entries = vec![
-        SplatEntry::new(Rect::new(0.0, 0.0, 64.0  / 1024.0, 64.0 / 1024.0), SplatType::Radial, SplatDirection::UpAndDiagonal)
+        SplatEntry::new(Rect::new(0.0, 0.0, 64.0  / 1024.0, 64.0 / 1024.0), SplatType::Radial, SplatDirection::UpAndDiagonal),
+        SplatEntry::new(Rect::new(64.0  / 1024.0, 0.0, 128.0  / 1024.0, 64.0 / 1024.0), SplatType::Radial, SplatDirection::UpAndDiagonal)
     ];
 
     commands.insert_resource(SplatDb {

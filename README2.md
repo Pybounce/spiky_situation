@@ -161,3 +161,10 @@ KEY + LOCKS
 - With a texture this size, should be able to create a lot of splats
 - For now can just hardcode Rect -> SplatData (ie type: radial/up/diagonal, size)
 - _Greyscale_ texture containing time. Since it's low resolution I can have theh large time be multiple seconds. This way I can add _dripping_
+
+#### Editor
+
+**Quality of Life**
+
+- Zooming in and out moves you closer/further to/from your cursor location (like sprite editor)
+- Hold to place
