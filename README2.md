@@ -168,3 +168,20 @@ KEY + LOCKS
 
 - Zooming in and out moves you closer/further to/from your cursor location (like sprite editor)
 - Hold to place
+
+#### Camera Footage
+
+**How**
+
+- Can put the border lines in the shader
+- Can have a resource with some config for the margins etc
+  - Since the border outlines and the UI will need to be some amount from the screen edge
+  - Then can have a system with Changed<Settings> or whatever
+
+**What**
+
+- Very subtle scan lines
+- Vignette to simulate lens or screen glow
+- Chromatic aberration
+- Noise/static: Random flicker or grain
+- Barrel distortion: Slight curvature at screen edges
