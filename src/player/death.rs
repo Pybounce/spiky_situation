@@ -1,5 +1,8 @@
 
+use std::f32::consts::FRAC_PI_2;
+
 use bevy::prelude::*;
+use rand::Rng;
 
 use crate::{builders::player_builders::PlayerBuilder, common::death::DeathMarker, databases::splat_db::SplatDb, local_player::LocalPlayer, shaders::splat::SplatMaterial};
 
@@ -29,25 +32,34 @@ pub fn player_splat(
     time: Res<Time>,
     splat_db: Res<SplatDb>
 ) {
+    let mut rng = rand::thread_rng();
+
     for transform in &query {
-        let (splat_tex, splat_rect) = splat_db.random_radial();
+        for _ in 0..1 {
+            let (splat_tex, splat_rect) = splat_db.random_radial();
 
-        let splat_mat = materials.add(SplatMaterial {
-            current_time: time.elapsed_secs(),
-            texture: splat_tex,
-            uv_rect: Vec4::new(splat_rect.min.x, splat_rect.min.y, splat_rect.max.x, splat_rect.max.y),
-        });
-        let mesh = meshes.add(Mesh::from(Rectangle::default()));
+            let uv_rect = Vec4::new(splat_rect.min.x / 1024.0, splat_rect.min.y / 1024.0, splat_rect.max.x / 1024.0, splat_rect.max.y / 1024.0);
 
-        commands.spawn((
-            Mesh2d(mesh),
-            MeshMaterial2d(splat_mat),
-            Transform { 
-                translation: transform.translation - (Vec3::Z * 10.0), 
-                scale: Vec3::splat(64.0),
-                ..default()
-            },
-        ));
+            let splat_mat = materials.add(SplatMaterial {
+                current_time: time.elapsed_secs(),
+                texture: splat_tex,
+                uv_rect: uv_rect,
+                brightness: rng.gen_range(0.8..1.2)
+            });
+            let mesh = meshes.add(Mesh::from(Rectangle::default()));
+
+            commands.spawn((
+                Mesh2d(mesh),
+                MeshMaterial2d(splat_mat),
+                Transform { 
+                    translation: transform.translation - (Vec3::Z * 10.0), 
+                    scale: Vec3::new(splat_rect.width(), splat_rect.height(), 1.0),
+                    rotation: Quat::from_rotation_z(rng.gen_range(0..4) as f32 * FRAC_PI_2 * 0.0),
+                    ..default()
+                },
+            ));
+        }
+
 
     }
 }
