@@ -185,3 +185,10 @@ KEY + LOCKS
 - Chromatic aberration
 - Noise/static: Random flicker or grain
 - Barrel distortion: Slight curvature at screen edges
+
+**UI**
+
+- Stage name: "Camera - <Level 3-14>"
+- Deaths
+- Time passed: "15:23.02"
+-
