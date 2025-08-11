@@ -2,7 +2,7 @@
 use bevy::{input::mouse::MouseWheel, prelude::*};
 use bevy_rapier2d::prelude::*;
 
-use crate::local_player::LocalPlayer;
+use crate::{local_player::LocalPlayer, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
 
 const CAMERA_ZOOM: u32 = 3;
 const CAMERA_ZOOM_MAX: u32 = 10;
@@ -28,7 +28,11 @@ pub fn spawn_camera(mut commands: Commands) {
                 translation: Vec3::default(),
                 factor: CAMERA_ZOOM as u32
             },
-            Msaa::Off
+            Msaa::Off,
+            CCTVPostProcessSettings {
+                intensity: 0.0005,
+                ..default()
+            },
         ));
 }
 

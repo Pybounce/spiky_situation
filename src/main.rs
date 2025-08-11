@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::{player_splat, spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, splat::SplatMaterial}};
+use crate::{builders::player_builders::init_player_builder, common::physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::{player_splat, spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, cctv_shader::plugin::CCTVPostProcessPlugin, splat::SplatMaterial}};
 
 mod common;
 
@@ -69,6 +69,7 @@ fn main() {
         .add_plugins(MainMenuPlugin)
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
+        .add_plugins(CCTVPostProcessPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
