@@ -282,7 +282,7 @@ impl FromWorld for PostProcessPipeline {
 // This is the component that will get passed to the shader
 #[derive(Component, Default, Clone, Copy, ExtractComponent, ShaderType)]
 pub struct CCTVPostProcessSettings {
-    pub intensity: f32,
+    pub chromatic_intensity: f32,
 }
 
 

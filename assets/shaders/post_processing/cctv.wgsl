@@ -3,7 +3,7 @@
 @group(0) @binding(0) var screen_texture: texture_2d<f32>;
 @group(0) @binding(1) var texture_sampler: sampler;
 struct PostProcessSettings {
-    intensity: f32,
+    chromatic_intensity: f32,
 }
 @group(0) @binding(2) var<uniform> settings: PostProcessSettings;
 
@@ -12,12 +12,12 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
 
     let fisheye_uv = fisheye_distorted_uv(in.uv);
 
-    let offset_strength = settings.intensity;
+    let chromatic_intensity = settings.chromatic_intensity;
 
     return vec4<f32>(
-        textureSample(screen_texture, texture_sampler, fisheye_uv + vec2<f32>(offset_strength, -offset_strength)).r,
-        textureSample(screen_texture, texture_sampler, fisheye_uv + vec2<f32>(-offset_strength, 0.0)).g,
-        textureSample(screen_texture, texture_sampler, fisheye_uv + vec2<f32>(0.0, offset_strength)).b,
+        textureSample(screen_texture, texture_sampler, fisheye_uv + vec2<f32>(chromatic_intensity, -chromatic_intensity)).r,
+        textureSample(screen_texture, texture_sampler, fisheye_uv + vec2<f32>(-chromatic_intensity, 0.0)).g,
+        textureSample(screen_texture, texture_sampler, fisheye_uv + vec2<f32>(0.0, chromatic_intensity)).b,
         1.0
     );
 }

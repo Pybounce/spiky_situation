@@ -30,7 +30,7 @@ pub fn spawn_camera(mut commands: Commands) {
             },
             Msaa::Off,
             CCTVPostProcessSettings {
-                intensity: 0.0005,
+                chromatic_intensity: 0.0005,
                 ..default()
             },
         ));
