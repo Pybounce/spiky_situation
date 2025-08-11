@@ -33,11 +33,11 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     c *= min(1.0, max(0.0, pow(vignette, vignette_intensity)));
 
 
-    let stripe_dark_mul = 0.9;
-    let stripe_width: f32 = 0.01;
-    let speed: f32 = 0.3;
-    let shifted_x = -in.uv.y + settings.time * speed;
-    let stripe = floor(shifted_x / stripe_width) % 2.0;
+    let stripe_dark_mul = 0.92;
+    let stripe_width: f32 = 0.15;
+    let speed: f32 = 1.1;
+    let shifted_x = -fisheye_uv.y + settings.time * speed;
+    let stripe = floor(shifted_x / stripe_width) % 7.0;
     if stripe == 0.0 {
         c *= vec4f(stripe_dark_mul, stripe_dark_mul, stripe_dark_mul, 1.0);
     }
