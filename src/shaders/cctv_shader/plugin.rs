@@ -283,6 +283,9 @@ impl FromWorld for PostProcessPipeline {
 #[derive(Component, Default, Clone, Copy, ExtractComponent, ShaderType)]
 pub struct CCTVPostProcessSettings {
     pub chromatic_intensity: f32,
+    pub fisheye_intensity: f32,
+    pub vignette_intensity: f32,
+    pub vignette_start: f32,
 }
 
 
