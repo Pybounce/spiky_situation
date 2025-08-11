@@ -3,6 +3,7 @@
 @group(0) @binding(0) var screen_texture: texture_2d<f32>;
 @group(0) @binding(1) var texture_sampler: sampler;
 struct PostProcessSettings {
+    time: f32,
     chromatic_intensity: f32,
     fisheye_intensity: f32,
     vignette_intensity: f32,
@@ -30,6 +31,17 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let uv_sqrd = fisheye_uv * (1.0 - fisheye_uv.yx);
     let vignette = uv_sqrd.x * uv_sqrd.y * vignette_start;
     c *= min(1.0, max(0.0, pow(vignette, vignette_intensity)));
+
+
+    let stripe_dark_mul = 0.9;
+    let stripe_width: f32 = 0.01;
+    let speed: f32 = 0.3;
+    let shifted_x = -in.uv.y + settings.time * speed;
+    let stripe = floor(shifted_x / stripe_width) % 2.0;
+    if stripe == 0.0 {
+        c *= vec4f(stripe_dark_mul, stripe_dark_mul, stripe_dark_mul, 1.0);
+    }
+
 
     return c;
 }

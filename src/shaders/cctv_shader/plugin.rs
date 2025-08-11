@@ -8,17 +8,12 @@ use bevy::{
         extract_component::{
             ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin,
             UniformComponentPlugin,
-        },
-        render_graph::{
+        }, globals::GlobalsUniform, render_asset::RenderAssets, render_graph::{
             NodeRunError, RenderGraphApp, RenderGraphContext, RenderLabel, ViewNode, ViewNodeRunner,
-        },
-        render_resource::{
+        }, render_resource::{
             binding_types::{sampler, texture_2d, uniform_buffer},
             *,
-        },
-        renderer::{RenderContext, RenderDevice},
-        view::ViewTarget,
-        RenderApp,
+        }, renderer::{RenderContext, RenderDevice}, view::{ViewTarget, ViewUniforms}, RenderApp
     }, ui::graph::{NodeUi, SubGraphUi},
 };
 
@@ -284,6 +279,7 @@ impl FromWorld for PostProcessPipeline {
 // This is the component that will get passed to the shader
 #[derive(Component, Default, Clone, Copy, ExtractComponent, ShaderType)]
 pub struct CCTVPostProcessSettings {
+    pub time: f32,
     pub chromatic_intensity: f32,
     pub fisheye_intensity: f32,
     pub vignette_intensity: f32,
