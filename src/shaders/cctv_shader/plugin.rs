@@ -1,6 +1,6 @@
 use bevy::{
     core_pipeline::{
-        core_2d::graph::{Core2d, Node2d}, core_3d::graph::{Core3d, Node3d}, fullscreen_vertex_shader::fullscreen_shader_vertex_state
+        core_2d::graph::{Core2d, Node2d}, fullscreen_vertex_shader::fullscreen_shader_vertex_state
     },
     ecs::query::QueryItem,
     prelude::*,
@@ -19,7 +19,7 @@ use bevy::{
         renderer::{RenderContext, RenderDevice},
         view::ViewTarget,
         RenderApp,
-    },
+    }, ui::graph::{NodeUi, SubGraphUi},
 };
 
 const SHADER_ASSET_PATH: &str = "shaders/post_processing/cctv.wgsl";
@@ -74,8 +74,10 @@ impl Plugin for CCTVPostProcessPlugin {
                 // This will automatically create all required node edges to enforce the given ordering.
                 (
                     Node2d::Tonemapping,
-                    PostProcessLabel,
                     Node2d::EndMainPassPostProcessing,
+                    NodeUi::UiPass,
+                    PostProcessLabel,
+                    Node2d::Upscaling,
                 ),
             );
     }

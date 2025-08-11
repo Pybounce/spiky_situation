@@ -1,5 +1,5 @@
 
-use bevy::{input::mouse::MouseWheel, prelude::*};
+use bevy::{core_pipeline::bloom::Bloom, input::mouse::MouseWheel, prelude::*};
 use bevy_rapier2d::prelude::*;
 
 use crate::{local_player::LocalPlayer, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
@@ -31,7 +31,7 @@ pub fn spawn_camera(mut commands: Commands) {
             Msaa::Off,
             CCTVPostProcessSettings {
                 chromatic_intensity: 0.0005,
-                fisheye_intensity: 0.02,
+                fisheye_intensity: 0.025,
                 vignette_intensity: 0.4,
                 vignette_start: 70.0
             },

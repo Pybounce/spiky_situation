@@ -20,8 +20,8 @@ pub fn add_endless_mode_ui(
     commands
         .spawn(Node {
             position_type: PositionType::Absolute,
-            top: Val::Px(20.0),
-            left: Val::Px(20.0),
+            top: Val::Px(50.0),
+            left: Val::Px(50.0),
             flex_direction: FlexDirection::Column,
             row_gap: Val::Px(15.0),
             ..default()
