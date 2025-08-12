@@ -18,16 +18,17 @@ pub fn add_endless_mode_ui(
     mut commands: Commands
 ) {
     commands
-        .spawn(Node {
-            width: Val::Percent(100.0),
-            height: Val::Percent(100.0),
-            flex_direction: FlexDirection::Column,
-            justify_content: JustifyContent::SpaceBetween,
-            align_content: AlignContent::SpaceBetween,
-            border: UiRect::all(Val::Percent(4.0)),
-            ..default()
-        })
-        .with_children(|parent| {
+        .spawn((Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                flex_direction: FlexDirection::Column,
+                justify_content: JustifyContent::SpaceBetween,
+                align_content: AlignContent::SpaceBetween,
+                border: UiRect::all(Val::Percent(4.0)),
+                ..default()
+            }, 
+            DespawnOnStateExit::App(AppState::Game))
+        ).with_children(|parent| {
 
             parent.spawn(
                 Node {
@@ -46,11 +47,48 @@ pub fn add_endless_mode_ui(
                         width: Val::Auto,
                         height: Val::Auto,
                         border: UiRect::left(Val::Px(5.0)).with_top(Val::Px(5.0)),
+                        flex_direction: FlexDirection::Column,
                         ..default()
                     },
-                    BorderColor(Color::WHITE),
-
-                ));
+                    BorderColor(Color::WHITE)
+                )).with_children(|top_left_corner| {
+                    top_left_corner.spawn((
+                        Node {
+                            position_type: PositionType::Relative,
+                            margin: UiRect::left(Val::Px(20.0)).with_top(Val::Px(20.0)),
+                            ..default()
+                        },
+                        TextFont {
+                            font_size: 28.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                        Text::new(""),
+                        EndlessStagesCompleteText,
+                        TextLayout {
+                            linebreak: LineBreak::NoWrap,
+                            ..default()
+                        }
+                    ));
+                    top_left_corner.spawn((
+                        Node {
+                            position_type: PositionType::Relative,
+                            margin: UiRect::left(Val::Px(20.0)),
+                            ..default()
+                        },
+                        TextFont {
+                            font_size: 28.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                        Text::new(""),
+                        EndlessLivesRemainingText,
+                        TextLayout {
+                            linebreak: LineBreak::NoWrap,
+                            ..default()
+                        }
+                    ));
+                });
                 top_row_parent.spawn((
                     Node {
                         min_width: Val::Px(150.),
@@ -103,34 +141,6 @@ pub fn add_endless_mode_ui(
 
                 ));
             });
-
-            //parent.spawn((
-            //    Node {
-            //        ..default()
-            //    },
-            //    TextFont {
-            //        font_size: 28.0,
-            //        ..default()
-            //    },
-            //    TextColor(Color::WHITE),
-            //    Text::new(""),
-            //    EndlessStagesCompleteText,
-            //    DespawnOnStateExit::App(AppState::Game)
-            //));
-//
-            //parent.spawn((
-            //    Node {
-            //        ..default()
-            //    },
-            //    TextFont {
-            //        font_size: 28.0,
-            //        ..default()
-            //    },
-            //    TextColor(Color::WHITE),
-            //    Text::new(""),
-            //    EndlessLivesRemainingText,
-            //    DespawnOnStateExit::App(AppState::Game)
-            //));
         });
 
 }
