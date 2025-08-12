@@ -34,7 +34,11 @@ pub fn spawn_camera(mut commands: Commands) {
                 chromatic_intensity: 0.0005,
                 fisheye_intensity: 0.025,
                 vignette_intensity: 0.4,
-                vignette_start: 70.0
+                vignette_start: 70.0,
+                scanline_dark_mul: 0.95,
+                scanline_width: 0.15,
+                scanline_speed: 0.7,
+                scanline_gap: 7.0,
             },
         ));
 }

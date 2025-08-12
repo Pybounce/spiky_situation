@@ -277,6 +277,7 @@ impl FromWorld for PostProcessPipeline {
 }
 
 // This is the component that will get passed to the shader
+#[repr(C)]
 #[derive(Component, Default, Clone, Copy, ExtractComponent, ShaderType)]
 pub struct CCTVPostProcessSettings {
     pub time: f32,
@@ -284,6 +285,10 @@ pub struct CCTVPostProcessSettings {
     pub fisheye_intensity: f32,
     pub vignette_intensity: f32,
     pub vignette_start: f32,
+    pub scanline_dark_mul: f32,
+    pub scanline_width: f32,
+    pub scanline_speed: f32,
+    pub scanline_gap: f32,
 }
 
 
