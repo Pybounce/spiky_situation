@@ -46,7 +46,7 @@ pub fn add_endless_mode_ui(
                         max_height: Val::Percent(5.),
                         width: Val::Auto,
                         height: Val::Auto,
-                        border: UiRect::left(Val::Px(5.0)).with_top(Val::Px(5.0)),
+                        border: UiRect::left(Val::Px(6.0)).with_top(Val::Px(6.0)),
                         flex_direction: FlexDirection::Column,
                         ..default()
                     },
@@ -65,6 +65,10 @@ pub fn add_endless_mode_ui(
                         TextColor(Color::WHITE),
                         Text::new(""),
                         EndlessStagesCompleteText,
+                        TextShadow {
+                            offset: Vec2::splat(3.0),
+                            color: Color::linear_rgba(0.0, 0.0, 0.0, 1.0),
+                        },
                         TextLayout {
                             linebreak: LineBreak::NoWrap,
                             ..default()
@@ -97,7 +101,7 @@ pub fn add_endless_mode_ui(
                         max_height: Val::Percent(5.),
                         width: Val::Auto,
                         height: Val::Auto,
-                        border: UiRect::right(Val::Px(5.0)).with_top(Val::Px(5.0)),
+                        border: UiRect::right(Val::Px(6.0)).with_top(Val::Px(6.0)),
                         ..default()
                     },
                     BorderColor(Color::WHITE),
@@ -121,7 +125,7 @@ pub fn add_endless_mode_ui(
                         max_height: Val::Percent(5.),
                         width: Val::Auto,
                         height: Val::Auto,
-                        border: UiRect::left(Val::Px(5.0)).with_bottom(Val::Px(5.0)),
+                        border: UiRect::left(Val::Px(6.0)).with_bottom(Val::Px(6.0)),
                         ..default()
                     },
                     BorderColor(Color::WHITE),
@@ -134,7 +138,7 @@ pub fn add_endless_mode_ui(
                         max_height: Val::Percent(5.),
                         width: Val::Auto,
                         height: Val::Auto,
-                        border: UiRect::right(Val::Px(5.0)).with_bottom(Val::Px(5.0)),
+                        border: UiRect::right(Val::Px(6.0)).with_bottom(Val::Px(6.0)),
                         ..default()
                     },
                     BorderColor(Color::WHITE),
