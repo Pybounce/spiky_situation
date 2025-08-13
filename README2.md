@@ -31,6 +31,17 @@
 - [ ] Run Dead screen
 - [ ] More stages! :D
 
+#### Delayed Events
+
+- Could use this to let the death happen and wait x seconds
+- OR could add event triggers to Animators and other stuff?
+
+#### New Trap
+
+- Spikes that rise x seconds after you step on them.
+- Could possibly use Triggers since they stay forever.
+- To reset, maybe have another component that can reset a triggerId after x seconds? maybe delayed event? who knows.
+
 #### Collectables
 
 - Components for MoveOnCollide and SoundOnCollide and FlashOnCollide
