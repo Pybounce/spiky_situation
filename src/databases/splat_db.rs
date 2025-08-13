@@ -10,25 +10,29 @@ pub struct SplatDb {
 }
 
 impl SplatDb {
-    pub fn random_radial(&self) -> (Handle<Image>, Rect) {
+    pub fn random_radial(&self) -> (Handle<Image>, Rect, Vec2) {
         let mut rng = rand::thread_rng();
         let index = rng.gen_range(0..self.splat_entries.len());
-        return (self.atlas.clone(), self.splat_entries[index].rect);
+        return (self.atlas.clone(), self.splat_entries[index].rect, self.splat_entries[index].origin_offset);
     }
 }
 
 struct SplatEntry {
     pub rect: Rect,
     pub splat_type: SplatType,
-    pub splat_direction: SplatDirection
+    pub splat_direction: SplatDirection,
+    pub splat_size: SplatSize,
+    pub origin_offset: Vec2
 }
 
 impl SplatEntry {
-    pub fn new(rect: Rect, splat_type: SplatType, direction: SplatDirection) -> Self {
+    pub fn new(rect: Rect, splat_type: SplatType, direction: SplatDirection, origin_offset: Vec2, size: SplatSize) -> Self {
         return Self {
             rect,
             splat_type,
-            splat_direction: direction
+            splat_direction: direction,
+            origin_offset,
+            splat_size: size
         };
     }
 }
@@ -37,6 +41,11 @@ enum SplatType {
     Radial,
     Long,
     Wide
+}
+
+enum SplatSize {
+    Small,
+    Large
 }
 
 enum SplatDirection {
@@ -58,8 +67,9 @@ pub fn init_splat_db(
     });
 
     let entries = vec![
-        SplatEntry::new(Rect::new(0.0, 0.0, 64.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal),
-        SplatEntry::new(Rect::new(64.0, 0.0, 128.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal),
+        SplatEntry::new(Rect::new(0.0, 0.0, 64.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal, Vec2::ZERO, SplatSize::Large),
+        //SplatEntry::new(Rect::new(64.0, 0.0, 128.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal, Vec2::ZERO),
+        SplatEntry::new(Rect::new(192.0, 0.0, 240.0, 96.0), SplatType::Long, SplatDirection::Up, Vec2::new(-8.0, -24.0), SplatSize::Large),
         //SplatEntry::new(Rect::new(128.0, 0.0, 192.0, 64.0), SplatType::Long, SplatDirection::Up)
     ];
 

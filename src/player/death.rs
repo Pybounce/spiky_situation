@@ -35,8 +35,8 @@ pub fn player_splat(
     let mut rng = rand::thread_rng();
 
     for transform in &query {
-        for _ in 0..1 {
-            let (splat_tex, splat_rect) = splat_db.random_radial();
+        for _ in 0..2 {
+            let (splat_tex, splat_rect, origin_offset) = splat_db.random_radial();
 
             let uv_rect = Vec4::new(splat_rect.min.x / 1024.0, splat_rect.min.y / 1024.0, splat_rect.max.x / 1024.0, splat_rect.max.y / 1024.0);
 
@@ -52,7 +52,7 @@ pub fn player_splat(
                 Mesh2d(mesh),
                 MeshMaterial2d(splat_mat),
                 Transform { 
-                    translation: transform.translation - (Vec3::Z * 10.0), 
+                    translation: transform.translation - (Vec3::Z * 10.0) - origin_offset.extend(0.0), 
                     scale: Vec3::new(splat_rect.width(), splat_rect.height(), 1.0),
                     rotation: Quat::from_rotation_z(rng.gen_range(0..4) as f32 * FRAC_PI_2 * 0.0),
                     ..default()
