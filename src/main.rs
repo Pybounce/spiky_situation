@@ -69,7 +69,7 @@ fn main() {
         .add_plugins(MainMenuPlugin)
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
-        .add_plugins(CCTVPostProcessPlugin)
+        //.add_plugins(CCTVPostProcessPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())

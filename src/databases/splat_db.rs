@@ -68,9 +68,10 @@ pub fn init_splat_db(
 
     let entries = vec![
         SplatEntry::new(Rect::new(0.0, 0.0, 64.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal, Vec2::ZERO, SplatSize::Large),
-        //SplatEntry::new(Rect::new(64.0, 0.0, 128.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal, Vec2::ZERO),
+        SplatEntry::new(Rect::new(64.0, 0.0, 128.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal, Vec2::ZERO, SplatSize::Large),
+        //SplatEntry::new(Rect::new(128.0, 0.0, 192.0, 64.0), SplatType::Long, SplatDirection::Up),
         SplatEntry::new(Rect::new(192.0, 0.0, 240.0, 96.0), SplatType::Long, SplatDirection::Up, Vec2::new(-8.0, -24.0), SplatSize::Large),
-        //SplatEntry::new(Rect::new(128.0, 0.0, 192.0, 64.0), SplatType::Long, SplatDirection::Up)
+        SplatEntry::new(Rect::new(240.0, 0.0, 272.0, 96.0), SplatType::Long, SplatDirection::Up, Vec2::new(0.0, -24.0), SplatSize::Large),
     ];
 
     commands.insert_resource(SplatDb {

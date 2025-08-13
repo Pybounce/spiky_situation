@@ -31,6 +31,13 @@
 - [ ] Run Dead screen
 - [ ] More stages! :D
 
+#### Blood Rework
+
+- Have BloodEmitter, BloodProvider
+- When BloodEmitter and BloodProvider collide, BloodEmitter should you know...emit some blood
+- BloodEmitter has a direction, maybe preferred mix of blood effects (2 long, 1 radial etc)
+- Then I can also use Velocity and I'll have the positions of both collision bodies
+
 #### Delayed Events
 
 - Could use this to let the death happen and wait x seconds
