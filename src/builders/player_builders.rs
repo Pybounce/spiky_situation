@@ -1,7 +1,7 @@
 use bevy::{ecs::system::EntityCommands, prelude::*};
 use bevy_rapier2d::prelude::{Ccd, Collider, CollidingEntities, GravityScale, LockedAxes, RigidBody, Sensor, Velocity};
 
-use crate::{common::{death::{DelayedDeathMarker, Killable}, physics::gravity::Gravity}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{death::{DelayedDeathMarker, Killable}, physics::gravity::Gravity, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::local_player::*;
 
 #[derive(Resource)]
@@ -100,7 +100,8 @@ impl PlayerBuilder {
             Wallable,
             DashController::default(),
             LockedAxes::ROTATION_LOCKED,
-            Sensor
+            Sensor,
+            SplatOnDeath
         )));
 
     }
