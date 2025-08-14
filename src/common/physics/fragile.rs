@@ -18,10 +18,10 @@ pub fn break_fragiles(
         };
 
         if let Ok((e, fs)) = fragile_query.get(entity1) {
-            fragile_hit(&mut commands, e, fs);
+            fragile_hit(&mut commands, e, fs, entity2);
         }
         if let Ok((e, fs)) = fragile_query.get(entity2) {
-            fragile_hit(&mut commands, e, fs);
+            fragile_hit(&mut commands, e, fs, entity1);
         }
     }
 }
@@ -32,9 +32,9 @@ pub fn break_fragiles(
 #[derive(Component)]
 pub struct FragileShield;
 
-fn fragile_hit(commands: &mut Commands, entity: Entity, shield: Option<&FragileShield>) {
+fn fragile_hit(commands: &mut Commands, entity: Entity, shield: Option<&FragileShield>, hit_by: Entity) {
     match shield {
         Some(_) => commands.entity(entity).remove::<FragileShield>(),
-        None => commands.entity(entity).try_insert(DeathMarker),
+        None => commands.entity(entity).try_insert(DeathMarker::killed_by(hit_by)),
     };
 }

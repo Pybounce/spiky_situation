@@ -34,7 +34,7 @@ pub fn read_lock_block_triggers(
     for trigger_event in trigger_event_reader.read() {
         for (entity, triggerable) in &lock_block_triggerables {
             if triggerable.trigger_id == trigger_event.trigger_id {
-                commands.entity(entity).try_insert(DeathMarker);
+                commands.entity(entity).try_insert(DeathMarker::default());
             }
         }
     }
