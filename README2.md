@@ -31,6 +31,11 @@
 - [ ] Run Dead screen
 - [ ] More stages! :D
 
+#### Improvements
+
+- [ ] CCTV lines
+  - Basically tiny scanlines but they don't move, just static
+
 #### Blood Rework
 
 - Have BloodEmitter, BloodProvider

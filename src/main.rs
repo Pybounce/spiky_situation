@@ -95,5 +95,6 @@ fn main() {
         .add_systems(Update, (raise_collision_remap_events, handle_collision_remap_events).chain())
         .add_event::<TriggerEvent>()
         .run();
+  
 }
 
