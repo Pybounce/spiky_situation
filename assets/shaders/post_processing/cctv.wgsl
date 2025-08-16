@@ -53,11 +53,26 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
         scanline_output = stripe_dark_mul;
     }
 
+    let vertical_line_mul = vertical_lines(fisheye_uv.x);
+    c *= vertical_line_mul;
+
     c *= min(vignette_output, scanline_output);
     c.a = 1.0;
     return c;
 }
 
+fn vertical_lines(x_uv: f32) -> f32 {
+    let stripe_dark_mul = 0.96;
+    let stripe_width: f32 = 0.002;
+    let gap: f32 = 2.0;
+
+    let stripe = floor(x_uv / stripe_width) % gap;
+    var scanline_output = 1.0;
+    if stripe == 0.0 {
+        scanline_output = stripe_dark_mul;
+    }
+    return scanline_output;
+}
 
 
 fn fisheye_distorted_uv(uv: vec2f) -> vec2f {
