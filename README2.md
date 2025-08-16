@@ -31,6 +31,13 @@
 - [ ] Run Dead screen
 - [ ] More stages! :D
 
+#### Splats
+
+- Issue right now is that they are based off of transforms, not colliders
+- Possibly better to have a SplatProvider component
+- Then I can still have splat on death and everything working the same way
+- But instead of getting GlobalTransform with the killer entity, I get SplatProvider, which will give me better details
+
 #### Improvements
 
 - [ ] CCTV lines
