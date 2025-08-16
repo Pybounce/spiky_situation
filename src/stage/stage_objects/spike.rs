@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::{math::Vect, prelude::{ActiveEvents, Collider, CollisionGroups, Group, RigidBody}};
 
-use crate::{obstacles::InstantKiller, stage::stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}};
+use crate::{common::splat::SplatProvider, obstacles::InstantKiller, stage::stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}};
 
 use super::{tiles::TileBundle, StageObject};
 
@@ -23,6 +23,9 @@ impl SpikeFactory {
             RigidBody::Fixed,
             InstantKiller,
             Spike,
+            SplatProvider {
+                translation_offset: Vec2::new(0.0, -(TILE_SIZE_HALF * 0.2)),
+            }
         ));
 
     }

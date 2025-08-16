@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::{math::Vect, prelude::{ActiveEvents, Collider, CollisionGroups, Group, RigidBody}};
 
-use crate::{common::{animated_sprite::SpriteAnimator, offset_mover::OffsetMover}, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}};
+use crate::{common::{animated_sprite::SpriteAnimator, offset_mover::OffsetMover, splat::SplatProvider}, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}};
 
 use super::{tiles::TileBundle, StageObject};
 
@@ -24,6 +24,9 @@ impl SawFactory {
             RigidBody::Fixed,
             InstantKiller,
             HalfSaw,
+            SplatProvider {
+                translation_offset: Vec2::new(0.0, -TILE_SIZE_HALF),
+            }
         ));
         match &saw_asset.movement_path_opt {
             Some(mp) => { e.insert(OffsetMover::new_from_grid(&mp.grid_offsets, mp.speed)); },

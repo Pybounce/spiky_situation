@@ -9,6 +9,14 @@ use crate::{common::death::DeathMarker, databases::splat_db::SplatDb, shaders::s
 #[derive(Component)]
 pub struct SplatOnDeath;
 
+
+#[derive(Component)]
+pub struct SplatProvider {
+    /// Instead of using the Entity's translation to calc splat direction, use translation + offset
+    pub translation_offset: Vec2
+}
+
+
 fn angle_from_positive_y(dir: Vec2) -> f32 {
     let dot = dir.dot(-Vec2::Y);
     let mut angle = -(dot - 1.0);
@@ -18,7 +26,7 @@ fn angle_from_positive_y(dir: Vec2) -> f32 {
 
 pub fn apply_splat_on_death(
     mut commands: Commands,
-    query: Query<(&GlobalTransform, &DeathMarker), (With<SplatOnDeath>, Added<DeathMarker>)>,
+    query: Query<(&GlobalTransform, &DeathMarker, Option<&SplatProvider>), (With<SplatOnDeath>, Added<DeathMarker>)>,
     transform_query: Query<&GlobalTransform>,
     mut materials: ResMut<Assets<SplatMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -26,13 +34,16 @@ pub fn apply_splat_on_death(
     splat_db: Res<SplatDb>
 ) {
     let mut rng = rand::thread_rng();
-    for (transform, death_mark) in &query {
+    for (transform, death_mark, splat_provider_opt) in &query {
 
         let splat_rotation = match death_mark.killed_by {
             Some(killed_by) => {
                 if let Ok(killer_transform) = transform_query.get(killed_by) {
-                    let killer_pos = killer_transform.compute_transform().translation;
-                    let splat_emitter_pos = transform.compute_transform().translation;
+                    let killer_pos = match splat_provider_opt {
+                        Some(provider) => killer_transform.translation() + provider.translation_offset.extend(0.0),
+                        None => killer_transform.translation(),
+                    };
+                    let splat_emitter_pos = transform.translation();
                     let direction = (killer_pos - splat_emitter_pos).truncate().normalize_or_zero();
                     let angle = angle_from_positive_y(direction);
                     let snapped_angle = (angle / (std::f32::consts::PI / 4.0)).round() * (std::f32::consts::PI / 4.0);
