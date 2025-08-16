@@ -10,13 +10,9 @@ use crate::{common::death::DeathMarker, databases::splat_db::SplatDb, shaders::s
 pub struct SplatOnDeath;
 
 fn angle_from_positive_y(dir: Vec2) -> f32 {
-    let dot = dir.dot(Vec2::Y);
-    println!("dir: {}", dir);
-    println!("dot: {}", dot);
-
+    let dot = dir.dot(-Vec2::Y);
     let mut angle = -(dot - 1.0);
     if dir.x < 0.0 { angle = -angle; }
-    println!("angle: {}", angle * 90.0);
     return angle * std::f32::consts::FRAC_PI_2; 
 }
 
@@ -35,23 +31,12 @@ pub fn apply_splat_on_death(
         let splat_rotation = match death_mark.killed_by {
             Some(killed_by) => {
                 if let Ok(killer_transform) = transform_query.get(killed_by) {
-                    println!("killed by: {}", killed_by);
-
-                    let killer_pos = killer_transform.rotation().inverse() * killer_transform.compute_transform().translation;
+                    let killer_pos = killer_transform.compute_transform().translation;
                     let splat_emitter_pos = transform.compute_transform().translation;
-                    println!("player_loc: {}", splat_emitter_pos);
-                    println!("killer_pos: {}", killer_pos);
                     let direction = (killer_pos - splat_emitter_pos).truncate().normalize_or_zero();
                     let angle = angle_from_positive_y(direction);
-                    let snapped_angle = (std::f32::consts::PI / 4.0);//(angle / (std::f32::consts::PI / 2.0)).round() * (std::f32::consts::PI / 2.0);
-
-                    println!("ang: {}", angle * 180.0 / std::f32::consts::PI);
-                    println!("rot: {}", snapped_angle * 180.0 / std::f32::consts::PI);
-                    println!();
-                    println!();
-                    println!();
-                    //Quat::from_rotation_z(snapped_angle)
-                    Quat::IDENTITY
+                    let snapped_angle = (angle / (std::f32::consts::PI / 4.0)).round() * (std::f32::consts::PI / 4.0);
+                    Quat::from_rotation_z(snapped_angle)
                 } else { Quat::IDENTITY }
             },
             None => Quat::IDENTITY,

@@ -1,7 +1,7 @@
 
 
 use bevy::{
-    asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::PresentMode, winit::{ UpdateMode, WinitSettings }
+    asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode}, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;
@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::{physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::apply_splat_on_death}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}};
+use crate::{builders::player_builders::init_player_builder, common::{physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::apply_splat_on_death}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::spike::Spike};
 
 mod common;
 
@@ -97,4 +97,3 @@ fn main() {
         .run();
   
 }
-
