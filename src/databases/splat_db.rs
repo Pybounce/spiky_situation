@@ -1,6 +1,6 @@
 
 use bevy::{image::{ImageLoaderSettings, ImageSampler}, prelude::*, render::render_resource::{Extent3d, TextureFormat}};
-use rand::{rngs::ThreadRng, Rng};
+use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng, Rng};
 
 
 #[derive(Resource)]
@@ -14,6 +14,17 @@ impl SplatDb {
         let mut rng = rand::thread_rng();
         let index = rng.gen_range(0..self.splat_entries.len());
         return (self.atlas.clone(), self.splat_entries[index].rect, self.splat_entries[index].origin_offset);
+    }
+    pub fn random_of_type(&self, splat_type: SplatType) -> Option<(Handle<Image>, Rect, Vec2)> {
+        let mut rng = thread_rng();
+        let filtered: Vec<&SplatEntry> = self.splat_entries
+            .iter()
+            .filter(|entry| entry.splat_type == splat_type)
+            .collect();
+        return match filtered.choose(&mut rng) {
+            Some(splat_entry) => Some((self.atlas.clone(), splat_entry.rect, splat_entry.origin_offset)),
+            None => None,
+        };
     }
 }
 
@@ -36,8 +47,8 @@ impl SplatEntry {
         };
     }
 }
-
-enum SplatType {
+#[derive(PartialEq)]
+pub enum SplatType {
     Radial,
     Long,
     Wide
