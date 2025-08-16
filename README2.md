@@ -33,10 +33,19 @@
 
 #### Splats
 
-- Issue right now is that they are based off of transforms, not colliders
-- Possibly better to have a SplatProvider component
-- Then I can still have splat on death and everything working the same way
-- But instead of getting GlobalTransform with the killer entity, I get SplatProvider, which will give me better details
+- [ ] Issue with rotated textures is the slanted pixels
+  - Not only do they look trash but also they won't fit the back wall, so in short, fuck that.
+  - Difficulty is I now need to filter by diagonals etc too
+  - If diagonal is a type, then maybe _a splat can be_
+    - 1 Radial Large
+    - 1 Long Up
+    - 1 Long Diagonal
+    - Maybe another small radial
+- [ ] Blood drying
+  - Perhaps make blood dry over time, so it starts one colour and slowly turns
+  - Then once dry, it can be drawn to the back wall
+  - It would give some variety in splats and mean you can see a new splat
+  - Will also mean z fighting
 
 #### Improvements
 
