@@ -46,6 +46,7 @@
   - Then once dry, it can be drawn to the back wall
   - It would give some variety in splats and mean you can see a new splat
   - Will also mean z fighting
+  - _Z fighting fix_ can just have a splat resource that has an f32 for the current z offset...then when splats are drawn to the backwall, it resets back to 0.0
 - **okay angles!**
   - So if I do 90s, then hitting a diagonal on a saw could tell it 90 right, and then the diagonal could go down leaving you with E and SE splats, which suck
   - Alternatively I do 45s, and then pick at random a 90 from there OR do 45 AND 90 and then you have both but if the 45 is also at 90, just pick a random one.
