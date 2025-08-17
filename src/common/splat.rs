@@ -26,6 +26,7 @@ pub fn apply_splat_on_death(
     splat_db: Res<SplatDb>
 ) {
     let RAD_45 = std::f32::consts::PI / 4.0;
+    let RAD_90 = std::f32::consts::PI / 2.0;
 
     for (transform, death_mark) in &emitter_query {
 
@@ -39,9 +40,10 @@ pub fn apply_splat_on_death(
 
                     let splat_emitter_pos = transform.translation();
                     let direction = (splat_emitter_pos - killer_pos).truncate().normalize_or_zero();
-                    let angle = direction.y.atan2(direction.x);
+                    let mut angle = direction.y.atan2(direction.x);
+                    angle = (angle / RAD_45).round() * RAD_45;
                     //let random_offset = rng.gen_range(-RAD_45..RAD_45);
-                    Quat::from_rotation_z(angle - (RAD_45 * 2.0))
+                    Quat::from_rotation_z(angle - RAD_90)
                 } else { Quat::IDENTITY }
             },
             None => Quat::IDENTITY,
