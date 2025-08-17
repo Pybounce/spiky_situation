@@ -53,7 +53,7 @@ pub fn move_camera(
     match pt {
         Ok(pt) => {
             let distance = ct.translation.truncate().distance(pt.translation.truncate());
-            let speed = distance * 2.5;
+            let speed = distance.powf(1.1) * 2.5;
             let dir = (pt.translation - ct.translation).truncate().normalize_or_zero();
 
             let delta = time.delta_secs() * speed * dir;
