@@ -55,6 +55,10 @@
 
 - [ ] CCTV lines
   - Basically tiny scanlines but they don't move, just static
+- [ ] Camera movement on death
+  - Have the camera, when dead, reduce velocity but keep moving
+  - Friction tied to current speed
+  - So you die and the camera smoothly slows and glides a little
 
 #### Blood Rework
 
