@@ -60,21 +60,30 @@ pub fn init_splat_db(
     });
 
     let entries = vec![
-        SplatEntry::new(Rect::new(0.0, 0.0, 64.0, 64.0), SplatType::Radial, Vec2::ZERO),
-        SplatEntry::new(Rect::new(192.0, 0.0, 240.0, 96.0), SplatType::Long, Vec2::new(-8.0, -24.0)),
-        SplatEntry::new(Rect::new(240.0, 0.0, 272.0, 96.0), SplatType::Long, Vec2::new(0.0, -24.0)),
-        SplatEntry::new(Rect::new(272.0, 0.0, 336.0, 80.0), SplatType::Diagonal, Vec2::new(-16.0, -24.0)),
-        SplatEntry::new(Rect::new(336.0, 0.0, 368.0, 96.0), SplatType::Long, Vec2::new(0.0, -24.0)),
+        SplatEntry::new(grid_to_rect(0, 0, 4, 4), SplatType::Radial, Vec2::ZERO),
+        SplatEntry::new(grid_to_rect(12, 0, 3, 6), SplatType::Long, Vec2::new(-8.0, -24.0)),
+        SplatEntry::new(grid_to_rect(15, 0, 2, 6), SplatType::Long, Vec2::new(0.0, -24.0)),
+        SplatEntry::new(grid_to_rect(17, 0, 4, 5), SplatType::Diagonal, Vec2::new(-16.0, -24.0)),
+        SplatEntry::new(grid_to_rect(21, 0, 2, 6), SplatType::Long, Vec2::new(0.0, -24.0)),
     ];
 
     let test_entries = vec![
-        SplatEntry::new(Rect::new(0.0, 64.0, 64.0, 128.0), SplatType::Radial, Vec2::ZERO),
-        SplatEntry::new(Rect::new(64.0, 64.0, 112.0, 160.0), SplatType::Long, Vec2::new(0.0, -24.0)),
-        SplatEntry::new(Rect::new(112.0, 64.0, 192.0, 144.0), SplatType::Diagonal, Vec2::new(-16.0, -16.0)),
+        SplatEntry::new(grid_to_rect(0, 4, 4, 4), SplatType::Radial, Vec2::ZERO),
+        SplatEntry::new(grid_to_rect(4, 4, 3, 6), SplatType::Long, Vec2::new(0.0, -24.0)),
+        SplatEntry::new(grid_to_rect(7, 4, 5, 5), SplatType::Diagonal, Vec2::new(-16.0, -16.0)),
     ];
 
     commands.insert_resource(SplatDb {
         atlas: splats,
         splat_entries: entries
     });
+}
+
+
+fn grid_to_rect(min_grid_x: u32, min_grid_y: u32, grid_width: u32, grid_height: u32) -> Rect {
+    let min_x = min_grid_x as f32 * 16.0;
+    let min_y = min_grid_y as f32 * 16.0;
+    let max_x = min_x + (grid_width as f32 * 16.0);
+    let max_y = min_y + (grid_height as f32 * 16.0);
+    return Rect::new(min_x, min_y, max_x, max_y);
 }
