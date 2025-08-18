@@ -1,6 +1,6 @@
 
-use bevy::{image::{ImageLoaderSettings, ImageSampler}, prelude::*, render::render_resource::{Extent3d, TextureFormat}};
-use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng, Rng};
+use bevy::{image::ImageLoaderSettings, prelude::*};
+use rand::{seq::SliceRandom, thread_rng, Rng};
 
 
 #[derive(Resource)]
@@ -31,19 +31,15 @@ impl SplatDb {
 struct SplatEntry {
     pub rect: Rect,
     pub splat_type: SplatType,
-    pub splat_direction: SplatDirection,
-    pub splat_size: SplatSize,
     pub origin_offset: Vec2
 }
 
 impl SplatEntry {
-    pub fn new(rect: Rect, splat_type: SplatType, direction: SplatDirection, origin_offset: Vec2, size: SplatSize) -> Self {
+    pub fn new(rect: Rect, splat_type: SplatType, origin_offset: Vec2) -> Self {
         return Self {
             rect,
             splat_type,
-            splat_direction: direction,
             origin_offset,
-            splat_size: size
         };
     }
 }
@@ -51,21 +47,7 @@ impl SplatEntry {
 pub enum SplatType {
     Radial,
     Long,
-    Wide
-}
-
-enum SplatSize {
-    Small,
-    Large
-}
-
-enum SplatDirection {
-    Up,
-    Down,
-    DiagonalUp,
-    DiagonalDown,
-    UpAndDiagonal,
-    DownAndDiagonal
+    Diagonal
 }
 
 
@@ -78,11 +60,16 @@ pub fn init_splat_db(
     });
 
     let entries = vec![
-        SplatEntry::new(Rect::new(0.0, 0.0, 64.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal, Vec2::ZERO, SplatSize::Large),
-        SplatEntry::new(Rect::new(64.0, 0.0, 128.0, 64.0), SplatType::Radial, SplatDirection::UpAndDiagonal, Vec2::ZERO, SplatSize::Large),
-        //SplatEntry::new(Rect::new(128.0, 0.0, 192.0, 64.0), SplatType::Long, SplatDirection::Up),
-        SplatEntry::new(Rect::new(192.0, 0.0, 240.0, 96.0), SplatType::Long, SplatDirection::Up, Vec2::new(-8.0, -24.0), SplatSize::Large),
-        SplatEntry::new(Rect::new(240.0, 0.0, 272.0, 96.0), SplatType::Long, SplatDirection::Up, Vec2::new(0.0, -24.0), SplatSize::Large),
+        SplatEntry::new(Rect::new(0.0, 0.0, 64.0, 64.0), SplatType::Radial, Vec2::ZERO),
+        SplatEntry::new(Rect::new(192.0, 0.0, 240.0, 96.0), SplatType::Long, Vec2::new(-8.0, -24.0)),
+        SplatEntry::new(Rect::new(240.0, 0.0, 272.0, 96.0), SplatType::Long, Vec2::new(0.0, -24.0)),
+        SplatEntry::new(Rect::new(272.0, 0.0, 336.0, 80.0), SplatType::Diagonal, Vec2::new(-16.0, -24.0)),
+    ];
+
+    let test_entries = vec![
+        SplatEntry::new(Rect::new(0.0, 64.0, 64.0, 128.0), SplatType::Radial, Vec2::ZERO),
+        SplatEntry::new(Rect::new(64.0, 64.0, 112.0, 160.0), SplatType::Long, Vec2::new(0.0, -24.0)),
+        SplatEntry::new(Rect::new(112.0, 64.0, 192.0, 144.0), SplatType::Diagonal, Vec2::new(-16.0, -16.0)),
     ];
 
     commands.insert_resource(SplatDb {
