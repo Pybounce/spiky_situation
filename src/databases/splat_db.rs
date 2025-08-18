@@ -64,6 +64,7 @@ pub fn init_splat_db(
         SplatEntry::new(Rect::new(192.0, 0.0, 240.0, 96.0), SplatType::Long, Vec2::new(-8.0, -24.0)),
         SplatEntry::new(Rect::new(240.0, 0.0, 272.0, 96.0), SplatType::Long, Vec2::new(0.0, -24.0)),
         SplatEntry::new(Rect::new(272.0, 0.0, 336.0, 80.0), SplatType::Diagonal, Vec2::new(-16.0, -24.0)),
+        SplatEntry::new(Rect::new(336.0, 0.0, 368.0, 96.0), SplatType::Long, Vec2::new(0.0, -24.0)),
     ];
 
     let test_entries = vec![
