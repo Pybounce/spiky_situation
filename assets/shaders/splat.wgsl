@@ -17,7 +17,8 @@ var blood_sampler: sampler;
 var<uniform> atlas_rect: vec4f;
 
 @group(2) @binding(4)
-var<uniform> brightness: f32;
+var<uniform> colour: vec3f;
+
 
 @fragment
 fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
@@ -30,7 +31,9 @@ fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
     if time_passed * 1000.0 < tex_color.r * 255.0 * 10.0 {
         tex_color.a = 0.0;
     }
-    tex_color = vec4f(0.2, 0.0, 0.0, tex_color.a);
-    return tex_color;
+
+    return vec4f(colour.r, colour.g, colour.b, tex_color.a);
 
 }
+
+

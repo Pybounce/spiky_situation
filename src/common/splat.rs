@@ -49,9 +49,14 @@ pub fn apply_splat_on_death(
             None => (0.0, 0.0),
         };
 
-        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Radial);
-        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Long);
-        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_45 + RAD_45, transform.translation(), SplatType::Diagonal);
+        let mut rng = rand::thread_rng();
+        
+        let colour = Color::hsl(rng.gen_range(0.0..360.0), 0.5, 0.5).to_linear();
+        let rgb = Vec3::new(colour.red, colour.green, colour.blue);
+
+        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Radial, rgb);
+        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Long, rgb);
+        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_45 + RAD_45, transform.translation(), SplatType::Diagonal, rgb);
 
 
     }
@@ -65,9 +70,9 @@ pub fn build_splat(
     time: &Res<Time>, 
     splat_rotation: f32, 
     pos: Vec3,
-    splat_type: SplatType
+    splat_type: SplatType,
+    colour: Vec3
 ) {
-    let mut rng = rand::thread_rng();
     let adjusted_rotation = Quat::from_rotation_z(splat_rotation);
     let Some((splat_tex, splat_rect, origin_offset)) = splat_db.random_of_type(splat_type) else { return };
 
@@ -77,7 +82,7 @@ pub fn build_splat(
         current_time: time.elapsed_secs(),
         texture: splat_tex,
         uv_rect: uv_rect,
-        brightness: rng.gen_range(0.8..1.2)
+        colour
     });
     let mesh = meshes.add(Mesh::from(Rectangle::default()));
     let translation = pos - (adjusted_rotation * origin_offset.extend(0.0));

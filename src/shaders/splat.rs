@@ -11,7 +11,7 @@ pub struct SplatMaterial {
     #[uniform(3)]
     pub uv_rect: Vec4,
     #[uniform(4)]
-    pub brightness: f32,
+    pub colour: Vec3,
 }
 
 impl Material2d for SplatMaterial {
