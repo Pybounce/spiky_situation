@@ -3,7 +3,7 @@ use events::{read_stage_build_complete_events, read_stage_build_events, read_sta
 use stage_asset::{Stage, StageLoader};
 use systems::{try_build_stage, unload_old_stage};
 
-use crate::{common::states::AppState, stage::stage_builder::systems::on_exit_building};
+use crate::{common::states::AppState, stage::stage_builder::systems::remove_stage_builder_data};
 
 pub mod events;
 pub mod stage_asset;
@@ -24,10 +24,9 @@ impl Plugin for StageBuilderPlugin {
         //.init_resource::<StageBuilderData>()
         .add_systems(PreUpdate, read_stage_build_events)
         .add_systems(OnEnter(StageBuilderState::Building), unload_old_stage)
-        .add_systems(OnExit(StageBuilderState::Building), on_exit_building)
         .add_systems(Update, (try_build_stage).run_if(in_state(StageBuilderState::Building)))
         .add_systems(PostUpdate, (read_stage_build_complete_events, read_stage_build_failed_events))
-        .add_systems(OnExit(AppState::Game), unload_old_stage);
+        .add_systems(OnExit(AppState::Game), (remove_stage_builder_data, unload_old_stage).chain());
     }
 }
 

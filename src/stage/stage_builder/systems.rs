@@ -23,7 +23,7 @@ pub fn unload_old_stage(
     commands.remove_resource::<CurrentStageData>();
 }
 
-pub fn on_exit_building(
+pub fn remove_stage_builder_data(
     mut commands: Commands
 ) {
     commands.remove_resource::<StageBuilderData>();
