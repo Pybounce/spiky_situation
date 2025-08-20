@@ -46,8 +46,8 @@ fn main() {
     let window_settings = WindowPlugin {
         primary_window: Some(Window {
             title: "Legend of the Octo-Parakeet".into(),
-            name: Some("bevy_quickstart".into()),
-            canvas: Some("#bevy".to_string()),
+            name: Some("game_name".into()),
+            canvas: Some("#game_canvas".to_string()),
             fit_canvas_to_parent: true,
             prevent_default_event_handling: true,
             //resolution: (1600.0, 900.0).into(),
@@ -69,7 +69,7 @@ fn main() {
         .add_plugins(MainMenuPlugin)
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
-        .add_plugins(CCTVPostProcessPlugin)
+        //.add_plugins(CCTVPostProcessPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())

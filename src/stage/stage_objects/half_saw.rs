@@ -4,7 +4,7 @@ use bevy_rapier2d::{math::Vect, prelude::{ActiveEvents, Collider, CollisionGroup
 
 use crate::{common::{animated_sprite::SpriteAnimator, offset_mover::OffsetMover, splat::SplatProvider}, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}};
 
-use super::{tiles::TileBundle, StageObject};
+use super::tiles::TileBundle;
 
 
 #[derive(Component)]

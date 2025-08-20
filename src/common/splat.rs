@@ -44,9 +44,7 @@ pub fn apply_splat_on_death(
     mut meshes: ResMut<Assets<Mesh>>,
     time: Res<Time>,
     splat_db: Res<SplatDb>,
-    stage_data_opt: Option<Res<CurrentStageData>>
 ) {
-    let Some(stage_data) = stage_data_opt else { return };
 
     for (transform, death_mark) in &emitter_query {
 
@@ -76,9 +74,9 @@ pub fn apply_splat_on_death(
         let colour = Color::hsl(0.0, 0.9, 0.3).to_linear();
         let rgb = Vec3::new(colour.red, colour.green, colour.blue);
 
-        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Radial, rgb, stage_data.stage_id);
-        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Long, rgb, stage_data.stage_id);
-        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_45 + RAD_45, transform.translation(), SplatType::Diagonal, rgb, stage_data.stage_id);
+        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Radial, rgb);
+        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Long, rgb);
+        build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_45 + RAD_45, transform.translation(), SplatType::Diagonal, rgb);
 
 
     }
@@ -94,7 +92,6 @@ pub fn build_splat(
     pos: Vec3,
     splat_type: SplatType,
     colour: Vec3,
-    stage_id: usize
 ) {
     let adjusted_rotation = Quat::from_rotation_z(splat_rotation);
     let Some((splat_tex, splat_rect, origin_offset)) = splat_db.random_of_type(splat_type) else { return };

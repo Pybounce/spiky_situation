@@ -1,5 +1,5 @@
 
-use bevy::{ecs::relationship, prelude::*};
+use bevy::prelude::*;
 use bevy_rapier2d::prelude::CollisionEvent;
 
 #[derive(Component)]

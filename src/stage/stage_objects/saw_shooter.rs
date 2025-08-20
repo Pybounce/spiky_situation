@@ -1,7 +1,7 @@
 use bevy::{math::{Rect, Vec2, Vec3}, prelude::{Commands, Component, Query, Res}, sprite::Sprite, time::{Time, Timer, TimerMode}, transform::components::Transform, utils::default};
 use bevy_rapier2d::prelude::{ActiveEvents, Collider, CollisionGroups, GravityScale, Group, LockedAxes, RigidBody, Sensor, Velocity};
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::fragile::{Fragile, FragileShield}}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE_HALF}, StageAssets}, stage_objects::StageObject}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::fragile::{Fragile, FragileShield}}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
 
 use super::tiles::PhysicalTileBundle;
 

@@ -8,13 +8,13 @@ use bevy::{
         extract_component::{
             ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin,
             UniformComponentPlugin,
-        }, globals::GlobalsUniform, render_asset::RenderAssets, render_graph::{
+        }, render_graph::{
             NodeRunError, RenderGraphApp, RenderGraphContext, RenderLabel, ViewNode, ViewNodeRunner,
         }, render_resource::{
             binding_types::{sampler, texture_2d, uniform_buffer},
             *,
-        }, renderer::{RenderContext, RenderDevice}, view::{ViewTarget, ViewUniforms}, RenderApp
-    }, ui::graph::{NodeUi, SubGraphUi},
+        }, renderer::{RenderContext, RenderDevice}, view::ViewTarget, RenderApp
+    }, ui::graph::NodeUi,
 };
 
 const SHADER_ASSET_PATH: &str = "shaders/post_processing/cctv.wgsl";

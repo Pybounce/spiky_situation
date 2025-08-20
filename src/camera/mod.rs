@@ -1,5 +1,5 @@
 
-use bevy::{core_pipeline::bloom::Bloom, input::mouse::MouseWheel, prelude::*};
+use bevy::{input::mouse::MouseWheel, prelude::*};
 use bevy_rapier2d::prelude::*;
 
 use crate::{local_player::LocalPlayer, shaders::cctv_shader::plugin::CCTVPostProcessSettings};

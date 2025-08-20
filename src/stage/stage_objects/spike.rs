@@ -3,7 +3,7 @@ use bevy_rapier2d::{math::Vect, prelude::{ActiveEvents, Collider, CollisionGroup
 
 use crate::{common::splat::SplatProvider, obstacles::InstantKiller, stage::stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}};
 
-use super::{tiles::TileBundle, StageObject};
+use super::tiles::TileBundle;
 
 #[derive(Component)]
 pub struct Spike;
