@@ -31,7 +31,7 @@ pub fn trigger_on_touch(
 
         for colliding_entity in colliding_entities.iter() {
             if let Ok(trigger) = trigger_query.get(colliding_entity) {
-                trigger_event_writer.send(TriggerEvent {
+                trigger_event_writer.write(TriggerEvent {
                     trigger_id: trigger.trigger_id
                 });
             }

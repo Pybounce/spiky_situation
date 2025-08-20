@@ -50,7 +50,7 @@ pub fn read_stage_build_failed_events(
 ) {
     for _ in event_reader.read() {
         stage_builder_state.set(StageBuilderState::NotBuilding);
-        game_over_event_writer.send(GameOver);
+        game_over_event_writer.write(GameOver);
     }
 }
 

@@ -20,7 +20,7 @@ pub fn check_goal_reached(
         for colliding_entities in &player_query {
             for colliding_entity in colliding_entities.iter() {
                 if let Ok(_) = goal_query.get(colliding_entity) {
-                    event_writer.send(GoalReached { stage_id: stage_data.stage_id });
+                    event_writer.write(GoalReached { stage_id: stage_data.stage_id });
                 }
             }
         }
@@ -39,9 +39,9 @@ pub fn next_staged_if_goal_reached(
         let mut build_event_raised = false;
         for event in event_reader.read() {
             if event.stage_id == stage_data.stage_id && !build_event_raised {
-                save_writer.send(SaveGame);
+                save_writer.write(SaveGame);
                 current_run.complete_stage();
-                build_event_writer.send(BuildStageEvent {stage_id: current_run.current_stage_id() });
+                build_event_writer.write(BuildStageEvent {stage_id: current_run.current_stage_id() });
                 build_event_raised = true;
             }
         }

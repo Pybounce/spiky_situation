@@ -59,6 +59,11 @@
   - Have the camera, when dead, reduce velocity but keep moving
   - Friction tied to current speed
   - So you die and the camera smoothly slows and glides a little
+- [ ] Stage Preloading
+  - To preload a stage, just load in the Stage Handle and store in a resource so it's not unloaded
+  - So that's all the preload event should do
+  - Then when exiting game, just remove that resource
+  - Also when you load a stage, have it check preloaded, and if it's there, remove it so that it doesn't stay loaded forever.
 
 #### Blood Rework
 

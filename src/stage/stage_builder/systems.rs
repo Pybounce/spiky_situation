@@ -34,13 +34,13 @@ pub fn try_build_stage(
 ) {
     match asset_server.load_state(&stage_builder_data.stage_handle) {
         bevy::asset::LoadState::NotLoaded => {
-            failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
             return;
         },
         bevy::asset::LoadState::Loading => { return; },
         bevy::asset::LoadState::Loaded => (),
         bevy::asset::LoadState::Failed(_) => {
-            failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
             return;
         },
     }
@@ -72,14 +72,14 @@ pub fn try_build_stage(
                     spawn_translation: (stage.spawn_grid_pos * TILE_SIZE).extend(0.0),
                     bounds: Rect::new(-TILE_SIZE, -TILE_SIZE, stage.grid_width as f32 * TILE_SIZE, stage.grid_height as f32 * TILE_SIZE),
                 });
-                complete_event_writer.send(StageBuildCompleteEvent { stage_id: stage_builder_data.stage_id });
+                complete_event_writer.write(StageBuildCompleteEvent { stage_id: stage_builder_data.stage_id });
             }
             else {
-                failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+                failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
             }
         },
         None => {
-            failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
         },
     }
 }
