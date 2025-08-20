@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::{physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::apply_splat_on_death}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::spike::Spike};
+use crate::{builders::player_builders::init_player_builder, common::{physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::spike::Spike};
 
 mod common;
 
@@ -88,8 +88,9 @@ fn main() {
         .add_systems(Update, (refresh_editor_renderer, draw_editor, update_mouse_data))
         .add_systems(Update, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
         .add_systems(Update, spawn_player_corpse)
+        .add_event::<ClearSplatsEvent>()
         .add_systems(Startup, init_splat_db)
-        .add_systems(Update, apply_splat_on_death)
+        .add_systems(Update, (apply_splat_on_death, clear_splat_events))
         .add_systems(Update, update_cctv_shader_time)
         .add_event::<CollisionRemapEvent>()
         .add_systems(Update, (raise_collision_remap_events, handle_collision_remap_events).chain())

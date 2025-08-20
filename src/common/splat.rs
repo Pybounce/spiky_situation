@@ -6,6 +6,24 @@ use rand::Rng;
 
 use crate::{common::death::DeathMarker, databases::splat_db::{SplatDb, SplatType}, shaders::splat::SplatMaterial};
 
+#[derive(Event)]
+pub struct ClearSplatsEvent;
+
+pub fn clear_splat_events(
+    mut clear_splats_reader: EventReader<ClearSplatsEvent>,
+    query: Query<Entity, With<Splat>>,
+    mut commands: Commands
+) {
+    for _ in clear_splats_reader.read() {
+        for entity in &query {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
+#[derive(Component)]
+pub struct Splat;
+
 #[derive(Component)]
 pub struct SplatOnDeath;
 
@@ -96,5 +114,6 @@ pub fn build_splat(
             rotation: adjusted_rotation,
             ..default()
         },
+        Splat
     ));
 }

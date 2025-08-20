@@ -5,10 +5,13 @@ use crate::{common::states::{AppState, GameState}, game::game_over::GameOver};
 use super::{StageBuilderData, StageBuilderState};
 
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Event)]
-pub struct LoadStageEvent {
-    pub stage_id: usize
-}
+// Future TODO fix
+// To preload a stage, just load in the Stage Handle and store in a resource so it's not unloaded
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//#[derive(Debug, Copy, Clone, PartialEq, Eq, Event)]
+//pub struct LoadStageEvent {
+//    pub stage_id: usize
+//}
 
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Event)]
@@ -42,26 +45,15 @@ pub fn read_stage_build_complete_events(
 
 pub fn read_stage_build_failed_events(
     mut event_reader: EventReader<StageBuildFailedEvent>,
-    mut game_over_event_writer: EventWriter<GameOver>
+    mut game_over_event_writer: EventWriter<GameOver>,
+    mut stage_builder_state: ResMut<NextState<StageBuilderState>>,
 ) {
     for _ in event_reader.read() {
+        stage_builder_state.set(StageBuilderState::NotBuilding);
         game_over_event_writer.send(GameOver);
     }
 }
 
-/// Listens for LoadStageEvent.</br>
-/// Begins loading the stage asset.</br>
-/// Adds handle to StageBuilderHandles
-pub fn read_stage_load_events(
-    mut event_reader: EventReader<LoadStageEvent>,
-    mut stage_builder_data: ResMut<StageBuilderData>,
-    asset_server: Res<AssetServer>,
-) {
-    for preload_event in event_reader.read() {
-        stage_builder_data.stage_id = preload_event.stage_id;
-        stage_builder_data.stage_handle = asset_server.load(format!("stages/stage_{}.stage", preload_event.stage_id));
-    }
-}
 
 /// REQUIRES STAGE LOAD EVENT RAISED </br>
 /// Listens for BuildStageEvent. </br>
@@ -70,9 +62,15 @@ pub fn read_stage_load_events(
 pub fn read_stage_build_events(
     mut event_reader: EventReader<BuildStageEvent>,
     mut stage_builder_state: ResMut<NextState<StageBuilderState>>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
 
 ) {
-    for _ in event_reader.read() {
+    for build_stage_event in event_reader.read() {
+        commands.insert_resource(StageBuilderData {
+            stage_id: build_stage_event.stage_id,
+            stage_handle: asset_server.load(format!("stages/stage_{}.stage", build_stage_event.stage_id)),
+        });
         stage_builder_state.set(StageBuilderState::Building);
     }
 }

@@ -1,7 +1,7 @@
 
 use bevy::prelude::*;
 
-use crate::{common::death::DeathMarker, databases::save_db::{SaveDb, SaveGame}, game::{endless::components::EndlessRun, game_over::GameOver}, local_player::LocalPlayer, stage::stage_builder::{events::{BuildStageEvent, LoadStageEvent}, CurrentStageData}};
+use crate::{common::death::DeathMarker, databases::save_db::{SaveDb, SaveGame}, game::{endless::components::EndlessRun, game_over::GameOver}, local_player::LocalPlayer, stage::stage_builder::{events::{BuildStageEvent}, CurrentStageData}};
 
 
 pub fn save_endless_game(
@@ -26,7 +26,6 @@ pub fn save_endless_game(
 pub fn check_death_endless_mode(
     query: Query<(), (With<LocalPlayer>, Added<DeathMarker>)>,
     stage_data_opt: Option<Res<CurrentStageData>>,
-    mut load_event_writer: EventWriter<LoadStageEvent>,
     mut build_event_writer: EventWriter<BuildStageEvent>,
     mut current_run_opt: Option<ResMut<EndlessRun>>,
     mut game_over_event_writer: EventWriter<GameOver>,
@@ -43,7 +42,6 @@ pub fn check_death_endless_mode(
                 else {
                     save_event_writer.send(SaveGame);
                     current_run.remove_life();
-                    load_event_writer.send(LoadStageEvent {stage_id: stage_data.stage_id});
                     build_event_writer.send(BuildStageEvent {stage_id: stage_data.stage_id});
                 }
             }

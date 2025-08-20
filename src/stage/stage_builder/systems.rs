@@ -8,12 +8,18 @@ use super::{events::{StageBuildCompleteEvent, StageBuildFailedEvent}, stage_asse
 pub fn unload_old_stage(
     stage_piece_query: Query<(Entity, &StageObject)>,
     mut commands: Commands,
-    stage_builder_data: Res<StageBuilderData>,
+    stage_builder_data: Option<Res<StageBuilderData>>,
 ) {
     for (e, sp) in &stage_piece_query {
         commands.entity(e).despawn();
     }
     commands.remove_resource::<CurrentStageData>();
+}
+
+pub fn on_exit_building(
+    mut commands: Commands
+) {
+    commands.remove_resource::<StageBuilderData>();
 }
 
 pub fn try_build_stage(
