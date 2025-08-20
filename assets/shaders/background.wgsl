@@ -22,9 +22,9 @@ fn fragment(in: FragmentInput) -> FragmentOutput {
 
     var color: vec4<f32>;
     if stripe == 0.0 {
-        color = vec4<f32>(0.61, 0.75, 0.87, 1.0);
+        color = vec4<f32>(0.8, 0.8, 0.8, 1.0);
     } else {
-        color = vec4<f32>(0.57, 0.72, 0.85, 1.0);
+        color = vec4<f32>(0.8, 0.8, 0.8, 1.0);
     }
 
 

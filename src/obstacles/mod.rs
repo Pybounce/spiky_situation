@@ -16,7 +16,7 @@ pub fn check_insta_kill_collisions(
 
         for colliding_entity in colliding_entities.iter() {
             if let Ok(_) = killer_query.get(colliding_entity) {
-                commands.entity(e).try_insert(DeathMarker);
+                commands.entity(e).try_insert(DeathMarker::killed_by(colliding_entity));
             }
         }
     }

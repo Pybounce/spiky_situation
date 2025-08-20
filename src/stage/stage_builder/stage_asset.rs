@@ -1,7 +1,7 @@
 
 
 use bevy::{
-    asset::{io::Reader, ron, AssetLoader, AsyncReadExt, LoadContext},
+    asset::{io::Reader, ron, AssetLoader, LoadContext},
     prelude::*,
     reflect::TypePath,
 };

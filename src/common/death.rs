@@ -1,8 +1,18 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::CollidingEntities;
 
-#[derive(Component)]
-pub struct DeathMarker;
+#[derive(Component, Default)]
+pub struct DeathMarker {
+    pub killed_by: Option<Entity>
+}
+
+impl DeathMarker {
+    pub fn killed_by(e: Entity) -> Self {
+        return Self {
+            killed_by: e.into()
+        };
+    }
+}
 
 #[derive(Component)]
 pub struct DelayedDeathMarker {
@@ -37,7 +47,7 @@ pub fn delay_death_marked(
     for (e, mut delayed_death_marker) in &mut query {
         delayed_death_marker.delay.tick(time.delta());
         if delayed_death_marker.delay.finished() {
-            commands.entity(e).try_insert(DeathMarker);
+            commands.entity(e).try_insert(DeathMarker::default());
         }
     }
 }
@@ -54,7 +64,7 @@ pub fn check_touched_by_death(
     for colliding_entities in &query {
         for colliding_entity in colliding_entities.iter() {
             if let Ok(entity) = death_marked_on_touch_query.get(colliding_entity) {
-                commands.entity(entity).try_insert(DeathMarker);
+                commands.entity(entity).try_insert(DeathMarker::default());
             }
         }
     }

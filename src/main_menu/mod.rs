@@ -2,7 +2,7 @@ use std::{env, fs, path::PathBuf};
 
 use bevy::prelude::*;
 
-use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction}, stage::stage_builder::events::{BuildStageEvent, LoadStageEvent}, stage_editor::StageEditorLoadDetails};
+use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction}, stage::stage_builder::events::{BuildStageEvent}, stage_editor::StageEditorLoadDetails};
 
 pub mod ui;
 
@@ -25,7 +25,6 @@ pub enum StartGame {
 
 pub fn try_start_game(
     mut start_game_reader: EventReader<StartGame>,
-    mut load_event_writer: EventWriter<LoadStageEvent>,
     mut build_event_writer: EventWriter<BuildStageEvent>,
     mut commands: Commands
 ) {
@@ -34,7 +33,6 @@ pub fn try_start_game(
         if game_started { continue; }
         match event {
             StartGame::Endless(endless_run) => {
-                load_event_writer.write(LoadStageEvent {stage_id: endless_run.current_stage_id() });
                 build_event_writer.write(BuildStageEvent {stage_id: endless_run.current_stage_id() });
 
                 commands.insert_resource(endless_run.clone());
@@ -53,8 +51,8 @@ pub fn try_enter_stage_editor(
 ) {
     if input.just_released(KeyCode::KeyE) {
         commands.insert_resource(StageEditorLoadDetails {
-            template_stage_id: 7.into(),
-            new_stage_id: 7,
+            template_stage_id: 1.into(),
+            new_stage_id: 9,
             template_stage_handle: None
         });
         app_state.set(AppState::StageEditor);

@@ -4,7 +4,7 @@ use bevy::prelude::*;
 pub struct FPSUI;
 
 pub fn setup_fps_stuff(mut commands: Commands) {
-    commands.insert_resource(FrameRate::new(60));
+    commands.insert_resource(FrameRate::new(300));
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,

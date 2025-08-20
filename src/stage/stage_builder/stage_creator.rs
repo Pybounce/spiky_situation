@@ -66,7 +66,7 @@ impl<'a> StageCreator<'a> {
         && build_goal(self, commands)
         && build_background(self, commands)
         && build_spikes(self, commands)
-        && build_far_background(self, commands)
+        && build_borders(self, commands)
         && build_player_spawner(self, commands)
         && build_checkpoints(self, commands)
         && build_half_saws(self, commands)
@@ -110,29 +110,58 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
             scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
             ..default()
         },
-        StageObject
+        StageObject::Volatile
     ));
     return true;
 }
 
-fn build_far_background(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+fn build_borders(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
 
     let index = map_surrounding_ground_bitmask_to_atlas_index(u8::MAX);
     let upper_left = Vec2::new((index as f32 % TILEMAP_SIZE as f32) as f32 * TILEMAP_TILE_SIZE, (index / TILEMAP_SIZE) as f32 * TILEMAP_TILE_SIZE);
     let lower_right = Vec2::new(upper_left.x + TILEMAP_TILE_SIZE , upper_left.y + TILEMAP_TILE_SIZE);
     let sprite_rect = Rect::new(upper_left.x, upper_left.y, lower_right.x, lower_right.y);
 
-    let mut background = TileBundle::new(
+    let bground_grid_width: f32 = stage_creator.stage.grid_width as f32 * 20.0;
+    let bground_grid_height: f32 = stage_creator.stage.grid_height as f32 * 20.0;
+    let stage_grid_size = Vec2::new(stage_creator.stage.grid_width as f32, stage_creator.stage.grid_height as f32);
+
+    let mut left = TileBundle::new(
         stage_creator, 
-        Vec2::new(stage_creator.stage.grid_width as f32 / 2.0, 
-        stage_creator.stage.grid_height as f32 / 2.0), 
-        sprite_rect, 0.0, stage_creator.tilemap);
-        background.transform.translation.z = -20.0;
-        background.transform.scale = Vec3::new(
-        stage_creator.stage.grid_width as f32 * TILE_SIZE * 10.0,
-        stage_creator.stage.grid_height as f32 * TILE_SIZE * 10.0,
-        1.0);
-    commands.spawn(background);
+        Vec2::new(-bground_grid_width / 2.0, stage_grid_size.y / 2.0), 
+        sprite_rect, 0.0, stage_creator.tilemap
+    );
+    left.transform.translation.z = 20.0;
+    left.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);
+    commands.spawn(left);
+
+    let mut right = TileBundle::new(
+        stage_creator, 
+        Vec2::new((bground_grid_width / 2.0) + stage_grid_size.x - 1.0, stage_grid_size.y / 2.0), 
+        sprite_rect, 0.0, stage_creator.tilemap
+    );
+    right.transform.translation.z = 20.0;
+    right.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);
+    commands.spawn(right);
+
+    let mut top = TileBundle::new(
+        stage_creator, 
+        Vec2::new(stage_grid_size.x / 2.0, (bground_grid_height / 2.0) + stage_grid_size.y - 1.0), 
+        sprite_rect, 0.0, stage_creator.tilemap
+    );
+    top.transform.translation.z = 20.0;
+    top.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);
+    commands.spawn(top);
+
+    let mut bottom = TileBundle::new(
+        stage_creator, 
+        Vec2::new(stage_grid_size.x / 2.0, -bground_grid_height / 2.0), 
+        sprite_rect, 0.0, stage_creator.tilemap
+    );
+    bottom.transform.translation.z = 20.0;
+    bottom.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);
+    commands.spawn(bottom);
+
 
     return true;
 }

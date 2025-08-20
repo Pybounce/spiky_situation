@@ -6,14 +6,27 @@ use super::{events::{StageBuildCompleteEvent, StageBuildFailedEvent}, stage_asse
 
 
 pub fn unload_old_stage(
-    stage_piece_query: Query<(Entity, &StageObject)>,
+    stage_object_query: Query<(Entity, &StageObject)>,
     mut commands: Commands,
-    stage_builder_data: Res<StageBuilderData>,
+    stage_builder_data: Option<Res<StageBuilderData>>,
+    current_stage_opt: Option<Res<CurrentStageData>>
 ) {
-    for (e, sp) in &stage_piece_query {
-        commands.entity(e).despawn();
+    let Some(current_stage) = current_stage_opt else { return };
+
+    for (e, so) in &stage_object_query {
+        let should_remove = match stage_builder_data {
+            Some(ref new_stage) => StageObject::StagePersistent != *so || new_stage.stage_id != current_stage.stage_id,
+            None => true,
+        };
+        if should_remove { commands.entity(e).despawn(); }
     }
     commands.remove_resource::<CurrentStageData>();
+}
+
+pub fn remove_stage_builder_data(
+    mut commands: Commands
+) {
+    commands.remove_resource::<StageBuilderData>();
 }
 
 pub fn try_build_stage(
@@ -28,13 +41,13 @@ pub fn try_build_stage(
 ) {
     match asset_server.load_state(&stage_builder_data.stage_handle) {
         bevy::asset::LoadState::NotLoaded => {
-            failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
             return;
         },
         bevy::asset::LoadState::Loading => { return; },
         bevy::asset::LoadState::Loaded => (),
         bevy::asset::LoadState::Failed(_) => {
-            failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
             return;
         },
     }
@@ -66,14 +79,14 @@ pub fn try_build_stage(
                     spawn_translation: (stage.spawn_grid_pos * TILE_SIZE).extend(0.0),
                     bounds: Rect::new(-TILE_SIZE, -TILE_SIZE, stage.grid_width as f32 * TILE_SIZE, stage.grid_height as f32 * TILE_SIZE),
                 });
-                complete_event_writer.send(StageBuildCompleteEvent { stage_id: stage_builder_data.stage_id });
+                complete_event_writer.write(StageBuildCompleteEvent { stage_id: stage_builder_data.stage_id });
             }
             else {
-                failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+                failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
             }
         },
         None => {
-            failed_event_writer.send(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
+            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
         },
     }
 }

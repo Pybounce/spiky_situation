@@ -1,5 +1,5 @@
 use bevy::{math::Rect, prelude::{Commands, Component}};
-use bevy_rapier2d::prelude::{CollisionGroups, Group};
+use bevy_rapier2d::prelude::{CollisionGroups, Group, Sensor};
 
 use crate::{common::death::DeathMarkOnTouch, stage::stage_builder::{stage_asset, stage_creator::StageCreator}};
 
@@ -22,7 +22,8 @@ impl KeyFactory {
                 trigger_id: key_asset.trigger_id
             },
             TriggerOnTouch,
-            DeathMarkOnTouch
+            DeathMarkOnTouch,
+            Sensor
         ));
     }
 }

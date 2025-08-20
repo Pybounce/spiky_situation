@@ -31,6 +31,58 @@
 - [ ] Run Dead screen
 - [ ] More stages! :D
 
+#### Splats
+
+- [ ] Issue with rotated textures is the slanted pixels
+  - Not only do they look trash but also they won't fit the back wall, so in short, fuck that.
+  - Difficulty is I now need to filter by diagonals etc too
+  - If diagonal is a type, then maybe _a splat can be_
+    - 1 Radial Large
+    - 1 Long Up
+    - 1 Long Diagonal
+    - Maybe another small radial
+- [ ] Blood drying
+  - Perhaps make blood dry over time, so it starts one colour and slowly turns
+  - Then once dry, it can be drawn to the back wall
+  - It would give some variety in splats and mean you can see a new splat
+  - Will also mean z fighting
+  - _Z fighting fix_ can just have a splat resource that has an f32 for the current z offset...then when splats are drawn to the backwall, it resets back to 0.0
+- **okay angles!**
+  - So if I do 90s, then hitting a diagonal on a saw could tell it 90 right, and then the diagonal could go down leaving you with E and SE splats, which suck
+  - Alternatively I do 45s, and then pick at random a 90 from there OR do 45 AND 90 and then you have both but if the 45 is also at 90, just pick a random one.
+
+#### Improvements
+
+- [ ] CCTV lines
+  - Basically tiny scanlines but they don't move, just static
+- [ ] Camera movement on death
+  - Have the camera, when dead, reduce velocity but keep moving
+  - Friction tied to current speed
+  - So you die and the camera smoothly slows and glides a little
+- [ ] Stage Preloading
+  - To preload a stage, just load in the Stage Handle and store in a resource so it's not unloaded
+  - So that's all the preload event should do
+  - Then when exiting game, just remove that resource
+  - Also when you load a stage, have it check preloaded, and if it's there, remove it so that it doesn't stay loaded forever.
+
+#### Blood Rework
+
+- Have BloodEmitter, BloodProvider
+- When BloodEmitter and BloodProvider collide, BloodEmitter should you know...emit some blood
+- BloodEmitter has a direction, maybe preferred mix of blood effects (2 long, 1 radial etc)
+- Then I can also use Velocity and I'll have the positions of both collision bodies
+
+#### Delayed Events
+
+- Could use this to let the death happen and wait x seconds
+- OR could add event triggers to Animators and other stuff?
+
+#### New Trap
+
+- Spikes that rise x seconds after you step on them.
+- Could possibly use Triggers since they stay forever.
+- To reset, maybe have another component that can reset a triggerId after x seconds? maybe delayed event? who knows.
+
 #### Collectables
 
 - Components for MoveOnCollide and SoundOnCollide and FlashOnCollide
@@ -135,3 +187,60 @@ KEY + LOCKS
 - Optionally just have it be position based such that when you press a direction, it goes through all Selectables and checks there positions and works it out on the fly
   - Would be better since you can press more unique directions but it's whatever
 - Bevy has some support for this kind of UI movement https://docs.rs/bevy/latest/bevy/input_focus/index.html
+
+#### Multiple Colliders
+
+- If I want ccd on the player then I need a secondary collider as a sensor for other stuff
+- I could have the ccd collider be the parent object to the actual Player entity but it's messy
+- I could use colliderOf(Entity) but it currently doesn't work with CollidingEntities, which I use a lot.
+
+#### Splatter! :D
+
+**Saving to back wall**
+
+- Give each temporary decal a _Splat_ component
+- Have a system that periodically runs through them:
+  - Gets their Handle<Image> and Rect to find pixels
+  - Gets their position + rotation
+  - Updates any background canvases as it needs
+  - Deletes the Splat entity since it should now be reflected in the background (if there's a delay then I can sort that whenever)
+
+**Splat textures**
+
+- Have a fairly large texture (1280x1280)
+- Only create splats for _radial_, _up_, _up diagonal_
+- These splats can then be rotated by 90deg to create 8 compass directions, without rotating the pixels themselves
+- With a texture this size, should be able to create a lot of splats
+- For now can just hardcode Rect -> SplatData (ie type: radial/up/diagonal, size)
+- _Greyscale_ texture containing time. Since it's low resolution I can have theh large time be multiple seconds. This way I can add _dripping_
+
+#### Editor
+
+**Quality of Life**
+
+- Zooming in and out moves you closer/further to/from your cursor location (like sprite editor)
+- Hold to place
+
+#### Camera Footage
+
+**How**
+
+- Can put the border lines in the shader
+- Can have a resource with some config for the margins etc
+  - Since the border outlines and the UI will need to be some amount from the screen edge
+  - Then can have a system with Changed<Settings> or whatever
+
+**What**
+
+- Very subtle scan lines
+- Vignette to simulate lens or screen glow
+- Chromatic aberration
+- Noise/static: Random flicker or grain
+- Barrel distortion: Slight curvature at screen edges
+
+**UI**
+
+- Stage name: "Camera - <Level 3-14>"
+- Deaths
+- Time passed: "15:23.02"
+-

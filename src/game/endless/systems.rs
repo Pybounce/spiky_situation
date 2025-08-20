@@ -1,13 +1,13 @@
 
 use bevy::prelude::*;
 
-use crate::{common::death::DeathMarker, databases::save_db::{SaveDb, SaveGame}, game::{endless::components::EndlessRun, game_over::GameOver}, local_player::LocalPlayer, stage::stage_builder::{events::{BuildStageEvent, LoadStageEvent}, CurrentStageData}};
+use crate::{common::death::DeathMarker, databases::save_db::{SaveDb, SaveGame}, game::{endless::components::EndlessRun, game_over::GameOver}, local_player::LocalPlayer, stage::stage_builder::{events::{BuildStageEvent}, CurrentStageData}};
 
 
 pub fn save_endless_game(
     mut save_game_event_reader: EventReader<SaveGame>,
     endless_game_opt: Option<Res<EndlessRun>>,
-    mut save_db: ResMut<SaveDb>
+    save_db: Res<SaveDb>
 ) {
     if let Some(endless_run) = endless_game_opt { 
         let mut saved = false;
@@ -26,7 +26,6 @@ pub fn save_endless_game(
 pub fn check_death_endless_mode(
     query: Query<(), (With<LocalPlayer>, Added<DeathMarker>)>,
     stage_data_opt: Option<Res<CurrentStageData>>,
-    mut load_event_writer: EventWriter<LoadStageEvent>,
     mut build_event_writer: EventWriter<BuildStageEvent>,
     mut current_run_opt: Option<ResMut<EndlessRun>>,
     mut game_over_event_writer: EventWriter<GameOver>,
@@ -34,17 +33,16 @@ pub fn check_death_endless_mode(
     save_db: Res<SaveDb>
 ) {
     if let Some(stage_data) = stage_data_opt {
-        if let Ok(_) = &query.get_single()  {
+        if let Ok(_) = &query.single()  {
             if let Some(current_run) = current_run_opt.as_mut() {
                 if current_run.lives_remaining() == 0 {
-                    game_over_event_writer.send(GameOver);
+                    game_over_event_writer.write(GameOver);
                     save_db.delete_game_save();
                 }
                 else {
-                    save_event_writer.send(SaveGame);
+                    save_event_writer.write(SaveGame);
                     current_run.remove_life();
-                    load_event_writer.send(LoadStageEvent {stage_id: stage_data.stage_id});
-                    build_event_writer.send(BuildStageEvent {stage_id: stage_data.stage_id});
+                    build_event_writer.write(BuildStageEvent {stage_id: stage_data.stage_id});
                 }
             }
         }

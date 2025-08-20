@@ -1,9 +1,7 @@
 
-use std::default;
-
 use bevy::{platform::collections::HashMap, prelude::*};
 
-use super::super::{controller::{EditorController, EDITOR_TILEMAP_SIZE}, enums::{EditorItem, IntervalBlockVariant, KeyVariant, LockBlockVariant}};
+use super::super::{controller::EDITOR_TILEMAP_SIZE, enums::{EditorItem, IntervalBlockVariant, KeyVariant, LockBlockVariant}};
 
 #[derive(Resource)]
 pub struct EditorRenderer {

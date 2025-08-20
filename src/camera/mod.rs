@@ -2,7 +2,7 @@
 use bevy::{input::mouse::MouseWheel, prelude::*};
 use bevy_rapier2d::prelude::*;
 
-use crate::local_player::LocalPlayer;
+use crate::{local_player::LocalPlayer, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
 
 const CAMERA_ZOOM: u32 = 3;
 const CAMERA_ZOOM_MAX: u32 = 10;
@@ -28,7 +28,18 @@ pub fn spawn_camera(mut commands: Commands) {
                 translation: Vec3::default(),
                 factor: CAMERA_ZOOM as u32
             },
-            Msaa::Off
+            Msaa::Off,
+            CCTVPostProcessSettings {
+                time: 0.0,
+                chromatic_intensity: 0.0005,
+                fisheye_intensity: 0.025,
+                vignette_intensity: 0.4,
+                vignette_start: 70.0,
+                scanline_dark_mul: 0.95,
+                scanline_width: 0.15,
+                scanline_speed: 0.7,
+                scanline_gap: 7.0,
+            },
         ));
 }
 
@@ -42,7 +53,7 @@ pub fn move_camera(
     match pt {
         Ok(pt) => {
             let distance = ct.translation.truncate().distance(pt.translation.truncate());
-            let speed = distance * 2.5;
+            let speed = distance.powf(1.1) * 2.5;
             let dir = (pt.translation - ct.translation).truncate().normalize_or_zero();
 
             let delta = time.delta_secs() * speed * dir;

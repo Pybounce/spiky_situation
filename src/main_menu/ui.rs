@@ -21,7 +21,7 @@ pub fn check_new_game_interaction(
             Interaction::Pressed => {
                 let stage_ids = get_stage_ids();
                 let new_run = EndlessRun::new(stage_ids, 100);
-                start_game_writer.send(StartGame::Endless(new_run));
+                start_game_writer.write(StartGame::Endless(new_run));
                 save_db.delete_game_save();
             }
             _ => ()
@@ -40,7 +40,7 @@ pub fn check_continue_game_interaction(
             Interaction::Pressed => {
                 if let Some(existing_run) = save_db.get_existing_save() {
                     match existing_run {
-                        GameSave::Endless(endless_run) => start_game_writer.send(StartGame::Endless(endless_run)),
+                        GameSave::Endless(endless_run) => start_game_writer.write(StartGame::Endless(endless_run)),
                     };
                 };
                 

@@ -54,7 +54,7 @@ pub fn tick_phantom_block(
         if pb.currently_active {
             pb.timer.tick(time.delta());
             if pb.timer.just_finished() {
-                commands.entity(entity).try_insert(DeathMarker);
+                commands.entity(entity).try_insert(DeathMarker::default());
             }
         }
     }

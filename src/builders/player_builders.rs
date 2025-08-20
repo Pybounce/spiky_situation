@@ -1,7 +1,8 @@
 use bevy::{ecs::system::EntityCommands, prelude::*};
-use bevy_rapier2d::prelude::{RigidBody, Velocity};
+use bevy_rapier2d::prelude::{Ccd, Collider, CollidingEntities, GravityScale, LockedAxes, RigidBody, Sensor, Velocity};
 
-use crate::{common::{death::DelayedDeathMarker, physics::gravity::Gravity}, local_player::PLAYER_SIZE, stage::stage_builder::stage_creator::TILE_SIZE};
+use crate::{common::{death::{DelayedDeathMarker, Killable}, physics::gravity::Gravity, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::local_player::*;
 
 #[derive(Resource)]
 pub struct PlayerBuilder {
@@ -29,6 +30,80 @@ impl PlayerBuilder {
                 acceleration: 3000.0,
             }
         ));
+    }
+    pub fn build_player(entity_commands: &mut EntityCommands, asset_server: &AssetServer, spawn_pos: Vec3) {
+        let atlas: Handle<Image> = asset_server.load("object_tilemap.png");
+        let player_rect = Rect::new(TILE_SIZE * 2.0, TILE_SIZE, TILE_SIZE * 3.0, TILE_SIZE * 2.0);
+
+        entity_commands.try_insert(((
+            LocalPlayer,
+            Sprite {
+                image: atlas,
+                rect: player_rect.into(),
+                custom_size: Vec2::splat(1.0).into(),
+                ..default()
+            },
+            Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(spawn_pos),
+            RigidBody::Dynamic,
+            Ccd::enabled(),
+            Collider::ball(0.5),
+            Velocity::linear(Vec2::ZERO),
+            Gravity {
+                max_force: PLAYER_MAX_GRAVITY,
+                current_force: 0.0,
+                acceleration: PLAYER_GRAVITY_ACCELERATION,
+            },
+            GravityScale(0.0),
+            Groundable,
+            CollidingEntities::default(),
+            PhysicsController {
+                max_velocity: PLAYER_MAX_VELOCITY,
+                min_velocity: PLAYER_MIN_VELOCITY,
+            },
+            JumpController {
+                key: KeyCode::KeyW,
+                force: PLAYER_JUMP_SPEED,
+                duration: PLAYER_JUMP_DURATION,
+                last_jump_pressed_time: 0.0,
+                last_jump_released_time: 0.0,
+                last_grounded: 0.0,
+                coyote_time: PLAYER_COYOTE_TIME,
+            },
+            WallJumpController {
+                force_in: PLAYER_WALL_JUMP_IN_FORCE,
+                force_out: PLAYER_WALL_JUMP_OUT_FORCE,
+                friction_coefficient: PLAYER_WALL_FRICTION_COEFFICIENT,
+            }),(
+            WallStickable {
+                wall_stick_time: PLAYER_WALL_STICK_DURATION,
+            },
+            GroundedHorizontalMovementController {
+                left_key: KeyCode::KeyA,
+                right_key: KeyCode::KeyD,
+                acceleration: PLAYER_ACCELERATION,
+                deceleration: PLAYER_DECELERATION,
+                max_speed: MAX_HORIZONTAL_SPEED,
+            },
+            AirbourneHorizontalMovementController {
+                left_key: KeyCode::KeyA,
+                right_key: KeyCode::KeyD,
+                acceleration: PLAYER_ACCELERATION / 1.0,
+                deceleration: PLAYER_DECELERATION,
+                max_speed: MAX_HORIZONTAL_SPEED,
+            },
+            Respawnable {
+                translation: spawn_pos,
+                delay_in_seconds: PLAYER_RESPAWN_DELAY,
+            },
+            StageObject::Volatile,
+            Killable,
+            Wallable,
+            DashController::default(),
+            LockedAxes::ROTATION_LOCKED,
+            Sensor,
+            SplatOnDeath
+        )));
+
     }
 }
 
