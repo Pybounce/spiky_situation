@@ -69,7 +69,7 @@ pub fn tick_saw_shooters(
                 },
                 Transform::from_translation(transform.translation - Vec3::new(0.0, 0.0, 1.0)),
                 SpriteAnimator::new(30, atlas_rects.clone()),
-                StageObject
+                StageObject::Volatile
             ));
         }
     }

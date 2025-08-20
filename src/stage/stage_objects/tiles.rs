@@ -47,7 +47,7 @@ impl TileBundle {
                 rect: Some(atlas_rect),
                 ..default()
             },
-            stage_marker: StageObject,
+            stage_marker: StageObject::Volatile,
         }
         
     }

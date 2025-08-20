@@ -110,7 +110,7 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
             scale: Vec3::new(TILE_SIZE * stage_creator.stage.grid_width as f32, TILE_SIZE * stage_creator.stage.grid_height as f32, 1.0),
             ..default()
         },
-        StageObject
+        StageObject::Volatile
     ));
     return true;
 }

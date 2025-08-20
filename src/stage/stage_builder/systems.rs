@@ -6,12 +6,19 @@ use super::{events::{StageBuildCompleteEvent, StageBuildFailedEvent}, stage_asse
 
 
 pub fn unload_old_stage(
-    stage_piece_query: Query<(Entity, &StageObject)>,
+    stage_object_query: Query<(Entity, &StageObject)>,
     mut commands: Commands,
     stage_builder_data: Option<Res<StageBuilderData>>,
+    current_stage_opt: Option<Res<CurrentStageData>>
 ) {
-    for (e, sp) in &stage_piece_query {
-        commands.entity(e).despawn();
+    let Some(current_stage) = current_stage_opt else { return };
+
+    for (e, so) in &stage_object_query {
+        let should_remove = match stage_builder_data {
+            Some(ref new_stage) => StageObject::StagePersistent != *so || new_stage.stage_id != current_stage.stage_id,
+            None => true,
+        };
+        if should_remove { commands.entity(e).despawn(); }
     }
     commands.remove_resource::<CurrentStageData>();
 }

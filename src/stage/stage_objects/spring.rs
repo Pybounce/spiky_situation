@@ -32,7 +32,7 @@ impl SpringFactory {
                 Bouncy {
                     force: Vec2::from_angle(rotation + (PI / 2.0)) * SPRING_BOUNCE_FORCE,
                 },
-                StageObject,
+                StageObject::Volatile,
                 AnimateOnTouch {
                     animator_entity: parent.target_entity(),
                 }
@@ -44,7 +44,7 @@ impl SpringFactory {
                 ActiveEvents::COLLISION_EVENTS,
                 RigidBody::Fixed,
                 Ground,
-                StageObject,
+                StageObject::Volatile,
             ));
         });
 

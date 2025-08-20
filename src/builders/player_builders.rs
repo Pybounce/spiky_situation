@@ -95,7 +95,7 @@ impl PlayerBuilder {
                 translation: spawn_pos,
                 delay_in_seconds: PLAYER_RESPAWN_DELAY,
             },
-            StageObject,
+            StageObject::Volatile,
             Killable,
             Wallable,
             DashController::default(),
