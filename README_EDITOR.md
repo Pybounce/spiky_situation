@@ -19,6 +19,9 @@
 - All other clicks in unique cells mark that position as the next
 - Clicks in the same cell twice in a row marks the end of the route
 - Can have mover varients that change speed
+- How will I make things like springs move?
+  - Would be good if they did, but needs to look right
+  - Can they just move on their own or do they have to be connected to a moving platform
 
 **Quality of life**
 
@@ -44,3 +47,9 @@
 - Since the grid is a hashmap, just add a z-cord to the hash key
 - Some enforcement needed for things that fire projectiles?
 - But really it would just allow for some nicer designed levels decorative stuff
+
+**Augments**
+
+- Something you can place on different stage objects, but not all
+- Mover is an example of an augment
+- Another example might be Ghost which makes it only visible based on distance or touching ground etc
