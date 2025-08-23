@@ -34,7 +34,7 @@ use crate::{common::{animated_sprite::{AnimateOnTouch, SpriteAnimator}, splat::S
 // so I need to start animation on collision
 // and then x seconds after collision, add instantkiller component
 
-const PRESSURE_SPIKE_DELAY: f32 = 0.5;
+const PRESSURE_SPIKE_DELAY: f32 = 0.3;
 
 #[derive(Component)]
 pub struct PressureSpike {
