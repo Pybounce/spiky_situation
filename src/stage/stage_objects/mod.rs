@@ -10,6 +10,7 @@ pub mod key;
 pub mod interval_block;
 pub mod phantom_block;
 pub mod saw_shooter;
+pub mod pressure_spikes;
 
 #[derive(Component, PartialEq, Clone, Copy)]
 pub enum StageObject {

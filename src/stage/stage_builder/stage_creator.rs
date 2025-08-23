@@ -1,4 +1,4 @@
-use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
 use bevy::prelude::*;
@@ -45,6 +45,10 @@ pub enum ObjectAtlasIndices {
     SawProjectile1 = 33,
     SawProjectile2 = 34,
     SawShooter = 27,
+    PressureSpike0 = 37,
+    PressureSpike1 = 38,
+    PressureSpike2 = 39,
+    PressureSpike3 = 40,
 }
 
 
@@ -76,6 +80,7 @@ impl<'a> StageCreator<'a> {
         && build_interval_blocks(self, commands)
         && build_phantom_blocks(self, commands)
         && build_saw_shooters(self, commands)
+        && build_pressure_spikes(self, commands)
     }
 
 
@@ -204,6 +209,20 @@ fn build_half_saws(stage_creator: &StageCreator, commands: &mut Commands) -> boo
         SawFactory::spawn_half(commands, stage_creator, atlas_rects.clone(), half_saw);
     }
 
+    return true;
+}
+
+fn build_pressure_spikes(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+
+    let atlas_rects = vec![
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::PressureSpike0),
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::PressureSpike1),
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::PressureSpike2),
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::PressureSpike3),
+    ];
+    for pressure_spike in &stage_creator.stage.pressure_spikes {
+        PressureSpikeBuilder::spawn(commands, stage_creator, atlas_rects.clone(), pressure_spike);
+    }
     return true;
 }
 

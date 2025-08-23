@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, LockBlock, PhantomBlock, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE};
+use crate::stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, LockBlock, PhantomBlock, PressureSpike, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -213,6 +213,9 @@ impl EditorController {
         for phantom_block in &stage.phantom_blocks {
             self.stage_grid.insert(phantom_block.grid_pos.as_ivec2(), EditorItem::PhantomBlock);
         }
+        for pressure_spike in &stage.pressure_spikes {
+            self.stage_grid.insert(pressure_spike.grid_pos.as_ivec2(), EditorItem::PressureSpike { rotation: pressure_spike.rotation });
+        }
         
     }
 
@@ -221,77 +224,83 @@ impl EditorController {
         for (grid_pos, stage_editor_obj) in &self.stage_grid {
             match stage_editor_obj {
                 EditorItem::Spike { rotation } => {
-                                            stage.spikes.push(Spike {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                rotation: *rotation,
-                                            });
-                                        },
+                    stage.spikes.push(Spike {
+                        grid_pos: grid_pos.as_vec2(),
+                        rotation: *rotation,
+                    });
+                },
                 EditorItem::Ground => {
-                                            stage.ground_tiles.push(GroundTile {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                tilemap_index: get_ground_atlas_index(self, *grid_pos, None),
-                                            });
-                                        },
+                    stage.ground_tiles.push(GroundTile {
+                        grid_pos: grid_pos.as_vec2(),
+                        tilemap_index: get_ground_atlas_index(self, *grid_pos, None),
+                    });
+                },
                 EditorItem::Spawn => stage.spawn_grid_pos = grid_pos.as_vec2(),
                 EditorItem::Spring { rotation } => {
-                                            stage.springs.push(Spring {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                rotation: *rotation,
-                                            });
-                                        }
+                    stage.springs.push(Spring {
+                        grid_pos: grid_pos.as_vec2(),
+                        rotation: *rotation,
+                    });
+                }
                 EditorItem::PhantomBlock => {
-                                            stage.phantom_blocks.push(PhantomBlock {
-                                                grid_pos: grid_pos.as_vec2(),
-                                            });
-                                        },
+                    stage.phantom_blocks.push(PhantomBlock {
+                        grid_pos: grid_pos.as_vec2(),
+                    });
+                },
                 EditorItem::HalfSaw { rotation } => {
-                                            stage.half_saws.push(HalfSaw {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                rotation: *rotation,
-                                                movement_path_opt: None
-                                            });
-                                        },
+                    stage.half_saws.push(HalfSaw {
+                        grid_pos: grid_pos.as_vec2(),
+                        rotation: *rotation,
+                        movement_path_opt: None
+                    });
+                },
                 EditorItem::Key { variant } => {
-                                            stage.keys.push(Key {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                trigger_id: match variant {
-                                                    KeyVariant::One => 1,
-                                                    KeyVariant::Two => 2,
-                                                    KeyVariant::Three => 3,
-                                                },
-                                            });
-                                        },
+                    stage.keys.push(Key {
+                        grid_pos: grid_pos.as_vec2(),
+                        trigger_id: match variant {
+                            KeyVariant::One => 1,
+                            KeyVariant::Two => 2,
+                            KeyVariant::Three => 3,
+                        },
+                    });
+                },
                 EditorItem::LockBlock { variant } => {
-                                            stage.lock_blocks.push(LockBlock {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                trigger_id: match variant {
-                                                    LockBlockVariant::One => 1,
-                                                    LockBlockVariant::Two => 2,
-                                                    LockBlockVariant::Three => 3,
-                                                },
-                                            });
-                                        },
+                    stage.lock_blocks.push(LockBlock {
+                        grid_pos: grid_pos.as_vec2(),
+                        trigger_id: match variant {
+                            LockBlockVariant::One => 1,
+                            LockBlockVariant::Two => 2,
+                            LockBlockVariant::Three => 3,
+                        },
+                    });
+                },
                 EditorItem::IntervalBlock { variant } => {
-                                            stage.interval_blocks.push(IntervalBlock {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                is_active: match variant {
-                                                    IntervalBlockVariant::On => true,
-                                                    IntervalBlockVariant::Off => false,
-                                                }
-                                            });
-                                        },
+                    stage.interval_blocks.push(IntervalBlock {
+                        grid_pos: grid_pos.as_vec2(),
+                        is_active: match variant {
+                            IntervalBlockVariant::On => true,
+                            IntervalBlockVariant::Off => false,
+                        }
+                    });
+                },
                 EditorItem::SawShooter { rotation } => {
-                                            stage.saw_shooter_blocks.push(SawShooterBlock {
-                                                grid_pos: grid_pos.as_vec2(),
-                                                rotation: *rotation,
-                                            });
-                                        },
+                    stage.saw_shooter_blocks.push(SawShooterBlock {
+                        grid_pos: grid_pos.as_vec2(),
+                        rotation: *rotation,
+                    });
+                },
                 EditorItem::Goal => stage.goal_grid_pos = grid_pos.as_vec2(),
                 EditorItem::TerrainTheme { variant } => stage.terrain_theme = match variant {
                     TerrainThemeVarient::Grass => TerrainTheme::Grass,
                     TerrainThemeVarient::Snow => TerrainTheme::Snow,
                     TerrainThemeVarient::Sand => TerrainTheme::Sand,
                 },
+                EditorItem::PressureSpike { rotation } => {
+                    stage.pressure_spikes.push(PressureSpike {
+                        grid_pos: grid_pos.as_vec2(),
+                        rotation: *rotation,
+                    });
+                }
             }
         }
         return stage;
