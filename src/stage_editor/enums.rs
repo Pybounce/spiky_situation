@@ -14,7 +14,9 @@ pub enum EditorItem {
     IntervalBlock { variant: IntervalBlockVariant } = 8,
     SawShooter { rotation: f32 } = 9,
     Goal = 10,
-    TerrainTheme { variant: TerrainThemeVarient } = 11
+    TerrainTheme { variant: TerrainThemeVarient } = 11,
+    PressureSpike { rotation: f32 }= 12,
+
 }
 
 impl EditorItem {
@@ -31,13 +33,14 @@ impl EditorItem {
             EditorItem::IntervalBlock { .. } => EditorItem::SawShooter { rotation: 0.0 },
             EditorItem::SawShooter { .. } => EditorItem::Goal,
             EditorItem::Goal => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass },
-            EditorItem::TerrainTheme { .. } => EditorItem::Ground,
+            EditorItem::TerrainTheme { .. } => EditorItem::PressureSpike { rotation: 0.0 },
+            EditorItem::PressureSpike { .. } => EditorItem::Ground,
         }
     }
     pub fn cycle_prev(&self) -> Self {
         match self {
             EditorItem::SawShooter { .. } => EditorItem::IntervalBlock { variant: IntervalBlockVariant::On },
-            EditorItem::Ground => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass },
+            EditorItem::Ground => EditorItem::PressureSpike { rotation: 0.0 },
             EditorItem::IntervalBlock { .. } => EditorItem::LockBlock { variant: LockBlockVariant::One },
             EditorItem::LockBlock { .. } => EditorItem::HalfSaw { rotation: 0.0 },
             EditorItem::HalfSaw { .. } => EditorItem::PhantomBlock,
@@ -48,6 +51,7 @@ impl EditorItem {
             EditorItem::Key { .. } => EditorItem::Ground,
             EditorItem::Goal { .. } => EditorItem::SawShooter { rotation: 0.0 },
             EditorItem::TerrainTheme { .. } => EditorItem::Goal,
+            EditorItem::PressureSpike { .. } => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass }
         }
     }
     pub fn cycle_next_variant(&self) -> Self {
@@ -64,6 +68,8 @@ impl EditorItem {
             EditorItem::SawShooter { rotation } => EditorItem::SawShooter { rotation: *rotation },
             EditorItem::Goal => EditorItem::Goal,
             EditorItem::TerrainTheme { variant } => EditorItem::TerrainTheme { variant: variant.cycle_next() },
+            EditorItem::PressureSpike { rotation } => EditorItem::PressureSpike { rotation: *rotation },
+
         }
     }
     pub fn cycle_prev_variant(&self) -> Self {
@@ -80,6 +86,7 @@ impl EditorItem {
             EditorItem::SawShooter { rotation } => EditorItem::SawShooter { rotation: *rotation },
             EditorItem::Goal => EditorItem::Goal,
             EditorItem::TerrainTheme { variant } => EditorItem::TerrainTheme { variant: variant.cycle_prev() },
+            EditorItem::PressureSpike { rotation } => EditorItem::PressureSpike { rotation: *rotation },
         }
     }
 
@@ -98,6 +105,7 @@ impl EditorItem {
             EditorItem::SawShooter { rotation } => rotate_quater_bounded(rotation),
             EditorItem::Goal => return false,
             EditorItem::TerrainTheme { .. } => return false,
+            EditorItem::PressureSpike { rotation } => rotate_quater_bounded(rotation),
         };
         return true;
     }
@@ -115,6 +123,7 @@ impl EditorItem {
             EditorItem::SawShooter { rotation } => *rotation,
             EditorItem::Goal => 0.0,
             EditorItem::TerrainTheme { .. } => 0.0,
+            EditorItem::PressureSpike { rotation } => *rotation,
         }
     }
 }

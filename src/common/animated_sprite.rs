@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::CollidingEntities;
 
@@ -76,10 +78,20 @@ impl SpriteAnimator {
         self.reverse = false;
         self.current_atlas_index = 0;
     }
+    /// Will not restart if already playing
+    pub fn play_or_continue(&mut self) {
+        if self.currently_animate == false {
+            self.play();
+        }
+    }
     pub fn play_reverse(&mut self) {
         self.currently_animate = true;
         self.reverse = true;
         self.current_atlas_index = self.atlas_rects.len() - 1;
+    }
+    /// time that animation takes to play
+    pub fn duration(&self) -> Duration {
+        return self.timer.duration() * (self.atlas_rects.len() as u32 - 1);
     }
 }
 

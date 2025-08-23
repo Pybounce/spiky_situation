@@ -22,6 +22,10 @@
 - How will I make things like springs move?
   - Would be good if they did, but needs to look right
   - Can they just move on their own or do they have to be connected to a moving platform
+- _Mover highlights_
+  - When you select the mover _tool_, lines appear where everything will move
+  - When you hover over a moveable that has a path, the path appears in another colour than the rest and it's z is brought all the way forward so you can see it clearly
+  - COULD have the lines be offset so if 2 paths overlap, the lines are above/below each other but that's tricky so fuck that
 
 **Quality of life**
 
