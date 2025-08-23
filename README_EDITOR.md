@@ -26,6 +26,9 @@
   - When you select the mover _tool_, lines appear where everything will move
   - When you hover over a moveable that has a path, the path appears in another colour than the rest and it's z is brought all the way forward so you can see it clearly
   - COULD have the lines be offset so if 2 paths overlap, the lines are above/below each other but that's tricky so fuck that
+- _Issue: Do things attach to a mover_
+  - If theres a spike or a spring on top etc
+  - If I child it, rapier will break everything, so will need to switch to avian
 
 **Quality of life**
 
