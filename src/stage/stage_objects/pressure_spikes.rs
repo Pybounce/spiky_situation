@@ -1,38 +1,8 @@
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
-use crate::{common::{animated_sprite::{AnimateOnTouch, SpriteAnimator}, splat::SplatProvider}, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}, stage_objects::{tiles::TileBundle, StageObject}}};
+use crate::{common::{animated_sprite::SpriteAnimator, splat::SplatProvider}, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
 
-
-// okay so add the thing with an animator and collider
-// give it a timer also
-
-// when collider is collided, start timer AND start animation (animation set to the same time)
-// as soon as timer ends, add instantkiller component so collider now kills
-
-
-
-
-
-
-
-
-
-// *** NEW PLAN ***
-// Build out that generic insert_on_delay and remove_on_delay system
-// simple.
-
-// yeah ok it's more complex than that but I NEED to have my stuff more generic
-// for the love of god I have so many systems for specific things like PhantomBlocks
-// it's shit.
-
-
-
-// need a way of saying OnCollideInsertWithDelay(c: Component)
-// But I may want multiple. hmm.
-
-// so I need to start animation on collision
-// and then x seconds after collision, add instantkiller component
 
 const PRESSURE_SPIKE_DELAY: f32 = 0.3;
 
@@ -95,9 +65,11 @@ pub fn tick_pressure_spikes(
     for (e, mut pressure_spike, mut animator) in &mut query {
         if pressure_spike.triggered && !pressure_spike.timer.finished() {
             pressure_spike.timer.tick(time.delta());
+            if pressure_spike.timer.remaining() <= animator.duration() {
+                animator.play_or_continue();    // TODO: Click sound here
+            }
             if pressure_spike.timer.just_finished() {
-                animator.play();
-                commands.entity(e).try_insert(InstantKiller);
+                commands.entity(e).try_insert(InstantKiller);   // TODO: Blade release sound here
             }
         }
     }
