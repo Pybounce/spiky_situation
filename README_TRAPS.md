@@ -7,7 +7,9 @@
   - Could possibly use Triggers since they stay forever.
   - To reset, maybe have another component that can reset a triggerId after x seconds? maybe delayed event? who knows.
 - [ ] Lasers
-  - Do I have a separate thing for rotating lasers or do I make a rotator that you can then put something on like a laser/saw shooter etc
+  - Lasers will have 2 parts, the backing ground tile and then the laser core
+  - There will be laser varients that just increase the amount of lasers in the core (1, 2, 3, 4)
+  - Then to make a rotating laser, just apply the rotator augment to it, simple.
 - [ ] Teleporters
   - Anything that can be teleported is teleported when it collides
 

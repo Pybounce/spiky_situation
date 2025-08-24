@@ -18,7 +18,7 @@
 - First click starts mover edit
 - All other clicks in unique cells mark that position as the next
 - Clicks in the same cell twice in a row marks the end of the route
-- Can have mover varients that change speed
+- Can have mover variants that change speed
 - How will I make things like springs move?
   - Would be good if they did, but needs to look right
   - Can they just move on their own or do they have to be connected to a moving platform
@@ -39,6 +39,14 @@
 - [ ] Copy key
   - Probably Q but will be settings to rebind
   - Sets your current item to the item your mouse is hovering over
+- [ ] Draggable areas
+  - Click and drag will basically just apply whatever you have to each cell in the rect you have outlined
+  - So if you're holding a spike, it will try to place it in each cell
+  - If you're holding an augment it will try to apply it to all cells
+  - Some things cannot use this feature, such as movement augment, since it's not a value or placeable
+- [ ] Augments
+  - When holding an augment, highlight editor items that can use it
+  - When holding an augment, show debug info for editor items using it (maybe ONLY on hover of that item)
 
 **Offset Grid**
 
@@ -57,6 +65,29 @@
 
 **Augments**
 
-- Something you can place on different stage objects, but not all
-- Mover is an example of an augment
-- Another example might be Ghost which makes it only visible based on distance or touching ground etc
+- Ok so what if I had different augments that can be applied to existing editor items (different ones depending on augment)
+- _Value Augments_
+  - These will very likely be _variants_
+    - So movementSpeed augment will be a variant of the movement augment
+  - Can have value augments that just increase or decrease the augment value from a range of 0-1
+  - Instead of clicking the editor item to increase/decrease, make it so you change the augment value of the augment you're holding, and then click to apply that value
+    - Otherwise doing mass changes will be a pain, since you'd have to go to each one to click and hold etc
+- _Rotator_
+  - Applying more of this will increase rotation cone
+  - To change start direction you can rotate the editor item (but it only does 90deg turns)
+  - If you make a full circle (ie value of 1), then the rotation doesn't turn around on itself but just goes around
+  - When less than a full circle, rewinds and repeats
+- _Speed_
+  - Applying this will change the translation speed of the editor item
+- _Rotation Speed_
+  - Applying this will change the rotation speed of the editor item
+- _Mover_
+  - Wouldn't be a value augment
+  - More info on it above.
+
+**Things that I do not know how to do**
+
+- How do I define different behaviours for if you're holding editor items or augments etc
+  - So if you're holding an editor item it should place it, but an augment it should apply it to the editor item in that cell
+- How do I work out what can and cannot be applied as a bulk rect
+  - Probably will be solved by the above
