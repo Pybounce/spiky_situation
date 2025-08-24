@@ -29,3 +29,22 @@
 - [ ] Ghost objects
   - Only visible when in mid air OR maybe based on distance??
   - Could be an augment that is applied to many objects, same as mover
+
+**Lasers**
+
+- Basic setup is to have a raycast find the start/end, and then slap a rect with that length, rotated correctly
+- Can either use a tiled texture (which would be procedurally making the mesh since the uvs need to tile it, I think.), or make a shader
+  - Possibly some middle ground where I define the mesh just as a normal quad, and tell it that the x repeats N times, so then the shader just takes the uv and divides uv.x by N??
+- Ignore blood splats for now
+- Collider will just take the same shape as the quad
+- _Issue_: Not sure how the static vs moving laser will be, more on this below
+
+**Static/Moving editor item textures**
+
+- So the blade shooter static is a block, on the same layer as ground, but when it moves, that might be clunky, same with laser
+- Rotating laser would also look clunky
+- So do I separate the textures such that I have a _Core_ texture that is the thing that moves, and when the object has no _Mover_ on it, I just also add a _Backing_ texture??
+  - Would the core have collision? probably not.
+  - So with this you would end up with a split between moving textures and non moving ones
+- Other platformers just have the tiles small enough so that a tile moving doesn't look strange.
+- My game could probably get away with a moving tile, but then...how will it work if it moves into another ground tile etc, it would look strange.

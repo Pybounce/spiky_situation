@@ -71,7 +71,7 @@ pub fn apply_splat_on_death(
         let mut rng = rand::thread_rng();
         
         //let colour = Color::hsl(rng.gen_range(0.0..360.0), 0.5, 0.5).to_linear();
-        let colour = Color::hsl(0.0, 0.9, 0.3).to_linear();
+        let colour = Color::hsl(0.1, 0.1, 0.1).to_linear();
         let rgb = Vec3::new(colour.red, colour.green, colour.blue);
 
         build_splat(&mut commands, &splat_db, &mut materials, &mut meshes, &time, splat_rot_90, transform.translation(), SplatType::Radial, rgb);
