@@ -29,6 +29,10 @@
 - [ ] Ghost objects
   - Only visible when in mid air OR maybe based on distance??
   - Could be an augment that is applied to many objects, same as mover
+- [ ] Block Rotator
+  - Single block that just rotates in increments of 90, with x seconds in between
+  - Things will be attached to this block so one side can have a spring, the other spike/laser etc
+  - Only issue is that rotation is usually done with animation, not just rotation - but if rotation works in general then this could as well not sure
 
 **Lasers**
 

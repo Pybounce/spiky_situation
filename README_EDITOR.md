@@ -77,13 +77,19 @@
   - To change start direction you can rotate the editor item (but it only does 90deg turns)
   - If you make a full circle (ie value of 1), then the rotation doesn't turn around on itself but just goes around
   - When less than a full circle, rewinds and repeats
-- _Speed_
+- _Move Speed_
   - Applying this will change the translation speed of the editor item
 - _Rotation Speed_
   - Applying this will change the rotation speed of the editor item
 - _Mover_
   - Wouldn't be a value augment
   - More info on it above.
+- _Speed_
+  - Ok so this is a generic speed augment that will apply differently to different things
+  - For example with blade shooters, it would increase the firerate, but for interval blocks it would decrease time between switches. Maybe for phantom blocks and pressure spikes it decreases there time too.
+  - **Issue** is, some things have multiple factors
+    - Blade shooter would have projectile speed and fire rate
+    - Could do what that chicken one does where the stage has an overall projectile speed resource, instead of per entity
 
 **Things that I do not know how to do**
 
@@ -91,3 +97,7 @@
   - So if you're holding an editor item it should place it, but an augment it should apply it to the editor item in that cell
 - How do I work out what can and cannot be applied as a bulk rect
   - Probably will be solved by the above
+
+**Rotation Issue**
+
+- Rotation is usually done with animation so would not be pixel perfect when done with actual rotation
