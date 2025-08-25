@@ -116,7 +116,7 @@ fn handle_placement(
     mut editor_con: ResMut<EditorController>,
     mouse_data: Res<MouseData>
 ) {
-    if buttons.just_pressed(MouseButton::Left) {
+    if buttons.pressed(MouseButton::Left) {
         let mouse_pos = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
         if editor_con.try_place(mouse_pos) {
 
@@ -129,7 +129,7 @@ fn handle_grid_object_removals(
     mut editor_con: ResMut<EditorController>,
     mouse_data: Res<MouseData>
 ) {
-    if buttons.just_pressed(MouseButton::Right) {
+    if buttons.pressed(MouseButton::Right) {
         let mouse_pos = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
         editor_con.try_remove(mouse_pos);
     }
