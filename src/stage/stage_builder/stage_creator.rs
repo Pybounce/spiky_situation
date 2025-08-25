@@ -54,6 +54,10 @@ pub enum ObjectAtlasIndices {
     Beam1 = 43,
     Beam2 = 44,
     Beam3 = 45,
+    BeamEndParticles0 = 56,
+    BeamEndParticles1 = 57,
+    BeamEndParticles2 = 58,
+    BeamEndParticles3 = 59,
 }
 
 
