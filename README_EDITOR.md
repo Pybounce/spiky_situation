@@ -97,7 +97,3 @@
   - So if you're holding an editor item it should place it, but an augment it should apply it to the editor item in that cell
 - How do I work out what can and cannot be applied as a bulk rect
   - Probably will be solved by the above
-
-**Rotation Issue**
-
-- Rotation is usually done with animation so would not be pixel perfect when done with actual rotation

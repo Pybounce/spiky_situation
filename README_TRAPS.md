@@ -4,6 +4,11 @@
 
 - [ ] Teleporters
   - Anything that can be teleported is teleported when it collides
+- [ ] Laser rotation
+  - Additional of NS and NSEW laser varients
+  - Separate the laser core from the block and only rotate it
+  - Laser core will need many laser beams, probably want to have many lasers as children and keep it the current way it is
+  - Will need to get the collision normal for the end particles
 
 **Unsure Ideas**
 
