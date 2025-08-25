@@ -21,6 +21,8 @@ impl LaserBuilder {
         let beam_atlas_rects = vec![
             get_object_tilemap_rect_from_index(ObjectAtlasIndices::Beam0),
             get_object_tilemap_rect_from_index(ObjectAtlasIndices::Beam1),
+            get_object_tilemap_rect_from_index(ObjectAtlasIndices::Beam2),
+            get_object_tilemap_rect_from_index(ObjectAtlasIndices::Beam3),
         ];
         let beam = commands.spawn((
             LaserBeam,
@@ -31,7 +33,7 @@ impl LaserBuilder {
                 rect: Some(beam_atlas_rects[0]),
                 ..default()
             },
-            SpriteAnimator::new(30, beam_atlas_rects.clone()),
+            SpriteAnimator::new(200, beam_atlas_rects.clone()),
             RigidBody::Fixed,
             Collider::cuboid(TILE_SIZE_HALF / 2.0, 0.5),
             ActiveEvents::COLLISION_EVENTS,

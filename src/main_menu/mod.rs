@@ -51,7 +51,7 @@ pub fn try_enter_stage_editor(
 ) {
     if input.just_released(KeyCode::KeyE) {
         commands.insert_resource(StageEditorLoadDetails {
-            template_stage_id: 3.into(),
+            template_stage_id: 4.into(),
             new_stage_id: 3,
             template_stage_handle: None
         });

@@ -52,6 +52,8 @@ pub enum ObjectAtlasIndices {
     Laser = 47,
     Beam0 = 42,
     Beam1 = 43,
+    Beam2 = 44,
+    Beam3 = 45,
 }
 
 
