@@ -30,6 +30,16 @@
   - If theres a spike or a spring on top etc
   - If I child it, rapier will break everything, so will need to switch to avian
 
+**Mover Implementation**
+
+- EditorController holds enum for idk EditorUseable?
+- EditorUseable is an enum { Item(EditorItem), Augment(EditorAugment) }
+- Then EditorItem needs a method that says whether or not it accepts the augment
+- Then we have separate systems dealing with each augment
+  - So moveable will need something that tracks if we've selected an item to apply it ot
+  - It needs to track all the positions
+  - It needs to apply them and clear the currently selected item
+
 **Quality of life**
 
 - [x] Hold to place
