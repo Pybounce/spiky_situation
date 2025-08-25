@@ -1,8 +1,8 @@
-use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, prelude::*};
 use controller::EditorController;
 use item_icon::*;
 use renderer::editor_renderer::EditorRenderer;
-use crate::{camera::PixelPerfectTranslation, common::{mouse::MouseData, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage};
+use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage};
 
 mod enums;
 mod controller;
@@ -153,31 +153,20 @@ fn handle_rotate(
     }
 }
 
-//TODO: Potentially move to moving the cam via clicking mouse3
 fn move_camera(
     mut query: Query<&mut PixelPerfectTranslation, With<Camera>>,
-    mouse_data: Res<MouseData>,
-    time: Res<Time>
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
+    mut mouse_motion_events: EventReader<WorldMouseMotion>,
 ) {
-    const CAMERA_MOVE_DEADZONE: f32 = 0.1;
-    const CAMERA_MOVE_SPEED: f32 = 64.0;
-
-    let mut direction = Vec3::ZERO;    
-    if mouse_data.window_position_normalised.x >= 1.0 - CAMERA_MOVE_DEADZONE {
-        direction += Vec3::X;
-    }
-    else if mouse_data.window_position_normalised.x <= CAMERA_MOVE_DEADZONE {
-        direction -= Vec3::X;
-    }
-    if mouse_data.window_position_normalised.y <= CAMERA_MOVE_DEADZONE {
-        direction += Vec3::Y;
-    }
-    else if mouse_data.window_position_normalised.y >= 1.0 - CAMERA_MOVE_DEADZONE {
-        direction -= Vec3::Y;
+    if !mouse_button_input.pressed(MouseButton::Middle) { return; }
+    
+    let mut delta = Vec2::ZERO;
+    for event in mouse_motion_events.read() {
+        delta += event.delta * Vec2::new(-1.0, -1.0);
     }
 
     for mut ppt in &mut query {
-        ppt.translation += direction * CAMERA_MOVE_SPEED * time.delta_secs();
+        ppt.translation += delta.extend(0.0);
     }
 }
 

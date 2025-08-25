@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::{physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{builders::player_builders::init_player_builder, common::{mouse::WorldMouseMotion, physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
 
 mod common;
 
@@ -76,6 +76,7 @@ fn main() {
         .add_event::<SaveGame>()
         .add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
+        .add_event::<WorldMouseMotion>()
         //.add_plugins(bevy_rapier2d::render::RapierDebugRenderPlugin::default())
         .init_resource::<SaveDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
