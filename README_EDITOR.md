@@ -32,7 +32,7 @@
 
 **Quality of life**
 
-- [ ] Hold to place
+- [x] Hold to place
 - [ ] Better editor movement
   - Mouse3 or Space + click + drag should move the editor by that amount
 - [ ] Zooming in and out moves you closer/further to/from your cursor location (like sprite editor)
