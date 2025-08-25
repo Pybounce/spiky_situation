@@ -11,6 +11,7 @@ pub mod interval_block;
 pub mod phantom_block;
 pub mod saw_shooter;
 pub mod pressure_spikes;
+pub mod laser;
 
 #[derive(Component, PartialEq, Clone, Copy)]
 pub enum StageObject {

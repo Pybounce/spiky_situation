@@ -1,4 +1,4 @@
-use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
 use bevy::prelude::*;
@@ -49,6 +49,9 @@ pub enum ObjectAtlasIndices {
     PressureSpike1 = 38,
     PressureSpike2 = 39,
     PressureSpike3 = 40,
+    Laser = 47,
+    Beam0 = 42,
+    Beam1 = 43,
 }
 
 
@@ -81,6 +84,7 @@ impl<'a> StageCreator<'a> {
         && build_phantom_blocks(self, commands)
         && build_saw_shooters(self, commands)
         && build_pressure_spikes(self, commands)
+        && build_lasers(self, commands)
     }
 
 
@@ -276,6 +280,14 @@ fn build_saw_shooters(stage_creator: &StageCreator, commands: &mut Commands) -> 
     let atlas_rects = vec![get_object_tilemap_rect_from_index(ObjectAtlasIndices::SawShooter)];
     for saw_shooter_block in &stage_creator.stage.saw_shooter_blocks {
         SawShooterFactory::spawn(commands, stage_creator, atlas_rects.clone(), saw_shooter_block);
+    }
+    return true;
+}
+
+fn build_lasers(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+    let atlas_rects = vec![get_object_tilemap_rect_from_index(ObjectAtlasIndices::Laser)];
+    for laser in &stage_creator.stage.lasers {
+        LaserBuilder::spawn(commands, stage_creator, atlas_rects.clone(), laser);
     }
     return true;
 }
