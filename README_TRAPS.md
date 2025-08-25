@@ -28,6 +28,11 @@
   - Single block that just rotates in increments of 90, with x seconds in between
   - Things will be attached to this block so one side can have a spring, the other spike/laser etc
   - Only issue is that rotation is usually done with animation, not just rotation - but if rotation works in general then this could as well not sure
+- [ ] Glass
+  - Thin layer of glass that you can jump/walk on
+  - Dashing through it will smash it
+  - Sawblades will smash it
+  - Lasers pass through it
 
 **Static/Moving editor item textures**
 
