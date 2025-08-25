@@ -95,7 +95,7 @@ fn main() {
         .add_event::<CollisionRemapEvent>()
         .add_systems(Update, (raise_collision_remap_events, handle_collision_remap_events).chain())
         .add_event::<TriggerEvent>()
-        .add_systems(Update, (rotate, trigger_pressure_spikes, tick_pressure_spikes))
+        .add_systems(Update, (trigger_pressure_spikes, tick_pressure_spikes))
         .run();
   
 }

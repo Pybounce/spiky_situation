@@ -25,6 +25,7 @@ pub struct Stage {
     pub phantom_blocks: Vec<PhantomBlock>,
     pub checkpoints: Vec<Checkpoint>,
     pub pressure_spikes: Vec<PressureSpike>,
+    pub lasers: Vec<Laser>,
     pub grid_width: usize,
     pub grid_height: usize,
     pub spawn_grid_pos: Vec2,
@@ -46,6 +47,7 @@ impl Stage {
             phantom_blocks: vec![],
             checkpoints: vec![],
             pressure_spikes: vec![],
+            lasers: vec![],
             grid_width: grid_size.x as usize,
             grid_height: grid_size.y as usize,
             spawn_grid_pos: Vec2::default(),
@@ -76,6 +78,12 @@ pub struct Spike {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PressureSpike {
+    pub grid_pos: Vec2,
+    pub rotation: f32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Laser {
     pub grid_pos: Vec2,
     pub rotation: f32,
 }

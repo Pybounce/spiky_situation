@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, LockBlock, PhantomBlock, PressureSpike, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE};
+use crate::stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -216,7 +216,9 @@ impl EditorController {
         for pressure_spike in &stage.pressure_spikes {
             self.stage_grid.insert(pressure_spike.grid_pos.as_ivec2(), EditorItem::PressureSpike { rotation: pressure_spike.rotation });
         }
-        
+        for laser in &stage.lasers {
+            self.stage_grid.insert(laser.grid_pos.as_ivec2(), EditorItem::Laser { rotation: laser.rotation });
+        }
     }
 
     fn build_stage(&self) -> Stage {
@@ -297,6 +299,12 @@ impl EditorController {
                 },
                 EditorItem::PressureSpike { rotation } => {
                     stage.pressure_spikes.push(PressureSpike {
+                        grid_pos: grid_pos.as_vec2(),
+                        rotation: *rotation,
+                    });
+                },
+                EditorItem::Laser { rotation } => {
+                    stage.lasers.push(Laser {
                         grid_pos: grid_pos.as_vec2(),
                         rotation: *rotation,
                     });
