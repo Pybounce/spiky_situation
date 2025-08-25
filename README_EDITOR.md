@@ -36,7 +36,7 @@
 - [x] Better editor movement
   - Mouse3 or Space + click + drag should move the editor by that amount
 - [ ] Zooming in and out moves you closer/further to/from your cursor location (like sprite editor)
-- [ ] Copy key
+- [x] Copy key
   - Probably Q but will be settings to rebind
   - Sets your current item to the item your mouse is hovering over
 - [ ] Draggable areas
