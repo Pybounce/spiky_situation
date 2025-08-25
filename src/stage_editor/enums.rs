@@ -16,6 +16,7 @@ pub enum EditorItem {
     Goal = 10,
     TerrainTheme { variant: TerrainThemeVarient } = 11,
     PressureSpike { rotation: f32 }= 12,
+    Laser { rotation: f32 }= 13,
 
 }
 
@@ -34,13 +35,14 @@ impl EditorItem {
             EditorItem::SawShooter { .. } => EditorItem::Goal,
             EditorItem::Goal => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass },
             EditorItem::TerrainTheme { .. } => EditorItem::PressureSpike { rotation: 0.0 },
-            EditorItem::PressureSpike { .. } => EditorItem::Ground,
+            EditorItem::PressureSpike { .. } => EditorItem::Laser { rotation: 0.0 },
+            EditorItem::Laser { .. } => EditorItem::Ground,
         }
     }
     pub fn cycle_prev(&self) -> Self {
         match self {
             EditorItem::SawShooter { .. } => EditorItem::IntervalBlock { variant: IntervalBlockVariant::On },
-            EditorItem::Ground => EditorItem::PressureSpike { rotation: 0.0 },
+            EditorItem::Ground => EditorItem::Laser { rotation: 0.0 },
             EditorItem::IntervalBlock { .. } => EditorItem::LockBlock { variant: LockBlockVariant::One },
             EditorItem::LockBlock { .. } => EditorItem::HalfSaw { rotation: 0.0 },
             EditorItem::HalfSaw { .. } => EditorItem::PhantomBlock,
@@ -51,7 +53,8 @@ impl EditorItem {
             EditorItem::Key { .. } => EditorItem::Ground,
             EditorItem::Goal { .. } => EditorItem::SawShooter { rotation: 0.0 },
             EditorItem::TerrainTheme { .. } => EditorItem::Goal,
-            EditorItem::PressureSpike { .. } => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass }
+            EditorItem::PressureSpike { .. } => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass },
+            EditorItem::Laser { .. } => EditorItem::PressureSpike { rotation: 0.0 }
         }
     }
     pub fn cycle_next_variant(&self) -> Self {
@@ -69,6 +72,7 @@ impl EditorItem {
             EditorItem::Goal => EditorItem::Goal,
             EditorItem::TerrainTheme { variant } => EditorItem::TerrainTheme { variant: variant.cycle_next() },
             EditorItem::PressureSpike { rotation } => EditorItem::PressureSpike { rotation: *rotation },
+            EditorItem::Laser { rotation } => EditorItem::Laser { rotation: *rotation },
 
         }
     }
@@ -87,6 +91,8 @@ impl EditorItem {
             EditorItem::Goal => EditorItem::Goal,
             EditorItem::TerrainTheme { variant } => EditorItem::TerrainTheme { variant: variant.cycle_prev() },
             EditorItem::PressureSpike { rotation } => EditorItem::PressureSpike { rotation: *rotation },
+            EditorItem::Laser { rotation } => EditorItem::Laser { rotation: *rotation },
+
         }
     }
 
@@ -106,6 +112,7 @@ impl EditorItem {
             EditorItem::Goal => return false,
             EditorItem::TerrainTheme { .. } => return false,
             EditorItem::PressureSpike { rotation } => rotate_quater_bounded(rotation),
+            EditorItem::Laser { rotation } => rotate_quater_bounded(rotation),
         };
         return true;
     }
@@ -124,6 +131,7 @@ impl EditorItem {
             EditorItem::Goal => 0.0,
             EditorItem::TerrainTheme { .. } => 0.0,
             EditorItem::PressureSpike { rotation } => *rotation,
+            EditorItem::Laser { rotation } => *rotation,
         }
     }
 }
