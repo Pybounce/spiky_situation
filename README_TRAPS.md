@@ -33,6 +33,8 @@
   - Dashing through it will smash it
   - Sawblades will smash it
   - Lasers pass through it
+- [ ] Gravity Flip
+  - Collecting this toggle will flip gravity
 
 **Static/Moving editor item textures**
 
