@@ -39,6 +39,7 @@
   - So moveable will need something that tracks if we've selected an item to apply it ot
   - It needs to track all the positions
   - It needs to apply them and clear the currently selected item
+- _maybe value augments are their own enum since they will all work the same way, unlike mover which requires specialised logic_
 
 **Quality of life**
 
