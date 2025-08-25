@@ -100,7 +100,7 @@ pub fn update_laser_beams(
             // beam
             if let Ok(mut beam_transform) = beam_query.get_mut(laser.beam) {
                 beam_transform.translation = (origin + ((hit_point - origin) / 2.0)).extend(100.0);
-                beam_transform.scale.y = distance;
+                beam_transform.scale.y = distance + 2.0;
                 beam_transform.rotation = laser_transform.rotation;
             }
 
