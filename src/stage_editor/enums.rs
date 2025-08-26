@@ -1,3 +1,30 @@
+use bevy::math::IVec2;
+
+#[derive(Default, Copy, Clone, Debug)]
+pub enum EditorValueAugment {
+    #[default]
+    MoveSpeed,
+    Rotation
+}
+
+#[derive(Default, Clone, Debug)]
+pub enum EditorTool {
+    #[default]
+    Brush,
+    Bucket,
+    MoveAugment(Vec<IVec2>),
+    //ValueAugment(EditorValueAugment),
+    //StageSize,
+}
+
+// so with move augment
+// if click and len == 0, check if item at gridPos can have MoveAugment applied, if so set Some and add gridPos to vec
+// if click and len > 0, and gridPos is the same as the last point added, apply the augment to the item at the first point added -> then clear all points
+// if click and len > 0 and gridPos is different to last added, add it to the list
+// if right click, remove last point
+
+// this has the benefit that if you switch editor tool halfway through, it won't have applied anything and will just remove all progress.
+
 
 #[derive(Default, Copy, Clone, Debug)]
 #[repr(u8)]
@@ -242,3 +269,6 @@ impl IntervalBlockVariant {
         }
     }
 }
+
+
+

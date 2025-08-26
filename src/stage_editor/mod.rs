@@ -2,7 +2,7 @@ use bevy::{input::mouse::MouseMotion, prelude::*};
 use controller::EditorController;
 use item_icon::*;
 use renderer::editor_renderer::EditorRenderer;
-use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage};
+use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage, stage_editor::enums::EditorTool};
 
 mod enums;
 mod controller;
@@ -21,8 +21,7 @@ impl Plugin for StageEditorPlugin {
         .add_systems(Update, (
             (handle_current_item_change, add_item_icon, move_item_icon, update_ground_atlas_indices),
             (handle_rotate, handle_placement, handle_grid_object_removals),
-            handle_save,
-            move_camera
+            handle_save, move_camera, switch_tool
         ).run_if(in_state(StageEditorState::InEdit)));
     }
 }
@@ -168,6 +167,25 @@ fn move_camera(
     for mut ppt in &mut query {
         ppt.translation += delta.extend(0.0);
     }
+}
+
+pub fn switch_tool(
+    mut editor_con: ResMut<EditorController>,
+    input: Res<ButtonInput<KeyCode>>,
+) {
+    if input.just_pressed(KeyCode::Digit1) {
+        editor_con.current_tool = EditorTool::Brush;
+    }
+    else if input.just_pressed(KeyCode::Digit2) {
+        editor_con.current_tool = EditorTool::Bucket;
+    }
+    else if input.just_pressed(KeyCode::Digit3) {
+        editor_con.current_tool = EditorTool::MoveAugment(vec![]);
+    }
+    else { return; }
+    println!("Editor Tool: {:?}", editor_con.current_tool);
+    println!("");
+    println!("");
 }
 
 

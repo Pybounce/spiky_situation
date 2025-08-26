@@ -11,6 +11,7 @@ pub const GROUND_TILEMAP_SIZE: f32 = 7.0;
 #[derive(Resource)]
 pub struct EditorController {
     pub current_item: EditorItem,
+    pub current_tool: EditorTool,
     tile_size: f32,
     /// Tracks whether or not the latest stage updates have been saved
     saved: bool,
@@ -29,6 +30,7 @@ impl EditorController {
         
         Self { 
             current_item: EditorItem::default(),
+            current_tool: EditorTool::default(),
             tile_size: TILE_SIZE,
             saved: false,
             object_atlas: object_atlas.clone(),
@@ -44,6 +46,7 @@ impl EditorController {
     pub fn from_stage(stage: &Stage, new_stage_id: usize, object_atlas: &Handle<Image>, ground_atlas: &Handle<Image>) -> Self {
         let mut editor = Self { 
             current_item: EditorItem::default(),
+            current_tool: EditorTool::default(),
             tile_size: TILE_SIZE,
             saved: false,
             object_atlas: object_atlas.clone(),
