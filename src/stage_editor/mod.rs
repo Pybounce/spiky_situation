@@ -115,11 +115,9 @@ fn handle_placement(
     mut editor_con: ResMut<EditorController>,
     mouse_data: Res<MouseData>
 ) {
-    if buttons.pressed(MouseButton::Left) {
+    if buttons.pressed(MouseButton::Left) && editor_con.current_tool == EditorTool::Brush {
         let mouse_pos = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
-        if editor_con.try_place(mouse_pos) {
-
-        }
+        let _ = editor_con.try_place(mouse_pos);
     }
 }
 
@@ -128,9 +126,9 @@ fn handle_grid_object_removals(
     mut editor_con: ResMut<EditorController>,
     mouse_data: Res<MouseData>
 ) {
-    if buttons.pressed(MouseButton::Right) {
+    if buttons.pressed(MouseButton::Right) && editor_con.current_tool == EditorTool::Brush {
         let mouse_pos = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
-        editor_con.try_remove(mouse_pos);
+        let _ = editor_con.try_remove(mouse_pos);
     }
 }
 
@@ -177,10 +175,10 @@ pub fn switch_tool(
         editor_con.current_tool = EditorTool::Brush;
     }
     else if input.just_pressed(KeyCode::Digit2) {
-        editor_con.current_tool = EditorTool::Bucket;
+        editor_con.current_tool = EditorTool::MoveAugment(vec![]);
     }
     else if input.just_pressed(KeyCode::Digit3) {
-        editor_con.current_tool = EditorTool::MoveAugment(vec![]);
+        //editor_con.current_tool = EditorTool::MoveAugment(vec![]);
     }
     else { return; }
     println!("Editor Tool: {:?}", editor_con.current_tool);

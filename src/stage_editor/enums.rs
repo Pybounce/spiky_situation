@@ -4,14 +4,16 @@ use bevy::math::IVec2;
 pub enum EditorValueAugment {
     #[default]
     MoveSpeed,
-    Rotation
+    Rotation,
+    RotationSpeed,
+    ProjectileFireRate,
+    ProjectileSpeed
 }
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, PartialEq)]
 pub enum EditorTool {
     #[default]
     Brush,
-    Bucket,
     MoveAugment(Vec<IVec2>),
     //ValueAugment(EditorValueAugment),
     //StageSize,
