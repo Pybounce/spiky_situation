@@ -23,8 +23,8 @@ impl SpringFactory {
             SpriteAnimator::new_non_repeating(50, atlas_rects),
         )).with_children(|parent| {
             parent.spawn((
-                Collider::cuboid(TILE_SIZE_HALF * 0.9, TILE_SIZE_HALF * 0.2),
-                Transform::from_xyz(0.0, 0.0, 0.0),
+                Collider::cuboid(TILE_SIZE_HALF * 0.9, TILE_SIZE_HALF * 0.3),
+                Transform::from_xyz(0.0, -TILE_SIZE_HALF / 3.0, 0.0),
                 CollisionGroups::new(Group::GROUP_3, Group::ALL),
                 ActiveEvents::COLLISION_EVENTS,
                 RigidBody::Fixed,
@@ -36,15 +36,6 @@ impl SpringFactory {
                 AnimateOnTouch {
                     animator_entity: parent.target_entity(),
                 }
-            ));
-            parent.spawn((
-                Collider::cuboid(TILE_SIZE_HALF, TILE_SIZE_HALF * 0.4),
-                Transform::from_xyz(0.0, -TILE_SIZE_HALF, 0.0),
-                CollisionGroups::new(Group::GROUP_1, Group::ALL),
-                ActiveEvents::COLLISION_EVENTS,
-                RigidBody::Fixed,
-                Ground,
-                StageObject::Volatile,
             ));
         });
 
