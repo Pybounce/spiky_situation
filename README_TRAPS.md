@@ -9,6 +9,10 @@
   - Separate the laser core from the block and only rotate it
   - Laser core will need many laser beams, probably want to have many lasers as children and keep it the current way it is
   - Will need to get the collision normal for the end particles
+- [ ] Tesla Coils
+  - Place coils around the map (they can move)
+  - When a coil is within x distance of another, they link with electricity
+  - Should be a shallow link when they're about to fully link so the player has time to react
 
 **Unsure Ideas**
 
