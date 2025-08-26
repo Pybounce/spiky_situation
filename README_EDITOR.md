@@ -1,5 +1,15 @@
 #### Editor Refactor
 
+**Current Issues**
+
+- [ ] Moveable Clone
+  - If the EditorItem contains all it's info then it also will contain the full vec path
+  - So when I copy one, I wil need to clear that path manually, also I can't copy, must be clone, which is annoying
+  - Could just impl Copy myself and leave that part out buttt it's risky.
+- [ ] Moveable Tracks vs Augment
+  - Tracks would allow me to draw one track and place many things on it
+  - Augment would mean I have to redo the track for every item on it, every time.
+
 **Must Haves**
 
 - [ ] Change stage size (within size limits)
