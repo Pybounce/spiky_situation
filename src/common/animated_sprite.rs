@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::CollidingEntities;
+use avian2d::prelude::*;
 
 
 #[derive(Component)]
@@ -18,7 +18,7 @@ pub struct SpriteAnimator {
 #[derive(Component)]
 pub struct AnimateOnTouch
 {
-    pub animator_entity: Entity
+    pub animator_entity: Option<Entity>
 }
 
 
@@ -117,8 +117,12 @@ pub fn check_animate_on_touch(
 ) {
     for colliding_entities in &toucher_query {
         for colliding_entity in colliding_entities.iter() {
-            if let Ok(aot) = animate_on_touch_query.get_mut(colliding_entity) {
-                if let Ok(mut sa) = sprite_animators.get_mut(aot.animator_entity) {
+            if let Ok(aot) = animate_on_touch_query.get_mut(*colliding_entity) {
+                let entity = match aot.animator_entity {
+                    Some(entity) => entity,
+                    None => *colliding_entity,
+                };
+                if let Ok(mut sa) = sprite_animators.get_mut(entity) {
                     sa.play();
                 } 
             }

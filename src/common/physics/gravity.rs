@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::dynamics::Velocity;
+use avian2d::prelude::*;
 
 use crate::ground::Grounded;
 
@@ -11,13 +11,13 @@ pub struct Gravity {
 }
 
 pub fn simulate_gravity(
-    mut query: Query<(&mut Velocity, &mut Gravity), Without<Grounded>>,
+    mut query: Query<(&mut LinearVelocity, &mut Gravity), Without<Grounded>>,
     time: Res<Time>
 ) {
     for (mut v, mut g) in &mut query {
         g.current_force += g.acceleration * time.delta_secs();
         g.current_force = g.current_force.min(g.max_force);
 
-        v.linvel.y -= g.current_force * time.delta_secs();
+        v.y -= g.current_force * time.delta_secs();
     }
 }

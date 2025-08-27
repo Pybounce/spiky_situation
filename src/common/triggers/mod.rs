@@ -1,6 +1,6 @@
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
 
 
@@ -30,7 +30,7 @@ pub fn trigger_on_touch(
     for colliding_entities in &colliding_query {
 
         for colliding_entity in colliding_entities.iter() {
-            if let Ok(trigger) = trigger_query.get(colliding_entity) {
+            if let Ok(trigger) = trigger_query.get(*colliding_entity) {
                 trigger_event_writer.write(TriggerEvent {
                     trigger_id: trigger.trigger_id
                 });

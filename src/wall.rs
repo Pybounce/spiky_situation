@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
 
 #[derive(Component)]
@@ -17,7 +17,7 @@ pub enum TouchingWall {
 
 pub fn check_touching_wall(
     mut commands: Commands,
-    mut wallable_query: Query<(Entity, &mut Transform, &mut Velocity, Option<&TouchingWall>), With<Wallable>>,
+    mut wallable_query: Query<(Entity, &mut Transform, &mut LinearVelocity, Option<&TouchingWall>), With<Wallable>>,
     _wall_query: Query<(), With<Wall>>,
     rapier_write_context: WriteRapierContext
 ) {
@@ -47,7 +47,7 @@ pub fn check_touching_wall(
             if let Some((_entity, toi)) = rapier_context.cast_ray(ray_pos, Vec2::new(1.0, 0.0), raycast_length + raycast_buffer, solid, filter) {
                 new_left_collision = true;
                 if toi <= raycast_length {
-                    velocity.linvel.x = velocity.linvel.x.min(0.0);
+                    velocity.0.x = velocity.0.x.min(0.0);
                     transform.translation.x -= raycast_length - toi;
                     break;
                 }
@@ -61,7 +61,7 @@ pub fn check_touching_wall(
             if let Some((_entity, toi)) = rapier_context.cast_ray(ray_pos, Vec2::new(-1.0, 0.0), raycast_length + raycast_buffer , solid, filter) {
                 new_right_collision = true;
                 if toi <= raycast_length {
-                    velocity.linvel.x = velocity.linvel.x.max(0.0);
+                    velocity.0.x = velocity.0.x.max(0.0);
                     transform.translation.x += raycast_length - toi;
                     break;
                 }

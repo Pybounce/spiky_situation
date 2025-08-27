@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::CollidingEntities;
+use avian2d::prelude::*;
 
 #[derive(Component, Default)]
 pub struct DeathMarker {
@@ -63,7 +63,7 @@ pub fn check_touched_by_death(
 ) {
     for colliding_entities in &query {
         for colliding_entity in colliding_entities.iter() {
-            if let Ok(entity) = death_marked_on_touch_query.get(colliding_entity) {
+            if let Ok(entity) = death_marked_on_touch_query.get(*colliding_entity) {
                 commands.entity(entity).try_insert(DeathMarker::default());
             }
         }

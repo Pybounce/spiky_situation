@@ -1,7 +1,7 @@
 use bevy::{ecs::system::EntityCommands, prelude::*};
-use bevy_rapier2d::prelude::{Ccd, Collider, CollidingEntities, GravityScale, LockedAxes, RigidBody, Sensor, Velocity};
+use avian2d::prelude::*;
 
-use crate::{common::{death::{DelayedDeathMarker, Killable}, physics::gravity::Gravity, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{death::{DelayedDeathMarker, Killable}, physics::{gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::local_player::*;
 
 #[derive(Resource)]
@@ -23,7 +23,7 @@ impl PlayerBuilder {
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(pos),
             DelayedDeathMarker::from_secs(5.0),
             RigidBody::Dynamic,
-            Velocity::linear(Vec2::new(0.0, 200.0)),
+            LinearVelocity(Vec2::new(0.0, 200.0)),
             Gravity {
                 max_force: 400.0,
                 current_force: 0.0,
@@ -45,9 +45,9 @@ impl PlayerBuilder {
             },
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(spawn_pos),
             RigidBody::Dynamic,
-            Ccd::enabled(),
-            Collider::ball(0.5),
-            Velocity::linear(Vec2::ZERO),
+            SweptCcd::default(),
+            Collider::circle(0.5),
+            LinearVelocity(Vec2::ZERO),
             Gravity {
                 max_force: PLAYER_MAX_GRAVITY,
                 current_force: 0.0,
@@ -101,7 +101,14 @@ impl PlayerBuilder {
             DashController::default(),
             LockedAxes::ROTATION_LOCKED,
             Sensor,
-            SplatOnDeath
+            SplatOnDeath,
+            CollisionLayers::new(GamePhysicsLayer::Player, LayerMask::ALL),
+            children![(
+                Transform::default(),
+                Collider::rectangle(TILE_SIZE, TILE_SIZE),
+                CollisionLayers::new(GamePhysicsLayer::Player, LayerMask::ALL),
+                CollisionEventsEnabled,
+            )]
         )));
 
     }

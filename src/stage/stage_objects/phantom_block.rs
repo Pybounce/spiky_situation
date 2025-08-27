@@ -1,7 +1,7 @@
 use bevy::{math::Rect, prelude::{Commands, Component, Entity, Query, Res, Without}, time::{Time, Timer, TimerMode}};
-use bevy_rapier2d::prelude::{CollidingEntities, CollisionGroups, Group};
+use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, death::DeathMarker}, ground::Ground, stage::stage_builder::{stage_asset, stage_creator::StageCreator}};
+use crate::{common::{animated_sprite::SpriteAnimator, death::DeathMarker, physics::layers::GamePhysicsLayer}, ground::Ground, stage::stage_builder::{stage_asset, stage_creator::StageCreator}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -19,7 +19,7 @@ impl PhantomBlockFactory {
         let animation_frame_delta: u128 = 50;
 
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, phantom_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, CollisionGroups::new(Group::GROUP_1, Group::ALL)),
+            PhysicalTileBundle::new(stage_creator, phantom_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             PhantomBlock {
                 timer: Timer::from_seconds(atlas_rects.len() as f32 * (animation_frame_delta as f32 / 1000.0), TimerMode::Once),
                 currently_active: false
@@ -37,7 +37,7 @@ pub fn check_phantom_block_touched(
     for colliding_entities in &colliding_query {
 
         for colliding_entity in colliding_entities.iter() {
-            if let Ok((mut pb, mut sa)) = phantom_query.get_mut(colliding_entity) {
+            if let Ok((mut pb, mut sa)) = phantom_query.get_mut(*colliding_entity) {
                 pb.currently_active = true;
                 sa.play();
             }

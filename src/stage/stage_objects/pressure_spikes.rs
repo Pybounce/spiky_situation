@@ -1,7 +1,8 @@
 
+use avian2d::prelude::Collider;
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
-use crate::{common::{animated_sprite::SpriteAnimator, splat::SplatProvider}, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
+use avian2d::prelude::*;
+use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, splat::SplatProvider}, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
 
 
 const PRESSURE_SPIKE_DELAY: f32 = 0.3;
@@ -25,17 +26,23 @@ pub struct PressureSpikeBuilder;
 
 impl PressureSpikeBuilder {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, pressure_spike: &stage_asset::PressureSpike) {
+        let mut mask = LayerMask(GamePhysicsLayer::StageObject.to_bits());
+        mask.add(GamePhysicsLayer::Player.to_bits());
+
         commands.spawn((
             TileBundle::new(stage_creator, pressure_spike.grid_pos, atlas_rects[0], pressure_spike.rotation, stage_creator.object_tilemap),
             SpriteAnimator::new_non_repeating(50, atlas_rects),
             PressureSpike::new(PRESSURE_SPIKE_DELAY),
-            Collider::compound(vec![((Vect::new(0.0, -(TILE_SIZE_HALF * 0.6))), 0.0, Collider::cuboid(TILE_SIZE_HALF * 0.8, TILE_SIZE_HALF * 0.4))]),
-            RigidBody::Fixed,
-            ActiveEvents::COLLISION_EVENTS,
-            CollisionGroups::new(Group::GROUP_2, Group::ALL),
+            RigidBody::Static,
             SplatProvider {
                 translation_offset: Vec2::new(0.0, -(TILE_SIZE_HALF * 0.6)),
-            }
+            },
+            children![(
+                Transform::from_translation(Vec3::new(0.0, TILE_SIZE_HALF * 0.6, 0.0)),
+                Collider::rectangle(TILE_SIZE * 0.8, TILE_SIZE * 0.4),
+                CollisionLayers::new(GamePhysicsLayer::StageObject, mask),
+                CollisionEventsEnabled,
+            )]
         ));
     }
 
@@ -48,7 +55,7 @@ pub fn trigger_pressure_spikes(
 ) {
     for colliding_entities in &trigger_query {
         for colliding_entity in colliding_entities.iter() {
-            if let Ok(mut pressure_spike) = pressure_spike_query.get_mut(colliding_entity) {
+            if let Ok(mut pressure_spike) = pressure_spike_query.get_mut(*colliding_entity) {
                 if pressure_spike.triggered == false {
                     pressure_spike.triggered = true;
                 }

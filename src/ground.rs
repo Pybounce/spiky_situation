@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
 
 
@@ -13,7 +13,7 @@ pub struct Grounded;
 
 pub fn check_grounded(
     mut commands: Commands,
-    mut wallable_query: Query<(Entity, &mut Transform, &mut Velocity), With<Groundable>>,
+    mut wallable_query: Query<(Entity, &mut Transform, &mut LinearVelocity), With<Groundable>>,
     rapier_write_context: WriteRapierContext
 ) {
     let rapier_context = rapier_write_context.single().unwrap();
@@ -36,7 +36,7 @@ pub fn check_grounded(
             ray_pos.x += transform.scale.x / (ray_count + 1) as f32;
             if let Some((_entity, toi)) = rapier_context.cast_ray(ray_pos, Vec2::new(0.0, 1.0), raycast_length + raycast_buffer , solid, filter) {
                 if toi <= raycast_length {
-                    velocity.linvel.y = velocity.linvel.y.min(0.0);
+                    velocity.0.y = velocity.0.y.min(0.0);
                     transform.translation.y -= raycast_length - toi;
                     break;
                 }
@@ -50,7 +50,7 @@ pub fn check_grounded(
                 ground_collision = true;
 
                 if toi <= raycast_length {
-                    velocity.linvel.y = velocity.linvel.y.max(0.0);
+                    velocity.0.y = velocity.0.y.max(0.0);
                     transform.translation.y += raycast_length - toi;
                     break;
                 }

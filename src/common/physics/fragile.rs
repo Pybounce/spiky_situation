@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::CollisionEvent;
+use avian2d::prelude::*;
 
 use crate::common::death::DeathMarker;
 
@@ -7,21 +7,16 @@ use crate::common::death::DeathMarker;
 pub struct Fragile;
 
 pub fn break_fragiles(
-    mut collision_events: EventReader<CollisionEvent>,
+    mut collision_events: EventReader<CollisionStarted>,
     fragile_query: Query<(Entity, Option<&FragileShield>), With<Fragile>>,
     mut commands: Commands
 ) {
     for collision_event in collision_events.read() {
-        let (entity1, entity2) = match collision_event {
-            CollisionEvent::Started(e1, e2, _) => { (*e1, *e2) },
-            CollisionEvent::Stopped(_, _, _) => { continue; },
-        };
-
-        if let Ok((e, fs)) = fragile_query.get(entity1) {
-            fragile_hit(&mut commands, e, fs, entity2);
+        if let Ok((e, fs)) = fragile_query.get(collision_event.0) {
+            fragile_hit(&mut commands, e, fs, collision_event.1);
         }
-        if let Ok((e, fs)) = fragile_query.get(entity2) {
-            fragile_hit(&mut commands, e, fs, entity1);
+        if let Ok((e, fs)) = fragile_query.get(collision_event.1) {
+            fragile_hit(&mut commands, e, fs, collision_event.0);
         }
     }
 }

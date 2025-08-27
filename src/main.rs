@@ -1,11 +1,11 @@
 
 
+use avian2d::PhysicsPlugins;
 use bevy::{
     asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode}, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;
-use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
 use camera::{handle_zoom_change, move_camera, move_pixel_perfect_translations, spawn_camera};
 use common::{animated_sprite::{animate_sprites, check_animate_on_touch}, checkpoint::check_checkpoint_reached, death::{check_touched_by_death, despawn_death_marked, delay_death_marked}, mouse::{update_mouse_data, MouseData}, offset_mover::move_offset_movers, physics::{bouncy::check_bouncy_collisions, fragile::break_fragiles, gravity::simulate_gravity}, shake::shake, states::StatesPlugin, triggers::{trigger_on_touch, TriggerEvent}};
 use game::GamePlugin;
@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::{mouse::WorldMouseMotion, physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{builders::player_builders::init_player_builder, common::{mouse::WorldMouseMotion, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
 
 mod common;
 
@@ -70,14 +70,13 @@ fn main() {
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
         //.add_plugins(CCTVPostProcessPlugin)
-        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        .add_plugins(PhysicsPlugins::default())
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
         .add_event::<SaveGame>()
         .add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
         .add_event::<WorldMouseMotion>()
-        .add_plugins(bevy_rapier2d::render::RapierDebugRenderPlugin::default())
         .init_resource::<SaveDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
         .add_systems(PostUpdate, apply_physics_controller_limits)
@@ -94,8 +93,6 @@ fn main() {
         .add_systems(Startup, init_splat_db)
         .add_systems(Update, (apply_splat_on_death, clear_splat_events))
         .add_systems(Update, update_cctv_shader_time)
-        .add_event::<CollisionRemapEvent>()
-        .add_systems(Update, (raise_collision_remap_events, handle_collision_remap_events).chain())
         .add_event::<TriggerEvent>()
         .add_systems(Update, (trigger_pressure_spikes, tick_pressure_spikes))
         .add_systems(FixedPreUpdate, update_laser_beams)

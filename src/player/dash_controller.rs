@@ -2,7 +2,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::Velocity;
+use avian2d::prelude::*;
 
 use crate::{common::physics::gravity::Gravity, local_player::{FORCE_MUL, MAX_HORIZONTAL_SPEED}, wall::TouchingWall};
 
@@ -59,7 +59,7 @@ pub fn start_dashing(
 }
 
 pub fn apply_dashing(
-    mut query: Query<(&mut DashController, &mut Velocity, &mut Gravity, Option<&TouchingWall>)>,
+    mut query: Query<(&mut DashController, &mut LinearVelocity, &mut Gravity, Option<&TouchingWall>)>,
     time: Res<Time>
 ) {
     for (mut dash_controller, mut velocity, mut gravity, touching_wall_opt) in &mut query {
@@ -75,10 +75,10 @@ pub fn apply_dashing(
         }
 
         if !dash_controller.duration_timer.finished() {
-            velocity.linvel = Vec2::new(dash_controller.dash_direction_sign * dash_controller.dash_speed, 0.0);
+            velocity.0 = Vec2::new(dash_controller.dash_direction_sign * dash_controller.dash_speed, 0.0);
         }
         else if dash_controller.duration_timer.just_finished() && !force_finished {
-            velocity.linvel = Vec2::new(dash_controller.dash_direction_sign * dash_controller.dash_end_speed, 0.0);
+            velocity.0 = Vec2::new(dash_controller.dash_direction_sign * dash_controller.dash_end_speed, 0.0);
             //gravity.current_force = 0.0;
         }
     }
