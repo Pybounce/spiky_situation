@@ -40,6 +40,7 @@ impl LaserBuilder {
             SpriteAnimator::new(200, beam_atlas_rects.clone()),
             RigidBody::Fixed,
             Collider::cuboid(TILE_SIZE_HALF / 2.0, 0.5),
+            ColliderScale::Absolute(Vec2::new(1.0, 1.0)),
             ActiveEvents::COLLISION_EVENTS,
             Sensor,
             InstantKiller,
@@ -83,7 +84,7 @@ impl LaserBuilder {
 pub fn update_laser_beams(
     laser_query: Query<(&Transform, &Laser), (Without<LaserBeam>, Without<LaserBeamEndParticles>)>,
     rapier_write_context: WriteRapierContext,
-    mut beam_query: Query<&mut Transform, With<LaserBeam>>,
+    mut beam_query: Query<(&mut ColliderScale, &mut Transform), With<LaserBeam>>,
     mut end_particles_query: Query<&mut Transform, (With<LaserBeamEndParticles>, Without<LaserBeam>, Without<Laser>)>
 
 ) {
@@ -98,7 +99,8 @@ pub fn update_laser_beams(
             let hit_point = origin + (dir * distance);
 
             // beam
-            if let Ok(mut beam_transform) = beam_query.get_mut(laser.beam) {
+            if let Ok((mut collider_scale, mut beam_transform)) = beam_query.get_mut(laser.beam) {
+                *collider_scale = ColliderScale::Absolute(Vec2::new(1.0, distance + 2.0));
                 beam_transform.translation = (origin + ((hit_point - origin) / 2.0)).extend(100.0);
                 beam_transform.scale.y = distance + 2.0;
                 beam_transform.rotation = laser_transform.rotation;

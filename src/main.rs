@@ -77,7 +77,7 @@ fn main() {
         .add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
         .add_event::<WorldMouseMotion>()
-        //.add_plugins(bevy_rapier2d::render::RapierDebugRenderPlugin::default())
+        .add_plugins(bevy_rapier2d::render::RapierDebugRenderPlugin::default())
         .init_resource::<SaveDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
         .add_systems(PostUpdate, apply_physics_controller_limits)
@@ -98,7 +98,7 @@ fn main() {
         .add_systems(Update, (raise_collision_remap_events, handle_collision_remap_events).chain())
         .add_event::<TriggerEvent>()
         .add_systems(Update, (trigger_pressure_spikes, tick_pressure_spikes))
-        .add_systems(Update, update_laser_beams)
+        .add_systems(FixedPreUpdate, update_laser_beams)
         .run();
   
 }
