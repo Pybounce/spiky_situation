@@ -31,6 +31,7 @@ impl SpringFactory {
             AnimateOnTouch {
                     animator_entity: None,
             },
+            CollisionEventsEnabled,
             children![(
                 Collider::rectangle(TILE_SIZE * 0.9, TILE_SIZE * 0.3),
                 Transform::from_xyz(0.0, -TILE_SIZE_HALF / 3.0, 0.0),

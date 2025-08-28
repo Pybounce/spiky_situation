@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{databases::save_db::SaveGame, game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::{BuildStageEvent}, CurrentStageData}, stage_objects::goal::StageGoal}};
+use crate::{common::physics::avian_ex::ManyCollidingEntities, databases::save_db::SaveGame, game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::BuildStageEvent, CurrentStageData}, stage_objects::goal::StageGoal}};
 
 #[derive(Event)]
 pub struct GoalReached {
@@ -11,7 +11,7 @@ pub struct GoalReached {
 
 
 pub fn check_goal_reached(
-    player_query: Query<&CollidingEntities, With<LocalPlayer>>,
+    player_query: Query<&ManyCollidingEntities, With<LocalPlayer>>,
     goal_query: Query<(), With<StageGoal>>,
     mut event_writer: EventWriter<GoalReached>,
     stage_data_opt: Option<Res<CurrentStageData>>,

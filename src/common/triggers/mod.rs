@@ -2,6 +2,8 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
+use crate::common::physics::avian_ex::ManyCollidingEntities;
+
 
 
 #[derive(Component)]
@@ -23,7 +25,7 @@ pub struct TriggerEvent {
 }
 
 pub fn trigger_on_touch(
-    colliding_query: Query<&CollidingEntities>,
+    colliding_query: Query<&ManyCollidingEntities>,
     trigger_query: Query<&Trigger, With<TriggerOnTouch>>,
     mut trigger_event_writer: EventWriter<TriggerEvent>
 ) {

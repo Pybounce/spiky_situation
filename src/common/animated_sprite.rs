@@ -3,6 +3,8 @@ use std::time::Duration;
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
+use crate::common::physics::avian_ex::ManyCollidingEntities;
+
 
 #[derive(Component)]
 pub struct SpriteAnimator {
@@ -111,7 +113,7 @@ pub fn animate_sprites(
 
 
 pub fn check_animate_on_touch(
-    toucher_query: Query<&CollidingEntities>,
+    toucher_query: Query<&ManyCollidingEntities>,
     mut sprite_animators: Query<&mut SpriteAnimator>,
     mut animate_on_touch_query: Query<&AnimateOnTouch>,
 ) {

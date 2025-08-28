@@ -2,7 +2,7 @@
 use avian2d::prelude::Collider;
 use bevy::prelude::*;
 use avian2d::prelude::*;
-use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, splat::SplatProvider}, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::{avian_ex::ManyCollidingEntities, layers::GamePhysicsLayer}, splat::SplatProvider}, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
 
 
 const PRESSURE_SPIKE_DELAY: f32 = 0.3;
@@ -50,7 +50,7 @@ impl PressureSpikeBuilder {
 
 
 pub fn trigger_pressure_spikes(
-    trigger_query: Query<&CollidingEntities>,
+    trigger_query: Query<&ManyCollidingEntities>,
     mut pressure_spike_query: Query<&mut PressureSpike>
 ) {
     for colliding_entities in &trigger_query {

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{local_player::LocalPlayer, player::death::Respawnable, stage::stage_builder::{stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, CurrentStageData}};
+use crate::{common::physics::avian_ex::ManyCollidingEntities, local_player::LocalPlayer, player::death::Respawnable, stage::stage_builder::{stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, CurrentStageData}};
 
 
 #[derive(Component)]
@@ -43,7 +43,7 @@ impl CheckpointBundle {
 
 pub fn check_checkpoint_reached(
     checkpoint_query: Query<(Entity, &Transform), With<Checkpoint>>,
-    mut player_query: Query<(&mut Respawnable, &CollidingEntities), With<LocalPlayer>>,
+    mut player_query: Query<(&mut Respawnable, &ManyCollidingEntities), With<LocalPlayer>>,
     mut stage_data: Option<ResMut<CurrentStageData>>,
     mut commands: Commands
 ) {

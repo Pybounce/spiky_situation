@@ -2,13 +2,15 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
+use crate::common::physics::avian_ex::ManyCollidingEntities;
+
 #[derive(Component)]
 pub struct Bouncy {
     pub force: Vec2
 }
 
 pub fn check_bouncy_collisions(
-    mut bounceable_query: Query<(&mut LinearVelocity, &CollidingEntities)>,
+    mut bounceable_query: Query<(&mut LinearVelocity, &ManyCollidingEntities)>,
     bouncy_query: Query<&Bouncy>
 ) {
     for (mut v, colliding_entities) in &mut bounceable_query {

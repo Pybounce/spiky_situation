@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
+use crate::common::physics::avian_ex::ManyCollidingEntities;
+
 #[derive(Component, Default)]
 pub struct DeathMarker {
     pub killed_by: Option<Entity>
@@ -57,7 +59,7 @@ pub fn delay_death_marked(
 pub struct DeathMarkOnTouch;
 
 pub fn check_touched_by_death(
-    query: Query<&CollidingEntities>,
+    query: Query<&ManyCollidingEntities>,
     death_marked_on_touch_query: Query<Entity, With<DeathMarkOnTouch>>,
     mut commands: Commands
 ) {

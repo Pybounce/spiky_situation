@@ -1,7 +1,7 @@
 use bevy::{math::Rect, prelude::{Commands, Component, Entity, Query, Res, Without}, time::{Time, Timer, TimerMode}};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, death::DeathMarker, physics::layers::GamePhysicsLayer}, ground::Ground, stage::stage_builder::{stage_asset, stage_creator::StageCreator}};
+use crate::{common::{animated_sprite::SpriteAnimator, death::DeathMarker, physics::{avian_ex::ManyCollidingEntities, layers::GamePhysicsLayer}}, ground::Ground, stage::stage_builder::{stage_asset, stage_creator::StageCreator}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -31,7 +31,7 @@ impl PhantomBlockFactory {
 }
 
 pub fn check_phantom_block_touched(
-    colliding_query: Query<&CollidingEntities, Without<PhantomBlock>>,
+    colliding_query: Query<&ManyCollidingEntities, Without<PhantomBlock>>,
     mut phantom_query: Query<(&mut PhantomBlock, &mut SpriteAnimator)>
 ) {
     for colliding_entities in &colliding_query {
