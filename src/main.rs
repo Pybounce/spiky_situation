@@ -80,7 +80,7 @@ fn main() {
         .add_event::<WorldMouseMotion>()
         .init_resource::<SaveDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
-        .add_systems(PostUpdate, apply_physics_controller_limits)
+        .add_systems(FixedPreUpdate, apply_physics_controller_limits)
         .add_systems(FixedPreUpdate, (handle_zoom_change, move_camera))
         .add_systems(Update, (add_wall_stuck, update_wall_stuck, remove_wall_stuck))
         .add_systems(Update, (check_touching_wall, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, shake, check_insta_kill_collisions, spawn_local_players, check_grounded, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))

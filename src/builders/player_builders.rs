@@ -46,7 +46,7 @@ impl PlayerBuilder {
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(spawn_pos),
             RigidBody::Dynamic,
             SweptCcd::default(),
-            Collider::circle(0.5),
+            Collider::circle(0.4),
             LinearVelocity(Vec2::ZERO),
             Gravity {
                 max_force: PLAYER_MAX_GRAVITY,
