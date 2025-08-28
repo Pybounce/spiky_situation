@@ -28,7 +28,6 @@ impl SpringFactory {
             Bouncy {
                 force: Vec2::from_angle(rotation + (PI / 2.0)) * SPRING_BOUNCE_FORCE,
             },
-            StageObject::Volatile,
             AnimateOnTouch {
                     animator_entity: None,
             },
