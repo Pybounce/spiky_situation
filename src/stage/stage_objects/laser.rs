@@ -1,3 +1,5 @@
+use std::f32;
+
 use bevy::{math::VectorSpace, prelude::*};
 use avian2d::prelude::*;
 
@@ -39,7 +41,7 @@ impl LaserBuilder {
             },
             SpriteAnimator::new(200, beam_atlas_rects.clone()),
             RigidBody::Static,
-            Collider::rectangle(TILE_SIZE_HALF, 0.5),
+            Collider::rectangle(TILE_SIZE_HALF, 1.0),
             CollisionEventsEnabled,
             Sensor,
             InstantKiller,
@@ -75,7 +77,7 @@ impl LaserBuilder {
                 beam_end_particles
             },
             Ground,
-            RayCaster::new(Vec2::Y * 8.1, Dir2::Y).with_ignore_self(true).with_max_hits(1).with_query_filter(SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground))
+            RayCaster::new(Vec2::Y * 8.1, Dir2::Y).with_ignore_self(true).with_solidness(true).with_query_filter(SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground))
         ));
     }
 
@@ -88,12 +90,15 @@ pub fn update_laser_beams(
 
 ) {
     for (laser_transform, laser, ray, ray_hits) in &laser_query {
-
+        let mut current_min_dist = f32::MAX;
         for hit in ray_hits.iter() {
-            let hit_point = ray.origin + (*ray.direction * hit.distance);
+
+            if hit.distance < current_min_dist { current_min_dist = hit.distance; } else { continue; }
+
+            let hit_point = ray.global_origin() + (*ray.global_direction() * hit.distance);
 
             if let Ok(mut beam_transform) = beam_query.get_mut(laser.beam) {
-                beam_transform.translation = (ray.origin + ((hit_point - ray.origin) / 2.0)).extend(100.0);
+                beam_transform.translation = (ray.global_origin() + ((hit_point - ray.global_origin()) / 2.0)).extend(90.0);
                 beam_transform.scale.y = hit.distance + 2.0;
                 beam_transform.rotation = laser_transform.rotation;
             }

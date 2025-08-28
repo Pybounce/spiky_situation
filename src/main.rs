@@ -70,7 +70,7 @@ fn main() {
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
         //.add_plugins(CCTVPostProcessPlugin)
-        .add_plugins(PhysicsPlugins::default())
+        .add_plugins(PhysicsPlugins::default()).add_plugins(avian2d::prelude::PhysicsDebugPlugin::default())
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
         .add_event::<SaveGame>()
