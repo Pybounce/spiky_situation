@@ -131,6 +131,8 @@
   - Due to the system ordering and the adding/removing of the InstantKiller component
   - Recommend just create an insert/remove after x seconds since making it frame perfect is not going well.
 - Interval blocks don't start transparent even when they're suppose to (the variant)
+- Running out lives crashes the game due to a resource not existing
+- SOMETIMES when the player dies they do not respawn
 
 #### Gamemodes
 
