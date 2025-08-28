@@ -88,7 +88,7 @@ fn main() {
         .add_systems(FixedPreUpdate, move_pixel_perfect_translations)
         .add_systems(Update, (start_dashing, break_fragiles, tick_saw_shooters, move_offset_movers, tick_phantom_block, check_phantom_block_touched, stop_interval_block_crush, tick_interval_blocks, check_touched_by_death, read_lock_block_triggers, trigger_on_touch, check_bouncy_collisions, check_animate_on_touch, update_player_airborn_look_state, update_player_grounded_look_state, update_player_look_direction))
         .add_systems(Update, (refresh_editor_renderer, draw_editor, update_mouse_data))
-        .add_systems(FixedPreUpdate, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
+        .add_systems(Update, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
         .add_systems(Update, spawn_player_corpse)
         .add_event::<ClearSplatsEvent>()
         .add_systems(Startup, init_splat_db)
