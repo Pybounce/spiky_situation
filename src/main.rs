@@ -1,11 +1,11 @@
 
 
+use avian2d::{prelude::PhysicsLengthUnit, PhysicsPlugins};
 use bevy::{
     asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode}, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;
-use bevy_rapier2d::plugin::{NoUserData, RapierPhysicsPlugin};
 use camera::{handle_zoom_change, move_camera, move_pixel_perfect_translations, spawn_camera};
 use common::{animated_sprite::{animate_sprites, check_animate_on_touch}, checkpoint::check_checkpoint_reached, death::{check_touched_by_death, despawn_death_marked, delay_death_marked}, mouse::{update_mouse_data, MouseData}, offset_mover::move_offset_movers, physics::{bouncy::check_bouncy_collisions, fragile::break_fragiles, gravity::simulate_gravity}, shake::shake, states::StatesPlugin, triggers::{trigger_on_touch, TriggerEvent}};
 use game::GamePlugin;
@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::{mouse::WorldMouseMotion, physics::collider_of::{handle_collision_remap_events, raise_collision_remap_events, CollisionRemapEvent}, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{builders::player_builders::init_player_builder, common::{mouse::WorldMouseMotion, physics::avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::death::spawn_player_corpse, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
 
 mod common;
 
@@ -70,35 +70,36 @@ fn main() {
         .add_plugins(StageEditorPlugin)
         .add_plugins(GamePlugin)
         //.add_plugins(CCTVPostProcessPlugin)
-        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        .add_plugins(PhysicsPlugins::default())//.add_plugins(avian2d::prelude::PhysicsDebugPlugin::default())
+        .insert_resource(PhysicsLengthUnit(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
         .add_event::<SaveGame>()
         .add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
         .add_event::<WorldMouseMotion>()
-        .add_plugins(bevy_rapier2d::render::RapierDebugRenderPlugin::default())
         .init_resource::<SaveDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
-        .add_systems(PostUpdate, apply_physics_controller_limits)
-        .add_systems(Update, (handle_zoom_change, move_camera))
+        .add_systems(FixedPreUpdate, apply_physics_controller_limits)
+        .add_systems(FixedPreUpdate, (handle_zoom_change, move_camera))
         .add_systems(Update, (add_wall_stuck, update_wall_stuck, remove_wall_stuck))
         .add_systems(Update, (check_touching_wall, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, shake, check_insta_kill_collisions, spawn_local_players, check_grounded, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))
         .add_systems(Update, (update_player_look_direction, simulate_gravity, check_checkpoint_reached, animate_sprites))
-        .add_systems(PostUpdate, move_pixel_perfect_translations)
-        .add_systems(Update, (start_dashing, break_fragiles, tick_saw_shooters, move_offset_movers, tick_phantom_block, check_phantom_block_touched, stop_interval_block_crush, tick_interval_blocks, check_touched_by_death, read_lock_block_triggers, trigger_on_touch, check_bouncy_collisions, check_animate_on_touch, update_player_airborn_look_state, update_player_grounded_look_state, update_player_look_direction))
+        .add_systems(FixedPreUpdate, move_pixel_perfect_translations)
+        .add_systems(Update, (start_dashing, break_fragiles, tick_saw_shooters, move_offset_movers, tick_phantom_block, check_phantom_block_touched, check_touched_by_death, read_lock_block_triggers, trigger_on_touch, check_bouncy_collisions, check_animate_on_touch, update_player_airborn_look_state, update_player_grounded_look_state, update_player_look_direction))
+        .add_systems(Update, (stop_interval_block_crush, tick_interval_blocks).chain())
         .add_systems(Update, (refresh_editor_renderer, draw_editor, update_mouse_data))
         .add_systems(Update, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
         .add_systems(Update, spawn_player_corpse)
         .add_event::<ClearSplatsEvent>()
         .add_systems(Startup, init_splat_db)
-        .add_systems(Update, (apply_splat_on_death, clear_splat_events))
+        .add_systems(PostUpdate, (apply_splat_on_death, clear_splat_events))
         .add_systems(Update, update_cctv_shader_time)
-        .add_event::<CollisionRemapEvent>()
-        .add_systems(Update, (raise_collision_remap_events, handle_collision_remap_events).chain())
         .add_event::<TriggerEvent>()
         .add_systems(Update, (trigger_pressure_spikes, tick_pressure_spikes))
         .add_systems(FixedPreUpdate, update_laser_beams)
+        .add_event::<CollisionRemapEvent>()
+        .add_systems(PreUpdate, (raise_collision_remap_events, handle_collision_remap_events, handle_many_colliding_entities).chain())
         .run();
   
 }

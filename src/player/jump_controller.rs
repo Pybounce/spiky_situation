@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
 use crate::{common::physics::gravity::Gravity, ground::Grounded, wall::TouchingWall};
 
@@ -26,15 +26,15 @@ pub struct Jumping;
 pub struct Falling;
 
 pub fn apply_wall_friction(
-    mut query: Query<(&mut Velocity, &WallJumpController), With<TouchingWall>>,
+    mut query: Query<(&mut LinearVelocity, &WallJumpController), With<TouchingWall>>,
     time: Res<Time>
 ) {
     for (mut v, wjc) in &mut query {
-        if v.linvel.y < 0.0 {
+        if v.0.y < 0.0 {
             // we want to simulate grabbing the wall
             // which would only happen when sliding down
             // sliding up should be fast
-            v.linvel.y -= wjc.friction_coefficient * v.linvel.y.powi(2) * v.linvel.y.signum() * time.delta_secs();
+            v.0.y -= wjc.friction_coefficient * v.0.y.powi(2) * v.0.y.signum() * time.delta_secs();
         }
     }
 }
@@ -60,14 +60,14 @@ pub fn maintain_player_jump(
 }
 
 pub fn begin_player_jump(
-    mut query: Query<(&mut Velocity, &mut JumpController, &mut Gravity), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
+    mut query: Query<(&mut LinearVelocity, &mut JumpController, &mut Gravity), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>
 ) {
     for (mut v, mut jc, mut g) in &mut query {
         if input.pressed(jc.key) {
             g.current_force = 0.0;
-            v.linvel.y = jc.force;
+            v.0.y = jc.force;
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time
             jc.last_jump_pressed_time = time.elapsed_secs_f64(); //todo: wrapped??
         }
@@ -100,7 +100,7 @@ pub fn update_last_grounded(
 
 
 pub fn check_jump_fall_states(
-    query: Query<(Entity, &Velocity, Option<&Grounded>)>,
+    query: Query<(Entity, &LinearVelocity, Option<&Grounded>)>,
     mut commands: Commands
 ) {
     for (e, v, g) in &query {
@@ -109,17 +109,17 @@ pub fn check_jump_fall_states(
             commands.entity(e).remove::<Falling>();
             continue;
         }
-        if v.linvel.y.abs() < 0.0001 {
+        if v.0.y.abs() < 0.0001 {
             //no vertical movement
             commands.entity(e).remove::<Jumping>();
             commands.entity(e).remove::<Falling>();
         }
-        else if v.linvel.y > 0.0 {
+        else if v.0.y > 0.0 {
             //going up
             commands.entity(e).remove::<Falling>();
             commands.entity(e).try_insert(Jumping);        
         }
-        else if v.linvel.y < 0.0 {
+        else if v.0.y < 0.0 {
             //going down
             commands.entity(e).remove::<Jumping>();
             commands.entity(e).try_insert(Falling);        

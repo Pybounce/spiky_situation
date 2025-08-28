@@ -1,5 +1,7 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::CollidingEntities;
+use avian2d::prelude::*;
+
+use crate::common::physics::avian_ex::ManyCollidingEntities;
 
 #[derive(Component, Default)]
 pub struct DeathMarker {
@@ -57,13 +59,13 @@ pub fn delay_death_marked(
 pub struct DeathMarkOnTouch;
 
 pub fn check_touched_by_death(
-    query: Query<&CollidingEntities>,
+    query: Query<&ManyCollidingEntities>,
     death_marked_on_touch_query: Query<Entity, With<DeathMarkOnTouch>>,
     mut commands: Commands
 ) {
     for colliding_entities in &query {
         for colliding_entity in colliding_entities.iter() {
-            if let Ok(entity) = death_marked_on_touch_query.get(colliding_entity) {
+            if let Ok(entity) = death_marked_on_touch_query.get(*colliding_entity) {
                 commands.entity(entity).try_insert(DeathMarker::default());
             }
         }

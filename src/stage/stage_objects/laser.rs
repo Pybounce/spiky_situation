@@ -1,7 +1,9 @@
-use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use std::f32;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::helpers::RapierRaycastExt}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
+use bevy::{math::VectorSpace, prelude::*};
+use avian2d::prelude::*;
+
+use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
 
 
 #[derive(Component)]
@@ -38,14 +40,13 @@ impl LaserBuilder {
                 ..default()
             },
             SpriteAnimator::new(200, beam_atlas_rects.clone()),
-            RigidBody::Fixed,
-            Collider::cuboid(TILE_SIZE_HALF / 2.0, 0.5),
-            ColliderScale::Absolute(Vec2::new(1.0, 1.0)),
-            ActiveEvents::COLLISION_EVENTS,
+            RigidBody::Static,
+            Collider::rectangle(TILE_SIZE_HALF, 1.0),
+            CollisionEventsEnabled,
             Sensor,
             InstantKiller,
             StageObject::Volatile,
-            CollisionGroups::new(Group::GROUP_2, Group::ALL),
+            CollisionLayers::new(GamePhysicsLayer::StageObject, LayerMask::ALL),
         )).id();
 
         let beam_end_particle_rects = vec![
@@ -69,43 +70,38 @@ impl LaserBuilder {
         )).id();
 
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, laser.grid_pos, atlas_rects[0], laser.rotation, stage_creator.object_tilemap, CollisionGroups::new(Group::GROUP_1, Group::ALL)),
+            PhysicalTileBundle::new(stage_creator, laser.grid_pos, atlas_rects[0], laser.rotation, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             SpriteAnimator::new_non_repeating(50, atlas_rects),
             Laser {
                 beam,
                 beam_end_particles
             },
             Ground,
+            RayCaster::new(Vec2::Y * 8.1, Dir2::Y).with_ignore_self(true).with_solidness(true).with_query_filter(SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground))
         ));
     }
 
 }
 
 pub fn update_laser_beams(
-    laser_query: Query<(&Transform, &Laser), (Without<LaserBeam>, Without<LaserBeamEndParticles>)>,
-    rapier_write_context: WriteRapierContext,
-    mut beam_query: Query<(&mut ColliderScale, &mut Transform), With<LaserBeam>>,
+    laser_query: Query<(&Transform, &Laser, &RayCaster, &RayHits), (Without<LaserBeam>, Without<LaserBeamEndParticles>)>,
+    mut beam_query: Query<&mut Transform, With<LaserBeam>>,
     mut end_particles_query: Query<&mut Transform, (With<LaserBeamEndParticles>, Without<LaserBeam>, Without<Laser>)>
 
 ) {
-    let rapier_ctx = rapier_write_context.single().unwrap();
+    for (laser_transform, laser, ray, ray_hits) in &laser_query {
+        let mut current_min_dist = f32::MAX;
+        for hit in ray_hits.iter() {
 
-    for (laser_transform, laser) in &laser_query {
+            if hit.distance < current_min_dist { current_min_dist = hit.distance; } else { continue; }
 
-        let origin = (laser_transform.translation + (laser_transform.rotation * (Vec3::Y * 8.1))).truncate();
-        let dir = (laser_transform.rotation * Vec3::Y).truncate().normalize();
+            let hit_point = ray.global_origin() + (*ray.global_direction() * hit.distance);
 
-        if let Some((_entity, distance)) = rapier_ctx.raycast_group(origin, dir, 1000.0, Group::GROUP_1) {
-            let hit_point = origin + (dir * distance);
-
-            // beam
-            if let Ok((mut collider_scale, mut beam_transform)) = beam_query.get_mut(laser.beam) {
-                *collider_scale = ColliderScale::Absolute(Vec2::new(1.0, distance + 2.0));
-                beam_transform.translation = (origin + ((hit_point - origin) / 2.0)).extend(100.0);
-                beam_transform.scale.y = distance + 2.0;
+            if let Ok(mut beam_transform) = beam_query.get_mut(laser.beam) {
+                beam_transform.translation = (ray.global_origin() + ((hit_point - ray.global_origin()) / 2.0)).extend(90.0);
+                beam_transform.scale.y = hit.distance + 2.0;
                 beam_transform.rotation = laser_transform.rotation;
             }
-
 
             // particles
             if let Ok(mut end_particles_transform) = end_particles_query.get_mut(laser.beam_end_particles) {
@@ -113,6 +109,5 @@ pub fn update_laser_beams(
                 end_particles_transform.rotation = laser_transform.rotation;
             }
         }
-
     }
 }
