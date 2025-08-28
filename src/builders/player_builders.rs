@@ -103,12 +103,6 @@ impl PlayerBuilder {
             Sensor,
             SplatOnDeath,
             CollisionLayers::new(GamePhysicsLayer::Player, LayerMask::ALL),
-            children![(
-                Transform::default(),
-                Collider::rectangle(TILE_SIZE, TILE_SIZE),
-                CollisionLayers::new(GamePhysicsLayer::Player, LayerMask::ALL),
-                CollisionEventsEnabled,
-            )]
         )));
 
     }

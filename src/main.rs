@@ -1,6 +1,6 @@
 
 
-use avian2d::PhysicsPlugins;
+use avian2d::{prelude::PhysicsLengthUnit, PhysicsPlugins};
 use bevy::{
     asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode}, winit::{ UpdateMode, WinitSettings }
 };
@@ -71,6 +71,7 @@ fn main() {
         .add_plugins(GamePlugin)
         //.add_plugins(CCTVPostProcessPlugin)
         .add_plugins(PhysicsPlugins::default()).add_plugins(avian2d::prelude::PhysicsDebugPlugin::default())
+        .insert_resource(PhysicsLengthUnit(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
         .add_event::<SaveGame>()
