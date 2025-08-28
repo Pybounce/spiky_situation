@@ -26,7 +26,7 @@ impl SpikeFactory {
                 translation_offset: Vec2::new(0.0, -(TILE_SIZE_HALF * 0.2)),
             },
             children![(
-                Transform::from_translation(Vec3::new(0.0, TILE_SIZE_HALF * 0.2, 0.0)),
+                Transform::from_translation(Vec3::new(0.0, -TILE_SIZE_HALF * 0.2, 0.0)),
                 Collider::rectangle(TILE_SIZE * 0.8, TILE_SIZE * 0.8),
                 CollisionLayers::new(GamePhysicsLayer::StageObject, mask),
                 CollisionEventsEnabled,
