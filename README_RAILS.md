@@ -21,6 +21,7 @@
   - Split them into 2 rails (Or if it's a looped rail, just change the head/tail)
 - As for the mover component, will just need a bool for ping_pong
   - If ping_pong == false, then on completion, just set it's translation back to the start (t == 0)
+- _Start by_ creating the data structure to hold the rails, with the correct API, maybe even some tests
 
 **Ground Stickables ---- awful name**
 
