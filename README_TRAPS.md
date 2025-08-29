@@ -4,6 +4,7 @@
 
 - [ ] Teleporters
   - Anything that can be teleported is teleported when it collides
+  - Rails should be able to go in one teleporter and out the other
 - [ ] Laser rotation
   - Additional of NS and NSEW laser varients
   - Separate the laser core from the block and only rotate it
