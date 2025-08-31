@@ -24,13 +24,29 @@ pub enum RailMergeOrder {
 
 impl Rail {
 
+    /// Removes any points that aren't on corners (likely as a result from merging another rail in)
+    pub fn compress(&mut self) {
+        let mut new_points: Vec<IVec2> = vec![self.points[0]];
+        for window in self.points.windows(3) {
+            let dir0 = (window[1] - window[0]).clamp(IVec2::new(-1, -1), IVec2::new(1, 1));
+            let dir1 = (window[2] - window[1]).clamp(IVec2::new(-1, -1), IVec2::new(1, 1));
+
+            if dir0 == dir1 {
+                new_points.push(window[1]);
+            }
+        } 
+        new_points.push(*self.points.last().unwrap());
+        self.points = new_points;
+    }
+
+    /// Gets the total length of the rail, in number of cells covered
     pub fn length(&self) -> u32 {
-        let mut len = 0;
+        let mut len = IVec2::ZERO;
         for line in self.points.windows(2) {
-            len += line[0].as_vec2().distance(line[1].as_vec2()) as u32;
+            len += line[0].clamp(IVec2::new(-1, -1), IVec2::new(1, 1));
         }
 
-        return len;
+        return (len.x + len.y) as u32;
     }
 
     pub fn try_new(start_cell: IVec2, end_cell: IVec2) -> Option<Self> {
@@ -91,6 +107,7 @@ impl Rail {
                 RailMergeOrder::TT => self.reverse(),
             };
 
+            self.compress();
             return true;
         }
 
@@ -107,6 +124,7 @@ impl Rail {
 
     pub fn reverse(&mut self) {
         self.points.reverse();
+        let a = self.points.iter().rev();
     }
 
     pub fn valid_with(&self, rail: &Rail) -> bool {
