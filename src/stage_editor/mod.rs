@@ -2,12 +2,13 @@ use bevy::{input::mouse::MouseMotion, prelude::*};
 use controller::EditorController;
 use item_icon::*;
 use renderer::editor_renderer::EditorRenderer;
-use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage, stage_editor::enums::EditorTool};
+use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage, stage_editor::enums::{EditorTool, RailPlacementMode}};
 
 mod enums;
 mod controller;
 mod item_icon;
 pub mod renderer;
+mod rail_grid;
 
 pub struct StageEditorPlugin;
 
@@ -175,7 +176,7 @@ pub fn switch_tool(
         editor_con.current_tool = EditorTool::Brush;
     }
     else if input.just_pressed(KeyCode::Digit2) {
-        editor_con.current_tool = EditorTool::MoveAugment(vec![]);
+        editor_con.current_tool = EditorTool::RailPlacer(RailPlacementMode::default());
     }
     else if input.just_pressed(KeyCode::Digit3) {
         //editor_con.current_tool = EditorTool::MoveAugment(vec![]);
