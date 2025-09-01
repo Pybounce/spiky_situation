@@ -176,13 +176,6 @@ impl RailGrid {
     pub fn try_add_rail(&mut self, start_cell: IVec2, end_cell: IVec2) -> bool {
 
         let Some(mut new_rail) = Rail::try_new(start_cell, end_cell) else { return false; };
-        println!("NEW RAILS POINTS");
-        for p in &new_rail.points {
-            println!("{}", p);
-        }
-        println!();
-        println!();
-        println!();
         if self.valid_rail(&new_rail) == false { return false; }
 
         let mut mergable_rail_ids: Vec<u32> = vec![];
@@ -190,8 +183,6 @@ impl RailGrid {
         for (rail_id, rail) in self.rails.iter_mut() {
             if rail.can_merge(&new_rail).is_some() {
                 mergable_rail_ids.push(*rail_id);
-                                println!("22");
-
             }
         }
 

@@ -56,3 +56,25 @@
   - Not sure when it would happen, ie when I create the stage or when I save the stage asset.
     - When I create the stage would be fairly easy
     - Check below me to see if an object exists, is it a moveable and static ground, if so, take it's track_id
+
+**Graph-Based Rails**
+
+- Have a RailGraph:
+  - nodes: Vec<(pos: IVec2, in_edge: Option<u32>, out_edge: Option<u32>)>
+  - edges: Vec(usize, usize)
+- When you click and drag, it ensures the 2 points are on one axis
+- Validity:
+  - If either node exists (node being the start/end), does it already have 2 connections
+    - If yes then we cannot add another currently.
+- Upon passing validation...
+- Create nodes that need to be created
+- Add edge between the 2 nodes.
+
+**Edge-Based Graph??**
+
+- RailGraph:
+  - edges: HashMap<u32, (start: IVec2, end: IVec2, in_edge: u32, out_edge: u32)>
+- So here, the start and end are always axis aligned
+- The added benefit to having no nodes is that the position between edges can be whatever the fuck I want.
+  - So if a rail goes through a teleporter, then it simply enters another edge that is connected to it, but in a totally different position
+- Only teleporter drawback is moving teleporters

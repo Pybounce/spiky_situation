@@ -72,7 +72,6 @@ pub fn refresh_editor_renderer(
     // draw rail grid
     for (rail_id, rail) in editor_controller.rail_grid.iter_rails() {
         for cell in rail.iter_cells() {
-            println!("{}", cell);
             commands.spawn((
                 Sprite {
                     custom_size: Some(Vec2::new(TILE_SIZE_HALF, TILE_SIZE_HALF)),
