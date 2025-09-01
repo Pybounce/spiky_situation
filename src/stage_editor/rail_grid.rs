@@ -5,6 +5,7 @@ use crate::common::math_ex::axis_aligned_intersect;
 
 #[derive(Default, Debug)]
 pub struct RailGrid {
+    current_id: u32,
     rails: HashMap<u32, Rail>,
     dirty_rails: Vec<u32>   // would also mark new rails as dirty. A system should then go through the rails to get cells, then find editoritems based on the rail cell. Hmm...but if I remove a rail, then I'll need to check every railid on the editoritems so, yeah not sure.
     // alternate to dirty rails would be to just get all the points those rails use and mark those as dirty. should be fairly easy to get outer points, it's just getting the full list that is annoying, doable though.
@@ -52,7 +53,8 @@ impl Rail {
     pub fn try_new(start_cell: IVec2, end_cell: IVec2) -> Option<Self> {
         if start_cell == end_cell { return None; }        
         let points = (start_cell, start_cell + (IVec2::X * (end_cell - start_cell)), end_cell);
-        return match points.0 == points.1 {
+        
+        return match points.0 == points.1 || points.1 == points.2 {
             true => Self { points: vec![points.0, points.2] },
             false => Self { points: vec![points.0, points.1, points.2] },
         }.into();
@@ -107,7 +109,7 @@ impl Rail {
                 RailMergeOrder::TT => self.reverse(),
             };
 
-            self.compress();
+            //self.compress();
             return true;
         }
 
@@ -124,7 +126,6 @@ impl Rail {
 
     pub fn reverse(&mut self) {
         self.points.reverse();
-        let a = self.points.iter().rev();
     }
 
     pub fn valid_with(&self, rail: &Rail) -> bool {
@@ -142,13 +143,40 @@ impl Rail {
         return true;
     }
 
+
+    pub fn iter_cells(&self) -> impl Iterator<Item = IVec2> + '_ {
+        return self.points
+            .windows(2).enumerate()
+            .flat_map(|(wi, w)| {
+                let start = w[0];
+                let end = w[1];
+                let step = (end - start).clamp(IVec2::new(-1, -1), IVec2::new(1, 1));
+                let len = (end - start).abs().max_element();
+                ((wi as i32).min(1)..=len).map(move |i| start + step * i)
+        });
+    }
+    
+    pub fn iter_points(&self) -> impl Iterator<Item = &IVec2> + '_ {
+        return self.points.iter();
+    }
+
 }
 
 impl RailGrid {
+    pub fn iter_rails(&self) -> impl Iterator<Item = (&u32, &Rail)> {
+        return self.rails.iter();
+    }
     /// Favours horizontal-first, to do vertical-first, just swap start and end cells
     pub fn try_add_rail(&mut self, start_cell: IVec2, end_cell: IVec2) -> bool {
 
         let Some(mut new_rail) = Rail::try_new(start_cell, end_cell) else { return false; };
+        println!("NEW RAILS POINTS");
+        for p in &new_rail.points {
+            println!("{}", p);
+        }
+        println!();
+        println!();
+        println!();
         if self.valid_rail(&new_rail) == false { return false; }
 
         let mut mergable_rail_ids: Vec<u32> = vec![];
@@ -156,8 +184,11 @@ impl RailGrid {
         for (rail_id, rail) in self.rails.iter_mut() {
             if rail.can_merge(&new_rail).is_some() {
                 mergable_rail_ids.push(*rail_id);
+                                println!("22");
+
             }
         }
+
         if mergable_rail_ids.len() > 0 {
             let Some(rail) = self.rails.get_mut(&mergable_rail_ids[0]) else { return false };
             rail.try_merge(&mut new_rail);
@@ -169,11 +200,16 @@ impl RailGrid {
                 let Some(rail1) = rail1 else { return false };
 
                 rail0.try_merge(rail1);    // if this fails then we're boned because I'm not doing rollback right now.
-
                 self.rails.remove(rail_id);
             }
 
         }
+        else {
+            // no merging, just add the rail
+            self.rails.insert(self.current_id, new_rail);
+            self.current_id += 1;
+        }
+
         return true;
     }
 
