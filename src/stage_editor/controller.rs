@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE};
+use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -18,6 +18,7 @@ pub struct EditorController {
     pub object_atlas: Handle<Image>,
     pub ground_atlas: Handle<Image>,
     pub stage_grid: HashMap<IVec2, EditorItem>,
+    pub rail_grid: RailGrid,
     pub grid_size: IVec2,
     grid_snap_unit: f32,
     pub version: usize,
@@ -39,7 +40,8 @@ impl EditorController {
             stage_grid: HashMap::new(),
             version: 0,
             new_stage_id,
-            grid_snap_unit: 16.0
+            grid_snap_unit: 16.0,
+            rail_grid: RailGrid::default()
          }
     }
 
@@ -55,7 +57,8 @@ impl EditorController {
             stage_grid: HashMap::new(),
             version: 0,
             new_stage_id,
-            grid_snap_unit: 16.0
+            grid_snap_unit: 16.0,
+            rail_grid: RailGrid::default()
          };
          editor.set_stage_template(stage);
          return editor;
@@ -110,6 +113,10 @@ impl EditorController {
         self.saved = false;
         self.version += 1;
         return true;
+    }
+
+    pub fn try_place_rail(&mut self, start: IVec2, end: IVec2) -> bool {
+        return self.rail_grid.try_add_rail(start, end);
     }
     
     pub fn can_place(&self, grid_pos: IVec2) -> bool {

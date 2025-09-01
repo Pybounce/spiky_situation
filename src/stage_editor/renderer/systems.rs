@@ -47,6 +47,7 @@ pub fn refresh_editor_renderer(
         commands.entity(entity).despawn();
     }
 
+    // draw editor items
     for grid_pos in editor_controller.stage_grid.keys() {
         let editor_item = editor_controller.stage_grid[grid_pos];
 
@@ -73,6 +74,7 @@ pub fn refresh_editor_renderer(
 
     }
 
+    // draw rail grid
 
     renderer.version = editor_controller.version;
     renderer.full_refresh = false;

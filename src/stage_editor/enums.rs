@@ -14,12 +14,12 @@ pub enum EditorValueAugment {
 pub enum EditorTool {
     #[default]
     Brush,
-    RailPlacer(RailPlacementMode),
+    RailPlacer((Option<IVec2>, RailPlacementMode)),
     //ValueAugment(EditorValueAugment),
     //StageSize,
 }
 
-#[derive(Default, Clone, Debug, PartialEq)]
+#[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum RailPlacementMode {
     #[default]
     Horizontal,

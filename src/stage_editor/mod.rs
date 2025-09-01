@@ -21,7 +21,7 @@ impl Plugin for StageEditorPlugin {
         .add_systems(OnExit(AppState::StageEditor), teardown_stage_editor)
         .add_systems(Update, (
             (handle_current_item_change, add_item_icon, move_item_icon, update_ground_atlas_indices),
-            (handle_rotate, handle_placement, handle_grid_object_removals),
+            (handle_rotate, handle_placement, handle_rail_placement, handle_grid_object_removals),
             handle_save, move_camera, switch_tool
         ).run_if(in_state(StageEditorState::InEdit)));
     }
@@ -111,6 +111,27 @@ pub struct StageEditorLoadDetails {
     pub template_stage_handle: Option<Handle<Stage>>
 }
 
+fn handle_rail_placement(
+    mut editor_con: ResMut<EditorController>,
+    buttons: Res<ButtonInput<MouseButton>>,
+    mouse_data: Res<MouseData>
+) {
+    let cell = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
+
+    if let EditorTool::RailPlacer((current_opt, placement_mode)) = editor_con.current_tool {
+        if buttons.just_pressed(MouseButton::Left) && current_opt.is_none() {
+            editor_con.current_tool = EditorTool::RailPlacer((Some(cell), placement_mode));
+        }
+        else if buttons.just_released(MouseButton::Left) && current_opt.is_some() {
+            match placement_mode {
+                RailPlacementMode::Horizontal => editor_con.try_place_rail(current_opt.unwrap(), cell),
+                RailPlacementMode::Vertical => editor_con.try_place_rail(cell, current_opt.unwrap()),
+            };
+            editor_con.current_tool = EditorTool::RailPlacer((None, placement_mode));
+        }
+    }
+}
+
 fn handle_placement(
     buttons: Res<ButtonInput<MouseButton>>,
     mut editor_con: ResMut<EditorController>,
@@ -176,7 +197,7 @@ pub fn switch_tool(
         editor_con.current_tool = EditorTool::Brush;
     }
     else if input.just_pressed(KeyCode::Digit2) {
-        editor_con.current_tool = EditorTool::RailPlacer(RailPlacementMode::default());
+        editor_con.current_tool = EditorTool::RailPlacer((None, RailPlacementMode::default()));
     }
     else if input.just_pressed(KeyCode::Digit3) {
         //editor_con.current_tool = EditorTool::MoveAugment(vec![]);
