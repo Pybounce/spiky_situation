@@ -133,6 +133,8 @@
 - Interval blocks don't start transparent even when they're suppose to (the variant)
 - Running out lives crashes the game due to a resource not existing
 - SOMETIMES when the player dies they do not respawn
+- Creating a rail that is 2 cells, then linking it's head to it's tail, creates a loop even though it's just a line
+  - Not a huge deal given the workaround is to just delete one cell and connect again but still.
 
 #### Gamemodes
 
