@@ -68,6 +68,10 @@ impl Rail {
         return self.points[self.points.len() - 1];
     }
 
+    pub fn is_head_or_tail(&self, cell: IVec2) -> bool {
+        return self.is_head(cell) || self.is_tail(cell);
+    }
+
     pub fn is_head(&self, cell: IVec2) -> bool {
         return self.head() == cell;
     }
@@ -118,6 +122,7 @@ impl Rail {
     }
 
     pub fn can_merge(&self, rail: &Rail) -> Option<RailMergeOrder> {
+        if self.head() == self.tail() { return None; }  // This rail is a loop
         if self.head() == rail.head() { return RailMergeOrder::HH.into(); }
         if self.head() == rail.tail() { return RailMergeOrder::HT.into(); }
         if self.tail() == rail.head() { return RailMergeOrder::TH.into(); }
@@ -134,10 +139,10 @@ impl Rail {
             let diff = (rail_line[1] - rail_line[0]).clamp(IVec2::new(-1, -1), IVec2::new(1, 1));
             let mut current_cell = rail_line[0];
 
-            if (rail.is_body(current_cell) && self.is_on(current_cell)) || self.is_body(current_cell) { return false; }
+            if (rail.is_body(current_cell) && self.is_on(current_cell)) || self.is_body(current_cell) || (self.is_head_or_tail(current_cell) && self.can_merge(rail).is_none()) { return false; }
             while current_cell != rail_line[1] {
                 current_cell += diff;
-                if (rail.is_body(current_cell) && self.is_on(current_cell)) || self.is_body(current_cell) { return false; }
+                if (rail.is_body(current_cell) && self.is_on(current_cell)) || self.is_body(current_cell) || (self.is_head_or_tail(current_cell) && self.can_merge(rail).is_none()) { return false; }
             }
         }
 

@@ -76,7 +76,7 @@ pub fn refresh_editor_renderer(
             commands.spawn((
                 Sprite {
                     custom_size: Some(Vec2::new(TILE_SIZE_HALF, TILE_SIZE_HALF)),
-                    color: Color::WHITE,
+                    color: Color::srgb_u8(*rail_id as u8 * 30, 0, 0),
                     ..default()
                 },
                 Transform { 
