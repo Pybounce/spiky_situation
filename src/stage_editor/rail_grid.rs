@@ -32,7 +32,7 @@ impl Rail {
             let dir0 = (window[1] - window[0]).clamp(IVec2::new(-1, -1), IVec2::new(1, 1));
             let dir1 = (window[2] - window[1]).clamp(IVec2::new(-1, -1), IVec2::new(1, 1));
 
-            if dir0 == dir1 {
+            if dir0 != dir1 {
                 new_points.push(window[1]);
             }
         } 
@@ -100,6 +100,7 @@ impl Rail {
                 RailMergeOrder::TT => { self.reverse(); },
             }
             rail.points.remove(0);
+            
             self.points.append(&mut rail.points);
 
             match merge_order {
@@ -109,7 +110,7 @@ impl Rail {
                 RailMergeOrder::TT => self.reverse(),
             };
 
-            //self.compress();
+            self.compress();
             return true;
         }
 
