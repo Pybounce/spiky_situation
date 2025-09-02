@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
+use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, RailRider, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -321,6 +321,7 @@ impl EditorController {
                     stage.lasers.push(Laser {
                         grid_pos: grid_pos.as_vec2(),
                         rotation: *rotation,
+                        rail_rider: if let Some((rail_id, waypoint_index)) = self.rail_grid.is_on(*grid_pos) { Some(RailRider::new(rail_id, waypoint_index + 1, false)) } else { None },
                     });
                 }
             }

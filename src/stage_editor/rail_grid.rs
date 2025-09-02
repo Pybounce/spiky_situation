@@ -104,6 +104,18 @@ impl Rail {
         return self.is_head(cell) || self.is_tail(cell) || self.is_body(cell);
     }
 
+    /// If cell is on the rail, returns the amount of waypoints it has passed </br>
+    /// So if you want the next waypoint of non-reversed, just add 1. </br>
+    /// Reversed next waypoint will be this one.
+    pub fn waypoint_index(&self, cell: IVec2) -> Option<usize> {
+        for (window_index, rail_line) in self.points.windows(2).enumerate() {
+            if axis_aligned_intersect(cell, cell, rail_line[0], rail_line[1]) { 
+                return Some(window_index);
+            }
+        }
+        return None;
+    }
+
     pub fn try_merge(&mut self, rail: &mut Rail) -> bool {
 
         if let Some(merge_order) = self.can_merge(rail) {
@@ -258,9 +270,12 @@ impl RailGrid {
         return None;
     }
 
-    fn is_on(&self, cell: IVec2) -> Option<u32> {
+    pub fn is_on(&self, cell: IVec2) -> Option<(u32, usize)> {
         for (rail_id, rail) in self.rails.iter() {
-            if rail.is_on(cell) { return Some(*rail_id); }
+            if let Some(waypoint_index) = rail.waypoint_index(cell) 
+            { 
+                return Some((*rail_id, waypoint_index)); 
+            }
         }
         return None;
     }
