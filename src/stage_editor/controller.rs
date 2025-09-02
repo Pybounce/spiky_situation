@@ -58,7 +58,7 @@ impl EditorController {
             version: 0,
             new_stage_id,
             grid_snap_unit: 16.0,
-            rail_grid: RailGrid::default()
+            rail_grid: RailGrid::from_rails(&stage.rail_graph.rails)
          };
          editor.set_stage_template(stage);
          return editor;
@@ -235,7 +235,7 @@ impl EditorController {
     fn build_stage(&self) -> Stage {
         let mut stage: Stage = Stage::new(self.new_stage_id, self.grid_size);
         stage.rail_graph = RailGraph {
-            rails: HashMap::<u32, Vec<IVec2>>::from_iter(self.rail_grid.iter_rails().map(|(id, rail)| (*id, rail.iter_points().copied().collect())).into_iter()),
+            rails: HashMap::<u32, Vec<IVec2>>::from_iter(self.rail_grid.iter_rails().map(|(id, rail)| (*id, rail.iter_points().copied().collect()))),
         };
         for (grid_pos, stage_editor_obj) in &self.stage_grid {
             match stage_editor_obj {

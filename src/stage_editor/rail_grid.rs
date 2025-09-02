@@ -11,6 +11,16 @@ pub struct RailGrid {
     // alternate to dirty rails would be to just get all the points those rails use and mark those as dirty. should be fairly easy to get outer points, it's just getting the full list that is annoying, doable though.
 }
 
+impl RailGrid {
+    pub fn from_rails(rails: &HashMap<u32, Vec<IVec2>>) -> Self {
+        return Self {
+            current_id: rails.iter().fold(0, |max_id, (&id, _)| max_id.max(id)) + 1,
+            rails: HashMap::<u32, Rail>::from_iter(rails.iter().map(|(id, points)| (*id, Rail { points: points.clone() }))),
+            dirty_rails: vec![],
+        };
+    }
+}
+
 #[derive(PartialEq, Debug)]
 pub struct Rail {
     points: Vec<IVec2>
