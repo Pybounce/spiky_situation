@@ -97,10 +97,10 @@ fn main() {
         .add_systems(Update, update_cctv_shader_time)
         .add_event::<TriggerEvent>()
         .add_systems(Update, (trigger_pressure_spikes, tick_pressure_spikes))
-        .add_systems(FixedPreUpdate, update_laser_beams)
+        .add_systems(Update, update_laser_beams)
         .add_event::<CollisionRemapEvent>()
         .add_systems(PreUpdate, (raise_collision_remap_events, handle_collision_remap_events, handle_many_colliding_entities).chain())
-        .add_systems(Update, move_rail_riders)
+        .add_systems(PreUpdate, move_rail_riders)
         .run();
   
 }

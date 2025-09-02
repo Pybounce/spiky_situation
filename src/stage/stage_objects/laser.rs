@@ -103,10 +103,12 @@ pub fn update_laser_beams(
 
             if hit.distance < current_min_dist { current_min_dist = hit.distance; } else { continue; }
 
-            let hit_point = ray.global_origin() + (*ray.global_direction() * hit.distance);
+            let ray_origin = laser_transform.translation.truncate() + (laser_transform.rotation * ray.origin.extend(0.0)).truncate();
+
+            let hit_point = ray_origin + (*ray.global_direction() * hit.distance);
 
             if let Ok(mut beam_transform) = beam_query.get_mut(laser.beam) {
-                beam_transform.translation = (ray.global_origin() + ((hit_point - ray.global_origin()) / 2.0)).extend(90.0);
+                beam_transform.translation = (ray_origin + ((hit_point - ray_origin) / 2.0)).extend(90.0);
                 beam_transform.scale.y = hit.distance + 2.0;
                 beam_transform.rotation = laser_transform.rotation;
             }
