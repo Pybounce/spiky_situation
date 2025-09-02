@@ -99,7 +99,7 @@ impl<'a> StageCreator<'a> {
 
 fn add_rails(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
     commands.insert_resource(RailGraph {
-        rails: stage_creator.stage.rail_graph.rails.iter().map(|(id, rail)| (*id, rail.iter().map(|p| (p.as_vec2().extend(0.0) * TILE_SIZE) + TILE_SIZE_HALF).collect())).collect(),
+        rails: stage_creator.stage.rail_graph.rails.iter().map(|(id, rail)| (*id, rail.iter().map(|p| ((p.as_vec2() * TILE_SIZE) + TILE_SIZE_HALF).extend(0.0)).collect())).collect(),
     });
     return true;
 }
