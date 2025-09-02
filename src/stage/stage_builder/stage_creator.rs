@@ -1,7 +1,7 @@
-use crate::{common::checkpoint::CheckpointBundle, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
-use bevy::prelude::*;
+use bevy::{platform::collections::HashMap, prelude::*};
 
 pub const TILE_SIZE: f32 = 16.0;
 pub const TILE_SIZE_HALF: f32 = TILE_SIZE / 2.0;
@@ -91,9 +91,17 @@ impl<'a> StageCreator<'a> {
         && build_saw_shooters(self, commands)
         && build_pressure_spikes(self, commands)
         && build_lasers(self, commands)
+        && add_rails(self, commands)
     }
 
 
+}
+
+fn add_rails(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+    commands.insert_resource(RailGraph {
+        rails: stage_creator.stage.rail_graph.rails.iter().map(|(id, rail)| (*id, rail.iter().map(|p| (p.as_vec2().extend(0.0) * TILE_SIZE) + TILE_SIZE_HALF).collect())).collect(),
+    });
+    return true;
 }
 
 fn build_player_spawner(stage_creator: &StageCreator, commands: &mut Commands) -> bool {

@@ -3,7 +3,7 @@ use std::f32;
 use bevy::{math::VectorSpace, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
 
 
 #[derive(Component)]
@@ -69,7 +69,7 @@ impl LaserBuilder {
             StageObject::Volatile
         )).id();
 
-        commands.spawn((
+        let mut laser_core = commands.spawn((
             PhysicalTileBundle::new(stage_creator, laser.grid_pos, atlas_rects[0], laser.rotation, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             SpriteAnimator::new_non_repeating(50, atlas_rects),
             Laser {
@@ -79,6 +79,14 @@ impl LaserBuilder {
             Ground,
             RayCaster::new(Vec2::Y * 8.1, Dir2::Y).with_ignore_self(true).with_solidness(true).with_query_filter(SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground))
         ));
+
+        if let Some(rail_rider) = &laser.rail_rider {
+            laser_core.insert(RailRider {
+                rail_id: rail_rider.rail_id,
+                current_waypoint_index: rail_rider.next_waypoint,
+                reversed: rail_rider.reversed,
+            });
+        }   
     }
 
 }
