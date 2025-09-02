@@ -1,9 +1,7 @@
 
 
 use bevy::{
-    asset::{io::Reader, ron, AssetLoader, LoadContext},
-    prelude::*,
-    reflect::TypePath,
+    asset::{io::Reader, ron, AssetLoader, LoadContext}, platform::collections::HashMap, prelude::*, reflect::TypePath
 };
 use serde::{ Deserialize, Serialize};
 use thiserror::Error;
@@ -13,6 +11,7 @@ use super::stage_creator::TILE_SIZE;
 #[derive(Asset, TypePath, Debug, Deserialize, Serialize)]
 pub struct Stage {
     pub id: usize,
+    pub rail_graph: RailGraph,
     pub terrain_theme: TerrainTheme,
     pub ground_tiles: Vec<GroundTile>,
     pub spikes: Vec<Spike>,
@@ -36,6 +35,7 @@ impl Stage {
     pub fn new(id: usize, grid_size: IVec2) -> Self {
         Self {
             id: id,
+            rail_graph: RailGraph::default(),
             ground_tiles: vec![],
             spikes: vec![],
             half_saws: vec![],
@@ -55,6 +55,10 @@ impl Stage {
             terrain_theme: TerrainTheme::Grass,
         }
     }
+}
+#[derive(Debug, Deserialize, Serialize, Default)]
+pub struct RailGraph {
+    pub rails: HashMap<u32, Vec<IVec2>>
 }
 
 #[derive(Debug, Deserialize, Serialize)]

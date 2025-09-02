@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
+use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -234,6 +234,9 @@ impl EditorController {
 
     fn build_stage(&self) -> Stage {
         let mut stage: Stage = Stage::new(self.new_stage_id, self.grid_size);
+        stage.rail_graph = RailGraph {
+            rails: HashMap::<u32, Vec<IVec2>>::from_iter(self.rail_grid.iter_rails().map(|(id, rail)| (*id, rail.iter_points().copied().collect())).into_iter()),
+        };
         for (grid_pos, stage_editor_obj) in &self.stage_grid {
             match stage_editor_obj {
                 EditorItem::Spike { rotation } => {
