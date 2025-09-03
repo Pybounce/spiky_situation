@@ -21,7 +21,7 @@ impl RailGrid {
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Rail {
     points: Vec<IVec2>
 }
@@ -194,10 +194,7 @@ impl RailGrid {
     pub fn iter_rails(&self) -> impl Iterator<Item = (&u32, &Rail)> {
         return self.rails.iter();
     }
-    /// Favours horizontal-first, to do vertical-first, just swap start and end cells
-    pub fn try_add_rail(&mut self, start_cell: IVec2, end_cell: IVec2) -> bool {
-
-        let Some(mut new_rail) = Rail::try_new(start_cell, end_cell) else { return false; };
+    pub fn try_add_from_rail(&mut self, mut new_rail: Rail) -> bool {
         if self.valid_rail(&new_rail) == false { return false; }
 
         let mut mergable_rail_ids: Vec<u32> = vec![];
@@ -231,16 +228,42 @@ impl RailGrid {
 
         return true;
     }
+    /// Favours horizontal-first, to do vertical-first, just swap start and end cells
+    pub fn try_add_from_cells(&mut self, start_cell: IVec2, end_cell: IVec2) -> bool {
+
+        let Some(new_rail) = Rail::try_new(start_cell, end_cell) else { return false; };
+        return self.try_add_from_rail(new_rail);
+    }
 
         
-    pub fn remove_cell(cell: IVec2) {
-        // Find what rail contains the cell
-        // if None, return
+    pub fn try_remove_cell(&mut self, cell: IVec2) -> bool {
+        let Some((rail_id, _)) = self.is_on(cell) else { return false };
+        
+        if let Some(rail) = self.rails.get_mut(&rail_id) {
 
-        // is it a start/end of the rail
-        // If yes --> remove it
-        // if no --> Split the rail into 2 rails
-        todo!()
+            let mut rail_cells: Vec<IVec2> = rail.iter_cells().collect();
+            let index = rail_cells.iter().position(|x| *x == cell).unwrap();
+
+            let mut right_cells = rail_cells.split_off(index);
+            right_cells.remove(0);
+
+            if rail_cells.len() > 1 {
+                rail.points = rail_cells;
+                rail.compress();
+            } else {
+                self.rails.remove(&rail_id);
+            }
+
+            if right_cells.len() > 1 {
+                let mut right_rail = Rail::try_new(IVec2::new(0, 0), IVec2::new(0, 1)).unwrap();
+                right_rail.points = right_cells;
+                right_rail.compress();
+                self.try_add_from_rail(right_rail);
+            }
+
+            return true;
+        }
+        return false;
     }
 
     fn valid_rail(&self, rail: &Rail) -> bool {

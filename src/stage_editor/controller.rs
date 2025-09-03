@@ -116,8 +116,19 @@ impl EditorController {
     }
 
     pub fn try_place_rail(&mut self, start: IVec2, end: IVec2) -> bool {
-        self.version += 1;  //TODO: Only need to bump when successfull placed. just doing this for testing
-        return self.rail_grid.try_add_rail(start, end);
+        if self.rail_grid.try_add_from_cells(start, end) {
+            self.version += 1;
+            return true;
+        }
+        return false;
+    }
+
+    pub fn try_remove_rail(&mut self, cell: IVec2) -> bool {
+        if self.rail_grid.try_remove_cell(cell) {
+            self.version += 1;
+            return true;
+        }
+        return false;
     }
     
     pub fn can_place(&self, grid_pos: IVec2) -> bool {

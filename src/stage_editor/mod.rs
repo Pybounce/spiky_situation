@@ -21,7 +21,7 @@ impl Plugin for StageEditorPlugin {
         .add_systems(OnExit(AppState::StageEditor), teardown_stage_editor)
         .add_systems(Update, (
             (handle_current_item_change, add_item_icon, move_item_icon, update_ground_atlas_indices),
-            (handle_rotate, handle_placement, handle_rail_placement, handle_grid_object_removals),
+            (handle_rotate, handle_placement, handle_rail_placement, handle_rail_removal, handle_grid_object_removals),
             handle_save, move_camera, switch_tool
         ).run_if(in_state(StageEditorState::InEdit)));
     }
@@ -128,6 +128,20 @@ fn handle_rail_placement(
                 RailPlacementMode::Vertical => editor_con.try_place_rail(cell, current_opt.unwrap()),
             };
             editor_con.current_tool = EditorTool::RailPlacer((None, placement_mode));
+        }
+    }
+}
+
+fn handle_rail_removal(
+    mut editor_con: ResMut<EditorController>,
+    buttons: Res<ButtonInput<MouseButton>>,
+    mouse_data: Res<MouseData>
+) {
+    let cell = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
+
+    if let EditorTool::RailPlacer(_) = editor_con.current_tool {
+        if buttons.pressed(MouseButton::Right) {
+            editor_con.try_remove_rail(cell);
         }
     }
 }
