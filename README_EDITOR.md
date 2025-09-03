@@ -68,6 +68,8 @@
 - [ ] Augments
   - When holding an augment, highlight editor items that can use it
   - When holding an augment, show debug info for editor items using it (maybe ONLY on hover of that item)
+- [ ] Dynamic stage size
+  - If you place a tile outside of the stage size, it extends to fit the tile (to a max)
 
 **Offset Grid**
 
