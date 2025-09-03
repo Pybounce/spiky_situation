@@ -120,3 +120,64 @@
   - So if you're holding an editor item it should place it, but an augment it should apply it to the editor item in that cell
 - How do I work out what can and cannot be applied as a bulk rect
   - Probably will be solved by the above
+
+**Augment Implementation**
+
+```rs
+pub enum EditorTool {
+  ValueAugment((augment: Augment, value: f32, min_val: f32, max_val: f32))
+}
+
+// augment is simply a marker, they all have the same data
+
+pub enum Augment {
+  MoveSpeed,
+  FireRate,
+  ProjectileSpeed,
+  Rotation??
+}
+```
+
+Having the value split from the Augment enum will let me do things like
+
+```rs
+pub fn value_augment_ui() {
+   ... blah ...
+   if let ValueAugment((_augment, val)) = controller.tool {
+      augment_progress_ui.value = val;
+   }
+  // Instead of...
+     if let ValueAugment(augment) = controller.tool {
+      let val = match augment {
+        MoveSpeed(v) => v,
+        ProjectileSpeed(v) => v
+      };
+      augment_progress_ui.value = val;
+   }
+   // Since they should ALL have a value
+   // When we switch or change value, can then apply min/max vals also.
+}
+```
+
+_Current Issue_
+
+- will need to have banding levels for the value
+  - So movement speed should only have Slow, Medium, Fast etc (or just 1, 2, 3)
+
+_Controls_
+
+- Currently can just be 3 to switch to value augments
+- A/D to switch between augment type
+- W/S to increase/decrease augment value
+
+**Selection/Move Tool**
+
+- Highlight an area by dragging
+- Can then click the area and drag to move all things inside it
+- For rails, this would disconnect them if the selection splits through the middle
+- Can copy, cut and paste also
+- _Issue_: How the fuck do I even implement this
+  - I need to drag stuff, but check it can go there before placing it
+  - But if they let go, it should just stay in the incorrect place and let them drag again right.
+  - Placing when it can?
+  - Maybe I invent blueprints for this, since I will effectively need copy paste functionality also
