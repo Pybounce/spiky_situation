@@ -2,7 +2,7 @@ use bevy::{input::mouse::MouseMotion, prelude::*};
 use controller::EditorController;
 use item_icon::*;
 use renderer::editor_renderer::EditorRenderer;
-use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage, stage_editor::enums::{EditorTool, RailPlacementMode}};
+use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage, stage_editor::enums::EditorTool};
 
 mod enums;
 mod controller;
@@ -118,16 +118,13 @@ fn handle_rail_placement(
 ) {
     let cell = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
 
-    if let EditorTool::RailPlacer((current_opt, placement_mode)) = editor_con.current_tool {
+    if let EditorTool::RailPlacer(current_opt) = editor_con.current_tool {
         if buttons.just_pressed(MouseButton::Left) && current_opt.is_none() {
-            editor_con.current_tool = EditorTool::RailPlacer((Some(cell), placement_mode));
+            editor_con.current_tool = EditorTool::RailPlacer(Some(cell));
         }
         else if buttons.just_released(MouseButton::Left) && current_opt.is_some() {
-            match placement_mode {
-                RailPlacementMode::Horizontal => editor_con.try_place_rail(current_opt.unwrap(), cell),
-                RailPlacementMode::Vertical => editor_con.try_place_rail(cell, current_opt.unwrap()),
-            };
-            editor_con.current_tool = EditorTool::RailPlacer((None, placement_mode));
+            editor_con.try_place_rail(current_opt.unwrap(), cell);
+            editor_con.current_tool = EditorTool::RailPlacer(None);
         }
     }
 }
@@ -211,7 +208,7 @@ pub fn switch_tool(
         editor_con.current_tool = EditorTool::Brush;
     }
     else if input.just_pressed(KeyCode::Digit2) {
-        editor_con.current_tool = EditorTool::RailPlacer((None, RailPlacementMode::default()));
+        editor_con.current_tool = EditorTool::RailPlacer(None);
     }
     else if input.just_pressed(KeyCode::Digit3) {
         //editor_con.current_tool = EditorTool::MoveAugment(vec![]);

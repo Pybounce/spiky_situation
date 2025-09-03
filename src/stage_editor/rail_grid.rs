@@ -61,7 +61,9 @@ impl Rail {
     }
 
     pub fn try_new(start_cell: IVec2, end_cell: IVec2) -> Option<Self> {
-        if start_cell == end_cell { return None; }        
+        if start_cell == end_cell { return None; }
+        if !(start_cell.x == end_cell.x || start_cell.y == end_cell.y) { return None; } //Only accepts straight lines now, no corners. 
+        
         let points = (start_cell, start_cell + (IVec2::X * (end_cell - start_cell)), end_cell);
         
         return match points.0 == points.1 || points.1 == points.2 {
