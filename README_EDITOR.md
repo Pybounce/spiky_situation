@@ -173,6 +173,12 @@ _Controls_
 **Selection/Move Tool**
 
 - Highlight an area by dragging
+- Should be able to:
+  - Move area
+  - Copy/Paste/Cut area
+  - Undo area movements
+  - Edit only selected area
+- _The edit tool should simply update the selected area in the controller, not itself_
 - Can then click the area and drag to move all things inside it
 - For rails, this would disconnect them if the selection splits through the middle
 - Can copy, cut and paste also
@@ -181,3 +187,44 @@ _Controls_
   - But if they let go, it should just stay in the incorrect place and let them drag again right.
   - Placing when it can?
   - Maybe I invent blueprints for this, since I will effectively need copy paste functionality also
+
+**Selection Tool Idea 1**
+
+```rs
+pub enum EditorTool {
+  ...
+  SelectionTool(area: Option<Rect>, offset: IVec2)
+}
+```
+
+- When I select an area it populates the area rect
+- When I drag to move, it updates the offset
+- When I end the drag, no change.
+- When I end the selection, it then moves the original area over the area + offset
+- When I COPY, it needs to save that template somewhere.
+- When I PASTE, it should end the current selection, but then where does it get the template and origin from to apply offset, since it no longer MOVES, and instead only places.
+
+**Selection Tool Idea 2**
+
+```rs
+pub enum EditorTool {
+  ...
+  SelectionTool(area: Option<Template>, cell: IVec2)
+}
+pub struct Template(Vec<EditorItem>, Vec<Rail>)
+```
+
+- When I select an area, it copies all that area data into a template and then deletes the original area. It also sets the cell to the cell of the original area.
+- When I end selection, it overwrites anything in that area with the template
+  - _What if it cannot overwrite_: Then it simply displays an error message and does not allow the player to end selection. They can undo selection which places the template back where it was originally?
+- If I COPY, it simply just stores the template in some other COPY variable
+- If I PASTE, it places the current selection if one exists, and then sets the current template to the copied one, and the cell to the original cell.
+  - _What if it cannot place current selection_: It doesn't let you paste?
+- _Possible solution to the placement rules_: Have it so they are only enforced when you try to publish, not save or edit. So you can break as many placement rules as you like during edit but not publish
+
+**Selection Tool Idea 3**
+
+- When I select an area it just saves the Rect
+- When I drag to move, it deletes the old area, and then overwrites the new area with the copied entities
+- When I end the selection, it just deletes the Rect
+- When I copy an area
