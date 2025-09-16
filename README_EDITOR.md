@@ -221,6 +221,7 @@ pub struct Template(Vec<EditorItem>, Vec<Rail>)
 - If I PASTE, it places the current selection if one exists, and then sets the current template to the copied one, and the cell to the original cell.
   - _What if it cannot place current selection_: It doesn't let you paste?
 - _Possible solution to the placement rules_: Have it so they are only enforced when you try to publish, not save or edit. So you can break as many placement rules as you like during edit but not publish
+  - _HOWEVER_ This does not work if you try to place out of bounds. Or maybe it does? Maybe I let them place out of bounds but not publish.
 
 **Selection Tool Idea 3**
 
