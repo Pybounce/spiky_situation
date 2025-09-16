@@ -1,7 +1,7 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::{CollisionGroups, Group};
+use avian2d::prelude::*;
 
-use crate::stage::stage_builder::stage_creator::StageCreator;
+use crate::{common::physics::layers::GamePhysicsLayer, stage::stage_builder::stage_creator::StageCreator};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -15,7 +15,7 @@ pub struct GoalFactory;
 impl GoalFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect) {
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.object_tilemap, CollisionGroups::new(Group::GROUP_3, Group::ALL)),
+            PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::StageObject, LayerMask::ALL)),
             StageGoal
         ));
     }

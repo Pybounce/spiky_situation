@@ -1,5 +1,5 @@
 
-use crate::{common::states::{AppState, DespawnOnStateExit}, stage::stage_builder::stage_creator::TILE_SIZE, stage_editor::enums::EditorItem};
+use crate::{common::states::{AppState, DespawnOnStateExit}, stage::stage_builder::stage_creator::{TILE_SIZE, TILE_SIZE_HALF}, stage_editor::enums::EditorItem};
 
 use super::{super::controller::EditorController, editor_renderer::{EditorRenderer, RenderedEditorItem}};
 use bevy::prelude::*;
@@ -9,11 +9,8 @@ pub fn draw_editor(
     renderer_opt: Option<ResMut<EditorRenderer>>,
     editor_controller_opt: Option<Res<EditorController>>
 ) {
-    if renderer_opt.is_none() || editor_controller_opt.is_none() {
-        return;
-    }
-    let mut renderer = renderer_opt.unwrap();
-    let editor_controller = editor_controller_opt.unwrap();
+    let Some(mut renderer) = renderer_opt else { return };
+    let Some(editor_controller) = editor_controller_opt else { return };
 
     //nothing to be updated
     if editor_controller.version == renderer.version { return; }
@@ -35,18 +32,17 @@ pub fn refresh_editor_renderer(
     existing_items: Query<Entity, With<RenderedEditorItem>>,
     mut commands: Commands
 ) {
-    if renderer_opt.is_none() || editor_controller_opt.is_none() {
-        return;
-    }
-    let mut renderer = renderer_opt.unwrap();
-    let editor_controller = editor_controller_opt.unwrap();
+
+    let Some(mut renderer) = renderer_opt else { return };
+    let Some(editor_controller) = editor_controller_opt else { return };
 
     if renderer.full_refresh == false { return; }
 
     for entity in existing_items.iter() {
-        commands.entity(entity).despawn();
+        commands.entity(entity).try_despawn();
     }
 
+    // draw editor items
     for grid_pos in editor_controller.stage_grid.keys() {
         let editor_item = editor_controller.stage_grid[grid_pos];
 
@@ -73,7 +69,41 @@ pub fn refresh_editor_renderer(
 
     }
 
-
+    // draw rail grid
+    for (rail_id, rail) in editor_controller.rail_grid.iter_rails() {
+        for cell in rail.iter_cells() {
+            commands.spawn((
+                Sprite {
+                    custom_size: Some(Vec2::new(TILE_SIZE_HALF, TILE_SIZE_HALF)),
+                    color: Color::srgb_u8(*rail_id as u8 * 30, 0, 0),
+                    ..default()
+                },
+                Transform { 
+                translation: editor_controller.grid_pos_to_world_grid_pos(cell), 
+                    ..default()
+                },
+                RenderedEditorItem,
+                DespawnOnStateExit::App(AppState::StageEditor)
+            ));
+        }
+    }
+    for (rail_id, rail) in editor_controller.rail_grid.iter_rails() {
+        for cell in rail.iter_points() {
+            commands.spawn((
+                Sprite {
+                    custom_size: Some(Vec2::new(TILE_SIZE_HALF, TILE_SIZE_HALF)),
+                    color: Color::srgb_u8(0, 0, 255),
+                    ..default()
+                },
+                Transform { 
+                translation: editor_controller.grid_pos_to_world_grid_pos(*cell) + Vec3::Z, 
+                    ..default()
+                },
+                RenderedEditorItem,
+                DespawnOnStateExit::App(AppState::StageEditor)
+            ));
+        }
+    }
     renderer.version = editor_controller.version;
     renderer.full_refresh = false;
 }

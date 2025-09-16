@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE};
+use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, RailRider, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -11,12 +11,14 @@ pub const GROUND_TILEMAP_SIZE: f32 = 7.0;
 #[derive(Resource)]
 pub struct EditorController {
     pub current_item: EditorItem,
+    pub current_tool: EditorTool,
     tile_size: f32,
     /// Tracks whether or not the latest stage updates have been saved
     saved: bool,
     pub object_atlas: Handle<Image>,
     pub ground_atlas: Handle<Image>,
     pub stage_grid: HashMap<IVec2, EditorItem>,
+    pub rail_grid: RailGrid,
     pub grid_size: IVec2,
     grid_snap_unit: f32,
     pub version: usize,
@@ -29,6 +31,7 @@ impl EditorController {
         
         Self { 
             current_item: EditorItem::default(),
+            current_tool: EditorTool::default(),
             tile_size: TILE_SIZE,
             saved: false,
             object_atlas: object_atlas.clone(),
@@ -37,13 +40,15 @@ impl EditorController {
             stage_grid: HashMap::new(),
             version: 0,
             new_stage_id,
-            grid_snap_unit: 16.0
+            grid_snap_unit: 16.0,
+            rail_grid: RailGrid::default()
          }
     }
 
     pub fn from_stage(stage: &Stage, new_stage_id: usize, object_atlas: &Handle<Image>, ground_atlas: &Handle<Image>) -> Self {
         let mut editor = Self { 
             current_item: EditorItem::default(),
+            current_tool: EditorTool::default(),
             tile_size: TILE_SIZE,
             saved: false,
             object_atlas: object_atlas.clone(),
@@ -52,7 +57,8 @@ impl EditorController {
             stage_grid: HashMap::new(),
             version: 0,
             new_stage_id,
-            grid_snap_unit: 16.0
+            grid_snap_unit: 16.0,
+            rail_grid: RailGrid::from_rails(&stage.rail_graph.rails)
          };
          editor.set_stage_template(stage);
          return editor;
@@ -107,6 +113,22 @@ impl EditorController {
         self.saved = false;
         self.version += 1;
         return true;
+    }
+
+    pub fn try_place_rail(&mut self, start: IVec2, end: IVec2) -> bool {
+        if self.rail_grid.try_add_from_cells(start, end) {
+            self.version += 1;
+            return true;
+        }
+        return false;
+    }
+
+    pub fn try_remove_rail(&mut self, cell: IVec2) -> bool {
+        if self.rail_grid.try_remove_cell(cell) {
+            self.version += 1;
+            return true;
+        }
+        return false;
     }
     
     pub fn can_place(&self, grid_pos: IVec2) -> bool {
@@ -223,6 +245,9 @@ impl EditorController {
 
     fn build_stage(&self) -> Stage {
         let mut stage: Stage = Stage::new(self.new_stage_id, self.grid_size);
+        stage.rail_graph = RailGraph {
+            rails: HashMap::<u32, Vec<IVec2>>::from_iter(self.rail_grid.iter_rails().map(|(id, rail)| (*id, rail.iter_points().copied().collect()))),
+        };
         for (grid_pos, stage_editor_obj) in &self.stage_grid {
             match stage_editor_obj {
                 EditorItem::Spike { rotation } => {
@@ -307,6 +332,7 @@ impl EditorController {
                     stage.lasers.push(Laser {
                         grid_pos: grid_pos.as_vec2(),
                         rotation: *rotation,
+                        rail_rider: if let Some((rail_id, waypoint_index)) = self.rail_grid.is_on(*grid_pos) { Some(RailRider::new(rail_id, waypoint_index + 1, false)) } else { None },
                     });
                 }
             }

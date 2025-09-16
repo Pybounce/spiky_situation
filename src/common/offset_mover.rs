@@ -12,7 +12,7 @@ pub struct OffsetMover {
 impl OffsetMover {
     pub fn new_from_grid(grid_offsets: &Vec<Vec2>, speed: f32) -> Self {
         OffsetMover {
-            offsets: grid_offsets.into_iter().map(|x| x.extend(0.0)).collect(),
+            offsets: grid_offsets.iter().map(|x| x.extend(0.0)).collect(),
             speed,
             current_target_index: 0,
             current_offset: Vec3::ZERO,

@@ -57,6 +57,7 @@ pub fn move_item_icon(
 pub fn handle_current_item_change(
     mut editor_con: ResMut<EditorController>,
     input: Res<ButtonInput<KeyCode>>,
+    mouse_data: Res<MouseData>,
     mut current_item_q: Query<&mut Sprite, With<ItemIcon>>
 ) {
     if input.just_pressed(KeyCode::KeyD) {
@@ -71,6 +72,13 @@ pub fn handle_current_item_change(
     else if input.just_pressed(KeyCode::KeyS) {
         editor_con.cycle_prev_item_variant()
     }
+    else if input.just_pressed(KeyCode::KeyQ) {
+        let current_grid_pos = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
+        if let Some(editor_item) = editor_con.stage_grid.get(&current_grid_pos) {
+            editor_con.current_item = *editor_item;
+            
+        }
+    }
     else {
         return;
     }
@@ -82,4 +90,3 @@ pub fn handle_current_item_change(
         sprite.rect = Some(EditorRenderer::get_item_icon_atlas_rect(&editor_con.current_item));
     }
 }
-

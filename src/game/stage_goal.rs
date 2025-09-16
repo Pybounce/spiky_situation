@@ -1,8 +1,8 @@
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
-use crate::{databases::save_db::SaveGame, game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::{BuildStageEvent}, CurrentStageData}, stage_objects::goal::StageGoal}};
+use crate::{common::physics::avian_ex::ManyCollidingEntities, databases::save_db::SaveGame, game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::BuildStageEvent, CurrentStageData}, stage_objects::goal::StageGoal}};
 
 #[derive(Event)]
 pub struct GoalReached {
@@ -11,7 +11,7 @@ pub struct GoalReached {
 
 
 pub fn check_goal_reached(
-    player_query: Query<&CollidingEntities, With<LocalPlayer>>,
+    player_query: Query<&ManyCollidingEntities, With<LocalPlayer>>,
     goal_query: Query<(), With<StageGoal>>,
     mut event_writer: EventWriter<GoalReached>,
     stage_data_opt: Option<Res<CurrentStageData>>,
@@ -19,7 +19,7 @@ pub fn check_goal_reached(
     if let Some(stage_data) = stage_data_opt {
         for colliding_entities in &player_query {
             for colliding_entity in colliding_entities.iter() {
-                if let Ok(_) = goal_query.get(colliding_entity) {
+                if let Ok(_) = goal_query.get(*colliding_entity) {
                     event_writer.write(GoalReached { stage_id: stage_data.stage_id });
                 }
             }

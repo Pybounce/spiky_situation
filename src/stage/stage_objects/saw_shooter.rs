@@ -1,7 +1,7 @@
 use bevy::{math::{Rect, Vec2, Vec3}, prelude::{Commands, Component, Query, Res}, sprite::Sprite, time::{Time, Timer, TimerMode}, transform::components::Transform, utils::default};
-use bevy_rapier2d::prelude::{ActiveEvents, Collider, CollisionGroups, GravityScale, Group, LockedAxes, RigidBody, Sensor, Velocity};
+use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::fragile::{Fragile, FragileShield}}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::{fragile::{Fragile, FragileShield}, layers::GamePhysicsLayer}}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -21,7 +21,7 @@ impl SawShooterFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, saw_shooter_block_asset: &stage_asset::SawShooterBlock) {
         
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, saw_shooter_block_asset.grid_pos, atlas_rects[0], saw_shooter_block_asset.rotation, stage_creator.object_tilemap, CollisionGroups::new(Group::GROUP_1, Group::ALL)),
+            PhysicalTileBundle::new(stage_creator, saw_shooter_block_asset.grid_pos, atlas_rects[0], saw_shooter_block_asset.rotation, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             SawShooter {
                 timer: Timer::from_seconds(3.0, TimerMode::Repeating)
             },
@@ -54,12 +54,12 @@ pub fn tick_saw_shooters(
                 Fragile, 
                 FragileShield, 
                 InstantKiller, 
-                Collider::ball(0.3 * 16.0), 
-                Velocity::linear((transform.rotation * Vec2::new(0.0, 100.0).extend(0.0)).truncate()),
+                Collider::circle(0.3 * 16.0), 
+                LinearVelocity((transform.rotation * Vec2::new(0.0, 100.0).extend(0.0)).truncate()),
                 Sensor,
                 RigidBody::Dynamic,
                 GravityScale(0.0),
-                ActiveEvents::COLLISION_EVENTS,
+                CollisionEventsEnabled,
                 LockedAxes::ROTATION_LOCKED,
                 Sprite {
                     image: stage_assets.stage_objects_handle.clone(),

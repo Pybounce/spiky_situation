@@ -1,5 +1,15 @@
 #### Editor Refactor
 
+**Current Issues**
+
+- [ ] Moveable Clone
+  - If the EditorItem contains all it's info then it also will contain the full vec path
+  - So when I copy one, I wil need to clear that path manually, also I can't copy, must be clone, which is annoying
+  - Could just impl Copy myself and leave that part out buttt it's risky.
+- [ ] Moveable Tracks vs Augment
+  - Tracks would allow me to draw one track and place many things on it
+  - Augment would mean I have to redo the track for every item on it, every time.
+
 **Must Haves**
 
 - [ ] Change stage size (within size limits)
@@ -30,13 +40,24 @@
   - If theres a spike or a spring on top etc
   - If I child it, rapier will break everything, so will need to switch to avian
 
+**Mover Implementation**
+
+- EditorController holds enum for idk EditorUseable?
+- EditorUseable is an enum { Item(EditorItem), Augment(EditorAugment) }
+- Then EditorItem needs a method that says whether or not it accepts the augment
+- Then we have separate systems dealing with each augment
+  - So moveable will need something that tracks if we've selected an item to apply it ot
+  - It needs to track all the positions
+  - It needs to apply them and clear the currently selected item
+- _maybe value augments are their own enum since they will all work the same way, unlike mover which requires specialised logic_
+
 **Quality of life**
 
-- [ ] Hold to place
-- [ ] Better editor movement
+- [x] Hold to place
+- [x] Better editor movement
   - Mouse3 or Space + click + drag should move the editor by that amount
 - [ ] Zooming in and out moves you closer/further to/from your cursor location (like sprite editor)
-- [ ] Copy key
+- [x] Copy key
   - Probably Q but will be settings to rebind
   - Sets your current item to the item your mouse is hovering over
 - [ ] Draggable areas
@@ -47,6 +68,8 @@
 - [ ] Augments
   - When holding an augment, highlight editor items that can use it
   - When holding an augment, show debug info for editor items using it (maybe ONLY on hover of that item)
+- [ ] Dynamic stage size
+  - If you place a tile outside of the stage size, it extends to fit the tile (to a max)
 
 **Offset Grid**
 
@@ -97,3 +120,112 @@
   - So if you're holding an editor item it should place it, but an augment it should apply it to the editor item in that cell
 - How do I work out what can and cannot be applied as a bulk rect
   - Probably will be solved by the above
+
+**Augment Implementation**
+
+```rs
+pub enum EditorTool {
+  ValueAugment((augment: Augment, value: f32, min_val: f32, max_val: f32))
+}
+
+// augment is simply a marker, they all have the same data
+
+pub enum Augment {
+  MoveSpeed,
+  FireRate,
+  ProjectileSpeed,
+  Rotation??
+}
+```
+
+Having the value split from the Augment enum will let me do things like
+
+```rs
+pub fn value_augment_ui() {
+   ... blah ...
+   if let ValueAugment((_augment, val)) = controller.tool {
+      augment_progress_ui.value = val;
+   }
+  // Instead of...
+     if let ValueAugment(augment) = controller.tool {
+      let val = match augment {
+        MoveSpeed(v) => v,
+        ProjectileSpeed(v) => v
+      };
+      augment_progress_ui.value = val;
+   }
+   // Since they should ALL have a value
+   // When we switch or change value, can then apply min/max vals also.
+}
+```
+
+_Current Issue_
+
+- will need to have banding levels for the value
+  - So movement speed should only have Slow, Medium, Fast etc (or just 1, 2, 3)
+
+_Controls_
+
+- Currently can just be 3 to switch to value augments
+- A/D to switch between augment type
+- W/S to increase/decrease augment value
+
+**Selection/Move Tool**
+
+- Highlight an area by dragging
+- Should be able to:
+  - Move area
+  - Copy/Paste/Cut area
+  - Undo area movements
+  - Edit only selected area
+- _The edit tool should simply update the selected area in the controller, not itself_
+- Can then click the area and drag to move all things inside it
+- For rails, this would disconnect them if the selection splits through the middle
+- Can copy, cut and paste also
+- _Issue_: How the fuck do I even implement this
+  - I need to drag stuff, but check it can go there before placing it
+  - But if they let go, it should just stay in the incorrect place and let them drag again right.
+  - Placing when it can?
+  - Maybe I invent blueprints for this, since I will effectively need copy paste functionality also
+
+**Selection Tool Idea 1**
+
+```rs
+pub enum EditorTool {
+  ...
+  SelectionTool(area: Option<Rect>, offset: IVec2)
+}
+```
+
+- When I select an area it populates the area rect
+- When I drag to move, it updates the offset
+- When I end the drag, no change.
+- When I end the selection, it then moves the original area over the area + offset
+- When I COPY, it needs to save that template somewhere.
+- When I PASTE, it should end the current selection, but then where does it get the template and origin from to apply offset, since it no longer MOVES, and instead only places.
+
+**Selection Tool Idea 2**
+
+```rs
+pub enum EditorTool {
+  ...
+  SelectionTool(area: Option<Template>, cell: IVec2)
+}
+pub struct Template(Vec<EditorItem>, Vec<Rail>)
+```
+
+- When I select an area, it copies all that area data into a template and then deletes the original area. It also sets the cell to the cell of the original area.
+- When I end selection, it overwrites anything in that area with the template
+  - _What if it cannot overwrite_: Then it simply displays an error message and does not allow the player to end selection. They can undo selection which places the template back where it was originally?
+- If I COPY, it simply just stores the template in some other COPY variable
+- If I PASTE, it places the current selection if one exists, and then sets the current template to the copied one, and the cell to the original cell.
+  - _What if it cannot place current selection_: It doesn't let you paste?
+- _Possible solution to the placement rules_: Have it so they are only enforced when you try to publish, not save or edit. So you can break as many placement rules as you like during edit but not publish
+  - _HOWEVER_ This does not work if you try to place out of bounds. Or maybe it does? Maybe I let them place out of bounds but not publish.
+
+**Selection Tool Idea 3**
+
+- When I select an area it just saves the Rect
+- When I drag to move, it deletes the old area, and then overwrites the new area with the copied entities
+- When I end the selection, it just deletes the Rect
+- When I copy an area

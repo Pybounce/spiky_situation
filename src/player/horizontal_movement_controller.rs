@@ -1,6 +1,6 @@
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
 use crate::{ground::Grounded, wall::TouchingWall};
 
@@ -17,7 +17,7 @@ pub struct GroundedHorizontalMovementController {
 
 
 pub fn move_ground_horizontal_controller(
-    mut query: Query<(&mut Velocity, &GroundedHorizontalMovementController), With<Grounded>>,
+    mut query: Query<(&mut LinearVelocity, &GroundedHorizontalMovementController), With<Grounded>>,
     input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>
 ) {
@@ -31,17 +31,17 @@ pub fn move_ground_horizontal_controller(
             change -= con.acceleration * time.delta_secs();
         }
 
-        vel.linvel.x += change;
+        vel.0.x += change;
 
-        if vel.linvel.x.abs() > con.max_speed {
+        if vel.0.x.abs() > con.max_speed {
            // vel.linvel.x -= 0.4 * (vel.linvel.x.abs() - con.max_speed.abs()).powi(2) * vel.linvel.x.signum() * time.delta_seconds();
            let friction = change.abs();
-           let diff = vel.linvel.x.abs() - con.max_speed;
-           vel.linvel.x -= vel.linvel.x.signum() * diff.abs().min(friction);
+           let diff = vel.0.x.abs() - con.max_speed;
+           vel.0.x -= vel.0.x.signum() * diff.abs().min(friction);
         } 
         if change.abs() < 0.01 {
             let friction = con.deceleration * time.delta_secs();
-            vel.linvel.x -= vel.linvel.x.signum() * vel.linvel.x.abs().min(friction);
+            vel.0.x -= vel.0.x.signum() * vel.0.x.abs().min(friction);
         }
     }
 }
@@ -59,7 +59,7 @@ pub struct AirbourneHorizontalMovementController {
 
 
 pub fn move_airbourne_horizontal_controller(
-    mut query: Query<(&mut Velocity, &AirbourneHorizontalMovementController, Option<&WallStuck>), Without<Grounded>>,    //todo: need an airbourne state, right now there are seaprate states for jumping
+    mut query: Query<(&mut LinearVelocity, &AirbourneHorizontalMovementController, Option<&WallStuck>), Without<Grounded>>,    //todo: need an airbourne state, right now there are seaprate states for jumping
     input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>
 ) {
@@ -86,17 +86,17 @@ pub fn move_airbourne_horizontal_controller(
             };
         }
 
-        vel.linvel.x += change;
+        vel.0.x += change;
         
-        if vel.linvel.x.abs() > con.max_speed {
+        if vel.0.x.abs() > con.max_speed {
             //vel.linvel.x -= 0.4 * (vel.linvel.x.abs() - con.max_speed.abs()).powi(2) * vel.linvel.x.signum() * time.delta_seconds();
             let friction = change.abs();
-            let diff = vel.linvel.x.abs() - con.max_speed;
-            vel.linvel.x -= vel.linvel.x.signum() * diff.abs().min(friction);
+            let diff = vel.0.x.abs() - con.max_speed;
+            vel.0.x -= vel.0.x.signum() * diff.abs().min(friction);
         } 
         if change.abs() < 0.01 {
             let friction = con.deceleration * time.delta_secs();
-            vel.linvel.x -= vel.linvel.x.signum() * vel.linvel.x.abs().min(friction);
+            vel.0.x -= vel.0.x.signum() * vel.0.x.abs().min(friction);
         }
 
     }

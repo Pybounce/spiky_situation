@@ -1,7 +1,7 @@
 use bevy::{math::Rect, prelude::{Commands, Component, Entity, Query, Res, With}, time::{Time, Timer, TimerMode}};
-use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group};
+use avian2d::prelude::*;
 
-use crate::{common::animated_sprite::SpriteAnimator, ground::Ground, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer}, ground::Ground, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE}}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -20,7 +20,7 @@ impl IntervalBlockFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, interval_block_asset: &stage_asset::IntervalBlock) {
         
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, interval_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, CollisionGroups::new(Group::GROUP_1, Group::ALL)),
+            PhysicalTileBundle::new(stage_creator, interval_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             IntervalBlock {
                 timer: Timer::from_seconds(1.0, TimerMode::Repeating),
                 currently_active: interval_block_asset.is_active
@@ -42,7 +42,7 @@ pub fn tick_interval_blocks(
             interval_block.currently_active = !interval_block.currently_active;
             if interval_block.currently_active {
                 sprite_anim.play_reverse();
-                commands.entity(e).try_insert(Collider::cuboid(TILE_SIZE_HALF, TILE_SIZE_HALF));
+                commands.entity(e).try_insert(Collider::rectangle(TILE_SIZE, TILE_SIZE));
                 commands.entity(e).try_insert(InstantKiller);
             }
             if !interval_block.currently_active {

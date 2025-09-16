@@ -1,6 +1,6 @@
 
 use bevy::{input::mouse::MouseWheel, prelude::*};
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
 use crate::{local_player::LocalPlayer, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
 
@@ -22,7 +22,7 @@ pub fn spawn_camera(mut commands: Commands) {
                 area: Default::default(),
             }),
             Transform::default(),
-            Velocity::default(),
+            LinearVelocity::default(),
             RigidBody::Dynamic,
             PixelPerfectTranslation {
                 translation: Vec3::default(),

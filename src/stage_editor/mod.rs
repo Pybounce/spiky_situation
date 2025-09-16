@@ -1,13 +1,14 @@
-use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, prelude::*};
 use controller::EditorController;
 use item_icon::*;
 use renderer::editor_renderer::EditorRenderer;
-use crate::{camera::PixelPerfectTranslation, common::{mouse::MouseData, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage};
+use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage, stage_editor::enums::EditorTool};
 
 mod enums;
 mod controller;
 mod item_icon;
 pub mod renderer;
+mod rail_grid;
 
 pub struct StageEditorPlugin;
 
@@ -20,9 +21,8 @@ impl Plugin for StageEditorPlugin {
         .add_systems(OnExit(AppState::StageEditor), teardown_stage_editor)
         .add_systems(Update, (
             (handle_current_item_change, add_item_icon, move_item_icon, update_ground_atlas_indices),
-            (handle_rotate, handle_placement, handle_grid_object_removals),
-            handle_save,
-            move_camera
+            (handle_rotate, handle_placement, handle_rail_placement, handle_rail_removal, handle_grid_object_removals),
+            handle_save, move_camera, switch_tool
         ).run_if(in_state(StageEditorState::InEdit)));
     }
 }
@@ -111,16 +111,46 @@ pub struct StageEditorLoadDetails {
     pub template_stage_handle: Option<Handle<Stage>>
 }
 
+fn handle_rail_placement(
+    mut editor_con: ResMut<EditorController>,
+    buttons: Res<ButtonInput<MouseButton>>,
+    mouse_data: Res<MouseData>
+) {
+    let cell = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
+
+    if let EditorTool::RailPlacer(current_opt) = editor_con.current_tool {
+        if buttons.just_pressed(MouseButton::Left) && current_opt.is_none() {
+            editor_con.current_tool = EditorTool::RailPlacer(Some(cell));
+        }
+        else if buttons.just_released(MouseButton::Left) && current_opt.is_some() {
+            editor_con.try_place_rail(current_opt.unwrap(), cell);
+            editor_con.current_tool = EditorTool::RailPlacer(None);
+        }
+    }
+}
+
+fn handle_rail_removal(
+    mut editor_con: ResMut<EditorController>,
+    buttons: Res<ButtonInput<MouseButton>>,
+    mouse_data: Res<MouseData>
+) {
+    let cell = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
+
+    if let EditorTool::RailPlacer(_) = editor_con.current_tool {
+        if buttons.pressed(MouseButton::Right) {
+            editor_con.try_remove_rail(cell);
+        }
+    }
+}
+
 fn handle_placement(
     buttons: Res<ButtonInput<MouseButton>>,
     mut editor_con: ResMut<EditorController>,
     mouse_data: Res<MouseData>
 ) {
-    if buttons.just_pressed(MouseButton::Left) {
+    if buttons.pressed(MouseButton::Left) && editor_con.current_tool == EditorTool::Brush {
         let mouse_pos = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
-        if editor_con.try_place(mouse_pos) {
-
-        }
+        let _ = editor_con.try_place(mouse_pos);
     }
 }
 
@@ -129,9 +159,9 @@ fn handle_grid_object_removals(
     mut editor_con: ResMut<EditorController>,
     mouse_data: Res<MouseData>
 ) {
-    if buttons.just_pressed(MouseButton::Right) {
+    if buttons.pressed(MouseButton::Right) && editor_con.current_tool == EditorTool::Brush {
         let mouse_pos = editor_con.world_to_grid_pos(mouse_data.world_position.extend(0.0));
-        editor_con.try_remove(mouse_pos);
+        let _ = editor_con.try_remove(mouse_pos);
     }
 }
 
@@ -153,32 +183,40 @@ fn handle_rotate(
     }
 }
 
-//TODO: Potentially move to moving the cam via clicking mouse3
 fn move_camera(
     mut query: Query<&mut PixelPerfectTranslation, With<Camera>>,
-    mouse_data: Res<MouseData>,
-    time: Res<Time>
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
+    mut mouse_motion_events: EventReader<WorldMouseMotion>,
 ) {
-    const CAMERA_MOVE_DEADZONE: f32 = 0.1;
-    const CAMERA_MOVE_SPEED: f32 = 64.0;
-
-    let mut direction = Vec3::ZERO;    
-    if mouse_data.window_position_normalised.x >= 1.0 - CAMERA_MOVE_DEADZONE {
-        direction += Vec3::X;
-    }
-    else if mouse_data.window_position_normalised.x <= CAMERA_MOVE_DEADZONE {
-        direction -= Vec3::X;
-    }
-    if mouse_data.window_position_normalised.y <= CAMERA_MOVE_DEADZONE {
-        direction += Vec3::Y;
-    }
-    else if mouse_data.window_position_normalised.y >= 1.0 - CAMERA_MOVE_DEADZONE {
-        direction -= Vec3::Y;
+    if !mouse_button_input.pressed(MouseButton::Middle) { return; }
+    
+    let mut delta = Vec2::ZERO;
+    for event in mouse_motion_events.read() {
+        delta += event.delta * Vec2::new(-1.0, -1.0);
     }
 
     for mut ppt in &mut query {
-        ppt.translation += direction * CAMERA_MOVE_SPEED * time.delta_secs();
+        ppt.translation += delta.extend(0.0);
     }
+}
+
+pub fn switch_tool(
+    mut editor_con: ResMut<EditorController>,
+    input: Res<ButtonInput<KeyCode>>,
+) {
+    if input.just_pressed(KeyCode::Digit1) {
+        editor_con.current_tool = EditorTool::Brush;
+    }
+    else if input.just_pressed(KeyCode::Digit2) {
+        editor_con.current_tool = EditorTool::RailPlacer(None);
+    }
+    else if input.just_pressed(KeyCode::Digit3) {
+        //editor_con.current_tool = EditorTool::MoveAugment(vec![]);
+    }
+    else { return; }
+    println!("Editor Tool: {:?}", editor_con.current_tool);
+    println!("");
+    println!("");
 }
 
 

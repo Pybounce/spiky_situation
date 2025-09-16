@@ -1,8 +1,8 @@
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
-use crate::{ground::Ground, stage::{stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, stage_objects::StageObject}, wall::Wall};
+use crate::{common::physics::layers::GamePhysicsLayer, ground::Ground, stage::{stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, stage_objects::StageObject}, wall::Wall};
 
 
 
@@ -21,8 +21,8 @@ pub struct PhysicalTileBundle {
     pub restitution: Restitution,
     pub friction: Friction,
     pub gravity_scale: GravityScale,
-    pub active_events: ActiveEvents,
-    pub collision_groups: CollisionGroups
+    pub collision_events_enabled: CollisionEventsEnabled,
+    pub collision_layers: CollisionLayers
 }
 
 #[derive(Bundle)]
@@ -54,16 +54,16 @@ impl TileBundle {
 }
 
 impl PhysicalTileBundle {
-    pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect, tile_rotation: f32, image_handle: &Handle<Image>, collision_groups: CollisionGroups) -> Self {
+    pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect, tile_rotation: f32, image_handle: &Handle<Image>, collision_layers: CollisionLayers) -> Self {
         PhysicalTileBundle {
             tile_bundle: TileBundle::new(stage_creator, grid_pos, atlas_rect, tile_rotation, image_handle),
-            rigidbody: RigidBody::Fixed,
-            collider: Collider::cuboid(TILE_SIZE_HALF, TILE_SIZE_HALF),
-            restitution: Restitution::coefficient(0.0),
-            friction: Friction::coefficient(0.0),
+            rigidbody: RigidBody::Static,
+            collider: Collider::rectangle(TILE_SIZE, TILE_SIZE),
+            restitution: Restitution::new(0.0),
+            friction: Friction::new(0.0),
             gravity_scale: GravityScale(0.0),
-            active_events: ActiveEvents::COLLISION_EVENTS,
-            collision_groups
+            collision_events_enabled: CollisionEventsEnabled,
+            collision_layers
         }
     }
 }
@@ -71,7 +71,7 @@ impl PhysicalTileBundle {
 impl GroundTileBundle {
     pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect) -> Self {
         GroundTileBundle {
-            physical_tile_bundle: PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.tilemap, CollisionGroups::new(Group::GROUP_1, Group::ALL)),
+            physical_tile_bundle: PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             ground_marker: Ground,
             wall_marker: Wall,
         }

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
 
 use crate::{common::physics::gravity::Gravity, ground::Grounded, wall::TouchingWall};
 
@@ -29,14 +29,14 @@ pub struct WallJumpController {
 }
 
 pub fn begin_player_wall_jump(
-    mut query: Query<(&mut Gravity, &mut Velocity, &mut JumpController, &TouchingWall, &WallJumpController, &AirbourneHorizontalMovementController), 
+    mut query: Query<(&mut Gravity, &mut LinearVelocity, &mut JumpController, &TouchingWall, &WallJumpController, &AirbourneHorizontalMovementController), 
         (Without<Grounded>, Without<CoyoteGrounded>)>,
     time: Res<Time>,
     input: Res<ButtonInput<KeyCode>>
 ) {
     for (mut g, mut v, mut jc, w, wjc, ahmc) in &mut query {
         if input.just_pressed(jc.key) {
-            v.linvel = match w {
+            v.0 = match w {
                 TouchingWall::Left => {
                     if input.pressed(ahmc.left_key) {
                         wjc.force_out * Vec2::new(-1.0, 1.0)

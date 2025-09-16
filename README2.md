@@ -121,13 +121,21 @@
 
 #### Bugs
 
-- Dashing into a wall forces you into it slightly
 - Dashing when just above ground causes you to hover slightly
   - Since the raycast doesn't then correctly set you (LIKELY WOULD SOLVE THE ABOVE BUG TOO)
 - Saw projectiles break when hitting keys.
   - Probably need to add some more collision layers etc
 - Checkpoints do nothing
   - I changed it so when you die the whole level is rebuilt, so now checkpoints don't do a thing.
+- Intervals blocks don't kill the player
+  - Due to the system ordering and the adding/removing of the InstantKiller component
+  - Recommend just create an insert/remove after x seconds since making it frame perfect is not going well.
+- Interval blocks don't start transparent even when they're suppose to (the variant)
+- Running out lives crashes the game due to a resource not existing
+- SOMETIMES when the player dies they do not respawn
+- Creating a rail that is 2 cells, then linking it's head to it's tail, creates a loop even though it's just a line
+  - Not a huge deal given the workaround is to just delete one cell and connect again but still.
+- Phantom Blocks are not being activated
 
 #### Gamemodes
 

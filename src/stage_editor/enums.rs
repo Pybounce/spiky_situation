@@ -1,3 +1,23 @@
+use bevy::math::IVec2;
+
+#[derive(Default, Copy, Clone, Debug)]
+pub enum EditorValueAugment {
+    #[default]
+    MoveSpeed,
+    Rotation,
+    RotationSpeed,
+    ProjectileFireRate,
+    ProjectileSpeed
+}
+
+#[derive(Default, Clone, Debug, PartialEq)]
+pub enum EditorTool {
+    #[default]
+    Brush,
+    RailPlacer(Option<IVec2>),
+    //ValueAugment(EditorValueAugment),
+    //StageSize,
+}
 
 #[derive(Default, Copy, Clone, Debug)]
 #[repr(u8)]
@@ -242,3 +262,6 @@ impl IntervalBlockVariant {
         }
     }
 }
+
+
+

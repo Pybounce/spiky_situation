@@ -1,6 +1,8 @@
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
+
+use crate::common::physics::avian_ex::ManyCollidingEntities;
 
 
 
@@ -23,14 +25,14 @@ pub struct TriggerEvent {
 }
 
 pub fn trigger_on_touch(
-    colliding_query: Query<&CollidingEntities>,
+    colliding_query: Query<&ManyCollidingEntities>,
     trigger_query: Query<&Trigger, With<TriggerOnTouch>>,
     mut trigger_event_writer: EventWriter<TriggerEvent>
 ) {
     for colliding_entities in &colliding_query {
 
         for colliding_entity in colliding_entities.iter() {
-            if let Ok(trigger) = trigger_query.get(colliding_entity) {
+            if let Ok(trigger) = trigger_query.get(*colliding_entity) {
                 trigger_event_writer.write(TriggerEvent {
                     trigger_id: trigger.trigger_id
                 });

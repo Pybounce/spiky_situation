@@ -1,5 +1,7 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use avian2d::prelude::*;
+
+use crate::common::physics::layers::GamePhysicsLayer;
 
 
 #[derive(Component)]
@@ -17,21 +19,15 @@ pub enum TouchingWall {
 
 pub fn check_touching_wall(
     mut commands: Commands,
-    mut wallable_query: Query<(Entity, &mut Transform, &mut Velocity, Option<&TouchingWall>), With<Wallable>>,
+    mut wallable_query: Query<(Entity, &mut Transform, &mut LinearVelocity, Option<&TouchingWall>), With<Wallable>>,
     _wall_query: Query<(), With<Wall>>,
-    rapier_write_context: WriteRapierContext
+    spatial: SpatialQuery,
 ) {
-    let rapier_context = rapier_write_context.single().unwrap();
     for (entity, mut transform, mut velocity, tw_opt) in &mut wallable_query {
         let mut new_left_collision = false;
         let mut new_right_collision = false;
 
-
-        let filter = QueryFilter::new()
-        .exclude_sensors()
-        .exclude_rigid_body(entity)
-        .groups(CollisionGroups::new(Group::GROUP_1, Group::GROUP_1));
-
+        let spatial_filter = SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground).with_excluded_entities([entity]);
 
 
 
@@ -44,11 +40,11 @@ pub fn check_touching_wall(
         for _ in 0..ray_count {
             ray_pos.y += transform.scale.y / (ray_count + 1) as f32;
 
-            if let Some((_entity, toi)) = rapier_context.cast_ray(ray_pos, Vec2::new(1.0, 0.0), raycast_length + raycast_buffer, solid, filter) {
+            if let Some(hit) = spatial.cast_ray(ray_pos, Dir2::X, raycast_length + raycast_buffer, solid, &spatial_filter) {
                 new_left_collision = true;
-                if toi <= raycast_length {
-                    velocity.linvel.x = velocity.linvel.x.min(0.0);
-                    transform.translation.x -= raycast_length - toi;
+                if hit.distance <= raycast_length {
+                    velocity.0.x = velocity.0.x.min(0.0);
+                    transform.translation.x -= raycast_length - hit.distance;
                     break;
                 }
             }
@@ -58,11 +54,11 @@ pub fn check_touching_wall(
         for _ in 0..ray_count {
             ray_pos.y += transform.scale.y / (ray_count + 1) as f32;
 
-            if let Some((_entity, toi)) = rapier_context.cast_ray(ray_pos, Vec2::new(-1.0, 0.0), raycast_length + raycast_buffer , solid, filter) {
+            if let Some(hit) = spatial.cast_ray(ray_pos, Dir2::NEG_X, raycast_length + raycast_buffer , solid, &spatial_filter) {
                 new_right_collision = true;
-                if toi <= raycast_length {
-                    velocity.linvel.x = velocity.linvel.x.max(0.0);
-                    transform.translation.x += raycast_length - toi;
+                if hit.distance <= raycast_length {
+                    velocity.0.x = velocity.0.x.max(0.0);
+                    transform.translation.x += raycast_length - hit.distance;
                     break;
                 }
             }
