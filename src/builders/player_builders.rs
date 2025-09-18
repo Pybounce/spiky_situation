@@ -1,7 +1,7 @@
 use bevy::{ecs::system::EntityCommands, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{animated_sprite::SpriteAnimator, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::local_player::*;
 
 #[derive(Resource)]
@@ -32,17 +32,23 @@ impl PlayerBuilder {
         ));
     }
     pub fn build_player(entity_commands: &mut EntityCommands, asset_server: &AssetServer, spawn_pos: Vec3) {
-        let atlas: Handle<Image> = asset_server.load("object_tilemap.png");
-        let player_rect = Rect::new(TILE_SIZE * 2.0, TILE_SIZE, TILE_SIZE * 3.0, TILE_SIZE * 2.0);
+        let atlas: Handle<Image> = asset_server.load("player.png");
+        let run_rects = vec![
+            Rect::new(0.0, 0.0, TILE_SIZE, TILE_SIZE),
+            Rect::new(TILE_SIZE, 0.0, TILE_SIZE * 2.0, TILE_SIZE),
+            Rect::new(TILE_SIZE * 2.0, 0.0, TILE_SIZE * 3.0, TILE_SIZE),
+            Rect::new(TILE_SIZE * 3.0, 0.0, TILE_SIZE * 4.0, TILE_SIZE),
+        ];
 
         entity_commands.try_insert(((
             LocalPlayer,
             Sprite {
                 image: atlas,
-                rect: player_rect.into(),
+                rect: run_rects[0].into(),
                 custom_size: Vec2::splat(1.0).into(),
                 ..default()
             },
+            SpriteAnimator::new(100, run_rects),
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(spawn_pos),
             RigidBody::Dynamic,
             SweptCcd::default(),
