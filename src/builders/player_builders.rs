@@ -1,7 +1,7 @@
-use bevy::{ecs::system::EntityCommands, prelude::*};
+use bevy::{ecs::system::EntityCommands, platform::collections::HashMap, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::local_player::*;
 
 #[derive(Resource)]
@@ -40,6 +40,17 @@ impl PlayerBuilder {
             Rect::new(TILE_SIZE * 3.0, 0.0, TILE_SIZE * 4.0, TILE_SIZE),
         ];
 
+        let dance_rects = vec![
+            Rect::new(0.0, TILE_SIZE * 2.0, TILE_SIZE, TILE_SIZE * 3.0),
+            Rect::new(TILE_SIZE, TILE_SIZE * 2.0, TILE_SIZE * 2.0, TILE_SIZE * 3.0),
+            Rect::new(TILE_SIZE * 2.0, TILE_SIZE * 2.0, TILE_SIZE * 3.0, TILE_SIZE * 3.0),
+            Rect::new(TILE_SIZE * 3.0, TILE_SIZE * 2.0, TILE_SIZE * 4.0, TILE_SIZE * 3.0),
+        ];
+
+        let mut state_animations = HashMap::<AnimationState, Vec<Rect>>::new();
+        state_animations.insert(AnimationState(PlayerAnimationState::Running as u32), run_rects.clone());
+        state_animations.insert(AnimationState(PlayerAnimationState::Idle as u32), dance_rects.clone());
+
         entity_commands.try_insert(((
             LocalPlayer,
             Sprite {
@@ -48,7 +59,9 @@ impl PlayerBuilder {
                 custom_size: Vec2::splat(1.0).into(),
                 ..default()
             },
-            SpriteAnimator::new(100, run_rects),
+            (SpriteAnimator::new(100, dance_rects),
+            AnimationController::new(state_animations),
+            AnimationState(PlayerAnimationState::Idle as u32)),
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(spawn_pos),
             RigidBody::Dynamic,
             SweptCcd::default(),

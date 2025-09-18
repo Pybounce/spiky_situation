@@ -45,6 +45,13 @@ impl SpriteAnimator {
             reverse: false
         }
     }
+
+    pub fn set_new_rects(&mut self, atlas_rects: Vec<Rect>) {
+        if atlas_rects.len() <= 0 { return; }
+        self.atlas_rects = atlas_rects;
+        self.current_atlas_index = 0;
+    }
+
     pub fn increment_atlas_index(&mut self) {
         if !self.reverse {
             self.current_atlas_index += 1;
