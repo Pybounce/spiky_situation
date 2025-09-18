@@ -47,9 +47,32 @@ impl PlayerBuilder {
             Rect::new(TILE_SIZE * 3.0, TILE_SIZE * 2.0, TILE_SIZE * 4.0, TILE_SIZE * 3.0),
         ];
 
+        let jumping_rects = vec![
+            Rect::new(0.0, TILE_SIZE, TILE_SIZE, TILE_SIZE * 2.0),
+        ];
+        
+        let falling_rects = vec![
+            Rect::new(TILE_SIZE, TILE_SIZE, TILE_SIZE * 2.0, TILE_SIZE * 2.0),
+        ];
+
+        let hovering_rects = vec![
+            Rect::new(TILE_SIZE * 2.0, TILE_SIZE, TILE_SIZE * 3.0, TILE_SIZE * 2.0),
+        ];
+
+        let idle_rects = vec![
+            Rect::new(TILE_SIZE * 0.0, TILE_SIZE * 3.0, TILE_SIZE * 1.0, TILE_SIZE * 4.0),
+            Rect::new(TILE_SIZE * 1.0, TILE_SIZE * 3.0, TILE_SIZE * 2.0, TILE_SIZE * 4.0),
+            Rect::new(TILE_SIZE * 2.0, TILE_SIZE * 3.0, TILE_SIZE * 3.0, TILE_SIZE * 4.0),
+            Rect::new(TILE_SIZE * 3.0, TILE_SIZE * 3.0, TILE_SIZE * 4.0, TILE_SIZE * 4.0),
+            Rect::new(TILE_SIZE * 4.0, TILE_SIZE * 3.0, TILE_SIZE * 5.0, TILE_SIZE * 4.0),
+        ];
+
         let mut state_animations = HashMap::<AnimationState, Vec<Rect>>::new();
         state_animations.insert(AnimationState(PlayerAnimationState::Running as u32), run_rects.clone());
-        state_animations.insert(AnimationState(PlayerAnimationState::Idle as u32), dance_rects.clone());
+        state_animations.insert(AnimationState(PlayerAnimationState::Idle as u32), idle_rects.clone());
+        state_animations.insert(AnimationState(PlayerAnimationState::Jumping as u32), jumping_rects.clone());
+        state_animations.insert(AnimationState(PlayerAnimationState::Falling as u32), falling_rects.clone());
+        state_animations.insert(AnimationState(PlayerAnimationState::Hovering as u32), hovering_rects.clone());
 
         entity_commands.try_insert(((
             LocalPlayer,
@@ -59,7 +82,7 @@ impl PlayerBuilder {
                 custom_size: Vec2::splat(1.0).into(),
                 ..default()
             },
-            (SpriteAnimator::new(100, dance_rects),
+            (SpriteAnimator::new(100, idle_rects),
             AnimationController::new(state_animations),
             AnimationState(PlayerAnimationState::Idle as u32)),
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(spawn_pos),
