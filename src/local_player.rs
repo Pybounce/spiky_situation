@@ -1,7 +1,7 @@
 
 use bevy::prelude::*;
 
-use crate::{player::look_state::PlayerLookState, stage::stage_builder::stage_creator::TILE_SIZE};
+use crate::{ground::Grounded, player::look_state::PlayerLookState, stage::stage_builder::stage_creator::TILE_SIZE, wall::TouchingWall};
 
 pub const FORCE_MUL: f32 = TILE_SIZE / 16.0;
 
@@ -33,14 +33,23 @@ pub struct LocalPlayer;
 
 
 pub fn update_player_look_direction(
-    mut query: Query<(&PlayerLookState, &mut Sprite)>,
+    mut query: Query<(&PlayerLookState, &mut Sprite, Option<&TouchingWall>, Option<&Grounded>)>,
 ) {
     
-    for (ls, mut s) in &mut query {
+    for (ls, mut s, wall_opt, grounded_opt) in &mut query {
         match ls {
             PlayerLookState::LookingLeft => s.flip_x = true,
             PlayerLookState::LookingRight => s.flip_x = false,
         }
+        if grounded_opt.is_none() {
+            if let Some(wall) = wall_opt {
+                match wall {
+                    TouchingWall::Left => s.flip_x = true,
+                    TouchingWall::Right => s.flip_x = false,
+                }
+            }
+        }
+
     }
 }
 

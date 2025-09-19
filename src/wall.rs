@@ -32,7 +32,7 @@ pub fn check_touching_wall(
 
 
         let raycast_buffer = 2.0;
-        let raycast_length = transform.scale.y / 2.0;
+        let raycast_length = transform.scale.y / 2.0 * 0.75;
         let solid = false;
         let ray_count = 3;
 

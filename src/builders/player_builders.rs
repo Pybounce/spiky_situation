@@ -67,12 +67,17 @@ impl PlayerBuilder {
             Rect::new(TILE_SIZE * 4.0, TILE_SIZE * 3.0, TILE_SIZE * 5.0, TILE_SIZE * 4.0),
         ];
 
+        let wall_grab_rects = vec![
+            Rect::new(0.0, TILE_SIZE * 4.0, TILE_SIZE, TILE_SIZE * 5.0),
+        ];
+
         let mut state_animations = HashMap::<AnimationState, Vec<Rect>>::new();
         state_animations.insert(AnimationState(PlayerAnimationState::Running as u32), run_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::Idle as u32), idle_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::Jumping as u32), jumping_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::Falling as u32), falling_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::Hovering as u32), hovering_rects.clone());
+        state_animations.insert(AnimationState(PlayerAnimationState::OnWall as u32), wall_grab_rects.clone());
 
         entity_commands.try_insert(((
             LocalPlayer,
@@ -88,7 +93,7 @@ impl PlayerBuilder {
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(spawn_pos),
             RigidBody::Dynamic,
             SweptCcd::default(),
-            Collider::circle(0.35),
+            Collider::circle(0.3),
             LinearVelocity(Vec2::ZERO),
             Gravity {
                 max_force: PLAYER_MAX_GRAVITY,
