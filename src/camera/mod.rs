@@ -22,8 +22,8 @@ pub fn spawn_camera(mut commands: Commands) {
                 area: Default::default(),
             }),
             Transform::default(),
-            LinearVelocity::default(),
-            RigidBody::Dynamic,
+            //LinearVelocity::default(),
+            //RigidBody::Dynamic,
             PixelPerfectTranslation {
                 translation: Vec3::default(),
                 factor: CAMERA_ZOOM as u32
@@ -56,7 +56,8 @@ pub fn move_camera(
             let speed = distance.powf(1.1) * 2.5;
             let dir = (pt.translation - ct.translation).truncate().normalize_or_zero();
 
-            let delta = time.delta_secs() * speed * dir;
+            let delta = (time.delta_secs() * speed).min(distance) * dir;
+            
             ct.translation += delta.extend(0.0);
         }
         Err(_) => (),

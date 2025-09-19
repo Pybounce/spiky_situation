@@ -80,16 +80,16 @@ fn main() {
         .add_event::<WorldMouseMotion>()
         .init_resource::<SaveDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
-        .add_systems(FixedPreUpdate, apply_physics_controller_limits)
-        .add_systems(FixedPreUpdate, (handle_zoom_change, move_camera))
+        .add_systems(FixedUpdate, apply_physics_controller_limits)
+        .add_systems(Update, (handle_zoom_change, move_camera, move_pixel_perfect_translations).chain())
         .add_systems(Update, (add_wall_stuck, update_wall_stuck, remove_wall_stuck))
-        .add_systems(Update, (check_touching_wall, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, shake, check_insta_kill_collisions, spawn_local_players, check_grounded, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))
+        .add_systems(Update, (shake, spawn_local_players, check_insta_kill_collisions, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))
+        .add_systems(FixedUpdate, (check_grounded, check_touching_wall))
         .add_systems(Update, (update_player_look_direction, simulate_gravity, check_checkpoint_reached, animate_sprites))
-        .add_systems(FixedPreUpdate, move_pixel_perfect_translations)
         .add_systems(Update, (start_dashing, break_fragiles, tick_saw_shooters, move_offset_movers, tick_phantom_block, check_phantom_block_touched, check_touched_by_death, read_lock_block_triggers, trigger_on_touch, check_bouncy_collisions, check_animate_on_touch, update_player_airborn_look_state, update_player_grounded_look_state, update_player_look_direction))
         .add_systems(Update, (stop_interval_block_crush, tick_interval_blocks).chain())
         .add_systems(Update, (refresh_editor_renderer, draw_editor, update_mouse_data))
-        .add_systems(Update, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
+        .add_systems(FixedUpdate, (move_airbourne_horizontal_controller, move_ground_horizontal_controller, apply_dashing).chain())
         .add_systems(Update, spawn_player_corpse)
         .add_event::<ClearSplatsEvent>()
         .add_systems(Startup, init_splat_db)
@@ -105,3 +105,11 @@ fn main() {
         .run();
   
 }
+
+
+// possible fix - just fix the fucking pixel perfect translations
+
+// add a new group of systems
+// pixelPerfectTranslation will grab the current translation right before transform propagation, it will then set the transform to snapped
+// then at the very beginning, it will set the translation back to unsnapped so things can use it
+// this way all the systems are acting on an unsnapped transform, and it just gets snapped right before transform propagation
