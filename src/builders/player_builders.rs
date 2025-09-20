@@ -78,6 +78,7 @@ impl PlayerBuilder {
         state_animations.insert(AnimationState(PlayerAnimationState::Falling as u32), falling_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::Hovering as u32), hovering_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::OnWall as u32), wall_grab_rects.clone());
+        state_animations.insert(AnimationState(PlayerAnimationState::Dancing as u32), dance_rects.clone());
 
         entity_commands.try_insert(((
             LocalPlayer,
