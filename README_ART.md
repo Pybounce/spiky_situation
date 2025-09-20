@@ -38,6 +38,20 @@
   - When things push them they move like a chain
   - Saw blades/lasers should cut the vine, destroying the bottom half?
 
+**General Environment**
+
+- Pillars (broken/unbroken)
+- Torches
+  - Back-wall mounted
+  - On a podium
+- Plant pots
+  - Hanging from ceiling using chains
+  - On the floor
+  - On a podium of sorts
+- Vines
+  - Hanging down
+  - Looping down and back up (ie 2 connection points on the ceiling)
+
 **Player Animations**
 
 - [x] Jump
