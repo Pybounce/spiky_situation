@@ -62,3 +62,7 @@
 - [ ] Spring flip?
   - Just does a flip when bouncing off a spring, once flip is done, if still in air, do normal jump
 - [ ] Do I add a slide??
+
+**Ideas**
+
+- Have the saw shooters fire fireballs instead. Since then I can do stuff with lighting
