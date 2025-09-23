@@ -25,8 +25,11 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     var c = textureSample(screen_texture, texture_sampler, in.uv);
     let x = u32(real_world_pos.x) + 8;
     let y = u32(real_world_pos.y) + 8;
-    let l = lighting_output[x + (y * 1600)];
 
-    c += (abs(l - 1.0) * 0.1);
+    let l = lighting_output[x + (y * 1600)];
+    let ambient = 0.05;
+
+    c *= (l + ambient);
+    c.a = 1.0;
     return c;
 }
