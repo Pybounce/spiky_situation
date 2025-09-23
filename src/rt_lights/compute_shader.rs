@@ -75,7 +75,7 @@ pub fn write_occluder_buffer(
 
     if input.just_pressed(KeyCode::KeyL) {
         mask.0.fill(0);
-        
+
         for t in query.iter() {
             let gx = t.translation.x as i32;
             let gy = t.translation.y as i32;
@@ -83,13 +83,14 @@ pub fn write_occluder_buffer(
                 for x in 0..16 {
                     let px = gx + x;
                     let py = gy + y;
+
                     if px >= 0 && px < 1600 && py >= 0 && py < 1600 {
                         mask.0[(py as usize) * 1600 + (px as usize)] = 1;
                     }
                 }
             }
         }
-    
+
         worker.write_slice("occluder_mask", &mask.0);
     }
 

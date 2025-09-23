@@ -49,3 +49,6 @@ _Better Data Input_
   - Could split Dynamic and Static Occluders such that static ones go in the grid buffer, but dynamic ones go in a separate, far smaller buffer
     - This smaller buffer could just contain OccluderRect(w, h, x, y) and therefore raytracing will be less performant but updating the buffer is fast
   - Good idea to check if I can update parts of the buffer at a time and if so maybe can just keep them all in one not sure
+- [ ] Baked and Dynamic
+  - For the most part, the lighting won't change
+  - Therefore you could just bake the nice raytraced light with static occluders, and then add simple lighting for dynamic ones
