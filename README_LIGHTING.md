@@ -42,3 +42,10 @@ _Better Data Input_
   - Yes it sends less but realistically we will only be sending diffs
   - So still less but not nearly as bad as it was.
   - Also harder to tell if the grid pos a ray is on is a wall since it's not indexed via the buffer
+
+**RTL Optimisations**
+
+- [ ] Occlusion Diffs
+  - Could split Dynamic and Static Occluders such that static ones go in the grid buffer, but dynamic ones go in a separate, far smaller buffer
+    - This smaller buffer could just contain OccluderRect(w, h, x, y) and therefore raytracing will be less performant but updating the buffer is fast
+  - Good idea to check if I can update parts of the buffer at a time and if so maybe can just keep them all in one not sure

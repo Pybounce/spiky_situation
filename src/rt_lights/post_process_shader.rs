@@ -11,11 +11,15 @@ use bevy::{
         }, render_graph::{
             NodeRunError, RenderGraphApp, RenderGraphContext, RenderLabel, ViewNode, ViewNodeRunner,
         }, render_resource::{
-            binding_types::{sampler, texture_2d, uniform_buffer},
+            binding_types::{sampler, storage_buffer, texture_2d, uniform_buffer},
             *,
         }, renderer::{RenderContext, RenderDevice}, view::ViewTarget, RenderApp
     }, ui::graph::NodeUi,
 };
+
+use bevy_app_compute::prelude::AppComputeWorker;
+
+use crate::rt_lights::compute_shader::{RTLComputeWorker, SharedRTLOutputBuffer};
 
 const SHADER_ASSET_PATH: &str = "shaders/rtl/rtl_post_process.wgsl";
 
@@ -145,6 +149,10 @@ impl ViewNode for PostProcessNode {
             return Ok(());
         };
 
+        let light_output_buffer = world
+            .get_resource::<SharedRTLOutputBuffer>()
+            .expect("RTL compute worker missing in RenderWorld");
+
         // This will start a new "post process write", obtaining two texture
         // views from the view target - a `source` and a `destination`.
         // `source` is the "current" main texture and you _must_ write into
@@ -172,6 +180,7 @@ impl ViewNode for PostProcessNode {
                 &post_process_pipeline.sampler,
                 // Set the settings binding
                 settings_binding.clone(),
+                light_output_buffer.0.as_entire_binding()
             )),
         );
 
@@ -228,6 +237,7 @@ impl FromWorld for PostProcessPipeline {
                     sampler(SamplerBindingType::Filtering),
                     // The settings uniform that will control the effect
                     uniform_buffer::<RTLPostProcessSettings>(true),
+                    storage_buffer::<f32>(false)
                 ),
             ),
         );

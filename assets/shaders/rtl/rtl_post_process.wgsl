@@ -7,10 +7,16 @@ struct PostProcessSettings {
 }
 @group(0) @binding(2) var<uniform> settings: PostProcessSettings;
 
+@group(0) @binding(3)
+var<storage, read_write> lighting_output: array<f32>;
+
 @fragment
 fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
 
     var c = textureSample(screen_texture, texture_sampler, in.uv);
-    c.x = 1.0;
+    if in.uv.x <= 0.25 {
+        let l = lighting_output[u32(1600.0 * in.uv.x * 4.0) + u32(1600.0 * 1600.0 * in.uv.y)];
+        c = c * l;
+    }
     return c;
 }
