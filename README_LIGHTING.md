@@ -33,3 +33,12 @@
 - Could then not raytrace lights that are too far
 - Could then also only update the part of the texture that the screen covers
 - To be clear, we would still be raytracing using all occluders outside of screenspace
+
+_Better Data Input_
+
+- Instead of sending over buffers full of each pixel and if it's ground, just send over SDFs and grid pos
+- Then we're still writing to a large texture for light data, but the input data/texture is very simple
+- _Is this actually better?_
+  - Yes it sends less but realistically we will only be sending diffs
+  - So still less but not nearly as bad as it was.
+  - Also harder to tell if the grid pos a ray is on is a wall since it's not indexed via the buffer

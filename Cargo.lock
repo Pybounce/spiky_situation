@@ -412,6 +412,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_app_compute"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a41aa46b6ccb4e2fd9db1cbc02d994dd2c5f4365723f622dbb16a393e84af419"
+dependencies = [
+ "bevy",
+ "bytemuck",
+ "futures-lite",
+ "naga",
+ "naga_oil",
+ "parking_lot",
+ "thiserror 2.0.12",
+ "tracing",
+ "wgpu",
+]
+
+[[package]]
 name = "bevy_asset"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2210,6 +2227,7 @@ version = "0.1.0"
 dependencies = [
  "avian2d",
  "bevy",
+ "bevy_app_compute",
  "bincode",
  "directories",
  "rand",
