@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::{death::DeathMarker, physics::layers::GamePhysicsLayer, triggers::{TriggerEvent, Triggerable}}, stage::stage_builder::{stage_asset::{self}, stage_creator::StageCreator}};
+use crate::{common::{death::DeathMarker, physics::layers::GamePhysicsLayer, triggers::{TriggerEvent, Triggerable}}, ground::Ground, stage::stage_builder::{stage_asset::{self}, stage_creator::StageCreator}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -20,7 +20,8 @@ impl LockBlockFactory {
             LockBlock,
             Triggerable {
                 trigger_id: lock_block_asset.trigger_id
-            }
+            },
+            Ground
         ));
     }
 }

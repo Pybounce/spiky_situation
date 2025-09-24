@@ -29,7 +29,7 @@ pub(crate) struct RTLComputeWorker;
 impl ComputeWorker for RTLComputeWorker {
     fn build(world: &mut World) -> AppComputeWorker<Self> {
         let light_count = 1;
-        let rays_per_light = 720;
+        let rays_per_light = 360;
         let total_rays = light_count * rays_per_light;
         let workgroup_size = 64;
         let workgroup_count = (total_rays + workgroup_size - 1) / workgroup_size;
@@ -37,7 +37,7 @@ impl ComputeWorker for RTLComputeWorker {
 
         let worker = AppComputeWorkerBuilder::new(world)
             .add_uniform("uni", &5.0)
-            .add_storage("lighting_output", &[0f32; 1600*1600])
+            .add_storage("lighting_output", &[0u32; 1600*1600])
             .add_storage("occluder_mask", &[0u32; 1600*1600])
             .add_pass::<RTLResetShader>([100, 100, 1], &["uni", "lighting_output"])
             .add_pass::<RTLComputeShader>([workgroup_count, 1, 1], &["uni", "lighting_output", "occluder_mask"])

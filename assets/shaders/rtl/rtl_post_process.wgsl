@@ -9,7 +9,7 @@ struct PostProcessSettings {
 @group(0) @binding(2) var<uniform> settings: PostProcessSettings;
 
 @group(0) @binding(3)
-var<storage, read_write> lighting_output: array<f32>;
+var<storage, read_write> lighting_output: array<u32>;
 
 @group(0) @binding(4) var<uniform> view: View;
 
@@ -26,10 +26,41 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let x = u32(real_world_pos.x) + 8;
     let y = u32(real_world_pos.y) + 8;
 
-    let l = lighting_output[x + (y * 1600)];
+    let l = get_gaussian_blur_3x3(x, y) / 100.0;
     let ambient = 0.05;
 
-    c *= (l + ambient);
+    c *= vec4f(1.0, 230.0/255.0, 205.0/255.0, 1.0) * min(1.0, l + ambient);
     c.a = 1.0;
     return c;
+}
+
+
+fn get_gaussian_blur_3x3(x: u32, y: u32) -> f32 {
+    let width: u32 = 1600u;
+
+    let x0 = max(x - 1u, 0u);
+    let x1 = x;
+    let x2 = min(x + 1u, width - 1u);
+
+    let y0 = max(y - 1u, 0u);
+    let y1 = y;
+    let y2 = min(y + 1u, width - 1u);
+
+    let p00 = f32(lighting_output[x0 + y0 * width]);
+    let p01 = f32(lighting_output[x1 + y0 * width]);
+    let p02 = f32(lighting_output[x2 + y0 * width]);
+
+    let p10 = f32(lighting_output[x0 + y1 * width]);
+    let p11 = f32(lighting_output[x1 + y1 * width]);
+    let p12 = f32(lighting_output[x2 + y1 * width]);
+
+    let p20 = f32(lighting_output[x0 + y2 * width]);
+    let p21 = f32(lighting_output[x1 + y2 * width]);
+    let p22 = f32(lighting_output[x2 + y2 * width]);
+
+    let sum = p00 * 1.0 + p01 * 2.0 + p02 * 1.0 +
+              p10 * 2.0 + p11 * 4.0 + p12 * 2.0 +
+              p20 * 1.0 + p21 * 2.0 + p22 * 1.0;
+
+    return sum / 16.0;
 }
