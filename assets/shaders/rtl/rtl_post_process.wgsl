@@ -26,7 +26,7 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let x = u32(real_world_pos.x) + 8;
     let y = u32(real_world_pos.y) + 8;
 
-    let l = get_gaussian_blur_3x3(x, y) / 100.0;
+    let l = get_gaussian_blur_11x11(x, y) / 100.0;
     let ambient = 0.05;
 
     c *= vec4f(1.0, 230.0/255.0, 205.0/255.0, 1.0) * min(1.0, l + ambient);

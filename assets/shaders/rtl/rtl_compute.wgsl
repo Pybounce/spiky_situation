@@ -33,7 +33,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     var dist = 0.0;
     while dist < 500.0 {
 
-        let lightmap_idx = u32(cur_pos.x) + (1600 * u32(cur_pos.y));
+        let lightmap_idx = pos_to_light_idx(cur_pos);
 
         if occluder_mask[lightmap_idx] > 0 {
             if last_was_occ { return; }
@@ -51,71 +51,49 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         }
         else { last_was_occ = false; }
         
-        //let falloff = 1.0 / (1.0 + dist * dist * 0.1);
-        //let falloff = 1.0 / (1.0 + dist * dist * 0.001);
         let falloff = exp(-dist * 0.015);
         lighting_output[lightmap_idx] += u32(intensity * 100.0 * falloff);
-
-
-
-        last_pos = vec2<i32>(i32(cur_pos.x), i32(cur_pos.y));
-
-        cur_pos += ray_dir;
-        //intensity *= step_falloff;
-        //intensity -= 0.001;
-        dist += length(ray_dir);
-    }
-
-
-
-    //let lightmap_idx = gid.x + (1600 * gid.y);
-    //let light_pos = vec2f(200.0, 80.0);
-    //let pos = vec2f(f32(gid.x), f32(gid.y));
-    //let dist = length(light_pos - pos);
-    //let intensity = smoothstep(64.0, 0.0, dist);
-    //lighting_output[lightmap_idx] = intensity;
-}
-
-fn spawn_ray(in_intensity: f32, in_cur_pos: vec2<i32>, in_step_falloff: f32, in_ray_dir: vec2f, in_dist: f32) {
-    var ray_dir = in_ray_dir;
-    var cur_pos = vec2f(f32(in_cur_pos.x), f32(in_cur_pos.y));
-    var intensity = in_intensity;
-    var step_falloff = in_step_falloff;
-
-    var last_pos = vec2<i32>(0, 0);
-    var last_was_occ = false;
-    var dist = 0.0;
-    while dist < 300.0 {
-
-        let lightmap_idx = u32(cur_pos.x) + (1600 * u32(cur_pos.y));
-
-        if occluder_mask[lightmap_idx] > 0 {
-            if last_was_occ { return; }
-            else { last_was_occ = true; }
-            if abs(i32(cur_pos.x) - last_pos.x) == 1 {
-                ray_dir.x = -ray_dir.x;
-            } else if abs(i32(cur_pos.y) - last_pos.y) == 1 {
-                ray_dir.y = -ray_dir.y;
-            }
-            else {
-                return;
-            }
-        }
-        else { last_was_occ = false; }
         
-        let falloff = exp(-dist * 0.02);
-        for (var dx = -1; dx <= 1; dx++) {
-            for (var dy = -1; dy <= 1; dy++) {
-                let idx = (i32(cur_pos.x) + dx) + (i32(cur_pos.y) + dy) * 1600;
-                lighting_output[idx] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff);
+    //
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff);
 
-            }
-        }
+
         last_pos = vec2<i32>(i32(cur_pos.x), i32(cur_pos.y));
 
         cur_pos += ray_dir;
-        //intensity *= step_falloff;
-        //intensity -= 0.001;
         dist += length(ray_dir);
     }
+
+
 }
+
+fn pos_to_light_idx(pos: vec2f) -> u32 {
+    return u32(pos.x) + (1600 * u32(pos.y));
+}
+
+
+
+// OK NEXT UP
+//
+// Multiple Blur Passes! :D
+//      Look up how guassian blur really works
+//      Look up working groups memory
+//      See if adding multiple blur passes helps smooth out the lighting
+//          It might end up that a large kernal blur (ie 11x11) is better than multiple 5x5 blurs but will need to find out
+//
+// Implement ray spawn bounces
+//      Probably have a ray buffer that contains queued rays
+//      Not sure if I should be, in the initial pass, filling it and then have 2 passes going through it, could work.
+//      So that initial one would have the amount of invocations as there are lights? Or maybe I keep it exactly how it is and each thread just writes a ray to the buffer
+//      Then we have a new raymarch pass where rays are taken from the buffer and processed
+//          When one of these rays in the first pass hits an occluder, it adds another N rays to the buffer in the allocated slots
+//          Will need to create the buffer and index mapper based on (MAX_LIGHTS * RAYS_PER_LIGHT) + (MAX_LIGHTS * RAYS_PER_LIGHT * RAYS_PER_BOUNCE) ^ BOUNCE_COUNT
+//              Since this is a large buffer, the struct should be optimised, very.
+//          When a ray is done, it should mark itself as finished in the buffer.
