@@ -22,14 +22,13 @@ impl ComputeShader for RTLResetShader {
     }
 }
 
-
 #[derive(Resource)]
 pub(crate) struct RTLComputeWorker;
 
 impl ComputeWorker for RTLComputeWorker {
     fn build(world: &mut World) -> AppComputeWorker<Self> {
         let light_count = 1;
-        let rays_per_light = 360;
+        let rays_per_light = 320;
         let total_rays = light_count * rays_per_light;
         let workgroup_size = 64;
         let workgroup_count = (total_rays + workgroup_size - 1) / workgroup_size;

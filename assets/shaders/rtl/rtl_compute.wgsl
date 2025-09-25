@@ -15,7 +15,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     let _o = occluder_mask[0];
     let _l = lighting_output[0];
 
-    let ray_count = u32(360);
+    let ray_count = u32(320);
 
     let light_idx = gid.x / ray_count;
     let ray_idx = gid.x % ray_count;
@@ -24,7 +24,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     var ray_dir = vec2f(cos(ray_angle), sin(ray_angle));
 
     var cur_pos = vec2f(200.0, 120.0);
-    var intensity = 0.9;
+    var intensity = 1.0;
     var step_falloff = 0.997;
 
     var last_pos = vec2<i32>(0, 0);
@@ -38,7 +38,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         if occluder_mask[lightmap_idx] > 0 {
             if last_was_occ { return; }
             else { last_was_occ = true; }
-
+            intensity *= 0.7;
             if abs(i32(cur_pos.x) - last_pos.x) == 1 {
                 ray_dir.x = -ray_dir.x;
             }
@@ -51,18 +51,18 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         }
         else { last_was_occ = false; }
         
-        let falloff = exp(-dist * 0.015);
+        let falloff = exp(-dist * 0.01);
         lighting_output[lightmap_idx] += u32(intensity * 100.0 * falloff);
         
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff);
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff);
-    //
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff);
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff);
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.5);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.5);
+    ////
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
+        //lighting_output[pos_to_light_idx(cur_pos + vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
+        //lighting_output[pos_to_light_idx(cur_pos - vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
 
 
         last_pos = vec2<i32>(i32(cur_pos.x), i32(cur_pos.y));
