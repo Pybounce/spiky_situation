@@ -18,7 +18,7 @@ impl GoalFactory {
             PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::StageObject, LayerMask::ALL)),
             StageGoal,
             PointLight {
-                intensity: 1.0,
+                intensity: 255,
                 colour: Color::srgb_u8(0, 255, 255),
             }
         ));

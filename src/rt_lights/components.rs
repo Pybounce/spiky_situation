@@ -13,6 +13,6 @@ use bevy::prelude::*;
 
 #[derive(Component, Default, Clone, Copy)]
 pub struct PointLight {
-    pub intensity: f32,
+    pub intensity: u8,
     pub colour: Color
 }

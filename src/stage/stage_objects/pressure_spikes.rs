@@ -38,8 +38,8 @@ impl PressureSpikeBuilder {
                 translation_offset: Vec2::new(0.0, -(TILE_SIZE_HALF * 0.6)),
             },
             PointLight {
-                intensity: 1.0,
-                colour: Color::WHITE,
+                intensity: 255,
+                colour: Color::srgb_u8(255, 190, 90),
             },
             children![(
                 Transform::from_translation(Vec3::new(0.0, -TILE_SIZE_HALF * 0.6, 0.0)),

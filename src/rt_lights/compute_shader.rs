@@ -3,7 +3,7 @@ use bevy::{prelude::*, render::{render_resource::Buffer, Extract}};
 use bevy_app_compute::prelude::*;
 use bytemuck::{Pod, Zeroable};
 
-use crate::{ground::Ground, rt_lights::components::PointLight};
+use crate::{ground::Ground, rt_lights::components::PointLight, stage::stage_objects::pressure_spikes::PressureSpike};
 
 const MAX_LIGHTS: u32 = 30;
 
@@ -27,10 +27,26 @@ impl ComputeShader for RTLResetShader {
 #[repr(C)]
 #[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
 pub struct RTPointLight {
-    pub colour: Vec4,
     pub pos: Vec2,
-    pub intensity: f32,
+    pub packed_light: u32,
     pub _pad: u32
+}
+
+impl RTPointLight {
+    pub fn new(pos: Vec2, colour: Color, intensity: u8) -> Self {
+        let [r, g, b] = colour.to_linear().to_u8_array_no_alpha();
+        let mut packed_light: u32 = 0;
+        packed_light |= (r as u32) << 24;
+        packed_light |= (g as u32) << 16;
+        packed_light |= (b as u32) << 8;
+        packed_light |= intensity as u32;
+        
+        return Self {
+            packed_light,
+            pos,
+            _pad: 0,
+        };
+    }
 }
 
 #[derive(Resource)]
@@ -122,13 +138,7 @@ pub(crate) fn update_rt_lights(
     let mut lights: Vec<RTPointLight> = vec![];
 
     for (transform, light) in query {
-        lights.push(RTPointLight {
-            intensity: light.intensity,
-            colour: light.colour.to_linear().to_vec4(),
-            pos: transform.translation.truncate(),
-            _pad: 0
-        });
-
+        lights.push(RTPointLight::new(transform.translation.truncate(), light.colour, light.intensity));
         current_count += 1;
         if current_count >= MAX_LIGHTS {
             break;
@@ -138,3 +148,5 @@ pub(crate) fn update_rt_lights(
     worker.write_slice("lights", &lights);
     worker.write("light_count", &current_count);
 }
+
+
