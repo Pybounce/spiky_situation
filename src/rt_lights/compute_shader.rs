@@ -1,9 +1,11 @@
 
 use bevy::{prelude::*, render::{render_resource::Buffer, Extract}};
 use bevy_app_compute::prelude::*;
+use bytemuck::{Pod, Zeroable};
 
-use crate::ground::Ground;
+use crate::{ground::Ground, rt_lights::components::PointLight};
 
+const MAX_LIGHTS: u32 = 30;
 
 #[derive(TypePath)]
 struct RTLComputeShader;
@@ -22,24 +24,34 @@ impl ComputeShader for RTLResetShader {
     }
 }
 
+#[repr(C)]
+#[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
+pub struct RTPointLight {
+    pub colour: Vec4,
+    pub pos: Vec2,
+    pub intensity: f32,
+    pub _pad: u32
+}
+
 #[derive(Resource)]
 pub(crate) struct RTLComputeWorker;
 
 impl ComputeWorker for RTLComputeWorker {
     fn build(world: &mut World) -> AppComputeWorker<Self> {
-        let light_count = 1;
+
+
         let rays_per_light = 320;
-        let total_rays = light_count * rays_per_light;
-        let workgroup_size = 64;
-        let workgroup_count = (total_rays + workgroup_size - 1) / workgroup_size;
+        let ray_workgroup_size = 64;
+        let ray_workgroup_count = (rays_per_light + ray_workgroup_size - 1) / ray_workgroup_size;
         
 
         let worker = AppComputeWorkerBuilder::new(world)
-            .add_uniform("uni", &5.0)
             .add_storage("lighting_output", &[0u32; 1600*1600])
             .add_storage("occluder_mask", &[0u32; 1600*1600])
-            .add_pass::<RTLResetShader>([100, 100, 1], &["uni", "lighting_output"])
-            .add_pass::<RTLComputeShader>([workgroup_count, 1, 1], &["uni", "lighting_output", "occluder_mask"])
+            .add_storage("lights", &[RTPointLight::default(); MAX_LIGHTS as usize])
+            .add_uniform("light_count", &0)
+            .add_pass::<RTLResetShader>([100, 100, 1], &["lighting_output"])
+            .add_pass::<RTLComputeShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "lighting_output", "occluder_mask"])
             .build();
 
             worker
@@ -60,14 +72,7 @@ pub(crate) fn extract_lighting_out_buffer(
     
 }
 
-//pub enum LightOccluder {
-//    Box(f32, f32)
-//}
-//
-//pub struct PointLight {
-//    pub intensity: f32,
-//    pub colour: Color
-//}
+
 
 #[derive(Resource)]
 pub(crate) struct OccluderMask(pub Vec<u32>);
@@ -79,7 +84,7 @@ pub fn init_occluder_mask(
 }
 
 /// TODO: Can have an UpdateEvent or I guess just track change diffs myself for this. (will need updates on occluder layout change whether that's mid level from dynamic ones or on new level loaded)
-pub fn write_occluder_buffer(
+pub(crate) fn write_occluder_buffer(
     query: Query<&Transform, With<Ground>>,
     mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
     mut mask: ResMut<OccluderMask>,
@@ -107,6 +112,29 @@ pub fn write_occluder_buffer(
 
         worker.write_slice("occluder_mask", &mask.0);
     }
+}
 
+pub(crate) fn update_rt_lights(
+    query: Query<(&Transform, &PointLight)>,
+    mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
+) {
+    let mut current_count = 0u32;
+    let mut lights: Vec<RTPointLight> = vec![];
 
+    for (transform, light) in query {
+        lights.push(RTPointLight {
+            intensity: light.intensity,
+            colour: light.colour.to_linear().to_vec4(),
+            pos: transform.translation.truncate(),
+            _pad: 0
+        });
+
+        current_count += 1;
+        if current_count >= MAX_LIGHTS {
+            break;
+        }
+    }
+
+    worker.write_slice("lights", &lights);
+    worker.write("light_count", &current_count);
 }

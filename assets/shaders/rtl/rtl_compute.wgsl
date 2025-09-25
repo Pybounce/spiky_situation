@@ -1,30 +1,44 @@
 
 @group(0) @binding(0)
-var<uniform> uni: f32;
+var<uniform> light_count: u32;
 @group(0) @binding(1)
-var<storage, read_write> lighting_output: array<u32>;
+var<storage, read_write> lights: array<RTPointLight>;
 @group(0) @binding(2)
+var<storage, read_write> lighting_output: array<u32>;
+@group(0) @binding(3)
 var<storage, read> occluder_mask: array<u32>;
+
+
+struct RTPointLight {
+    colour: vec4<f32>,
+    pos: vec2<f32>,
+    intensity: f32,
+    _pad: f32,
+};
 
 
 const PI = 3.14159265359;
 
-@compute @workgroup_size(64)
+@compute @workgroup_size(64, 1)
 fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
-    let _u = uni;
     let _o = occluder_mask[0];
     let _l = lighting_output[0];
 
+    let light_idx = gid.y;
+
+    if light_idx >= light_count { return; }
+
+    var cur_pos = lights[light_idx].pos;
+    var intensity = lights[light_idx].intensity;
+
     let ray_count = u32(320);
 
-    let light_idx = gid.x / ray_count;
     let ray_idx = gid.x % ray_count;
 
     var ray_angle = f32(ray_idx) * (2.0 * PI) / f32(ray_count);
     var ray_dir = vec2f(cos(ray_angle), sin(ray_angle));
 
-    var cur_pos = vec2f(200.0, 120.0);
-    var intensity = 1.0;
+    
     var step_falloff = 0.997;
 
     var last_pos = vec2<i32>(0, 0);
@@ -52,7 +66,9 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         else { last_was_occ = false; }
         
         let falloff = exp(-dist * 0.01);
-        lighting_output[lightmap_idx] += u32(intensity * 100.0 * falloff);
+        let cur_intensity = intensity * falloff;
+        if cur_intensity <= 0.01 { break; }
+        lighting_output[lightmap_idx] += u32(cur_intensity * 100.0);
         
         //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
         //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
