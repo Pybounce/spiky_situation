@@ -4,7 +4,7 @@ var<uniform> light_count: u32;
 @group(0) @binding(1)
 var<storage, read_write> lights: array<RTPointLight>;
 @group(0) @binding(2)
-var<storage, read_write> lighting_output: array<u32>;
+var<storage, read_write> lighting_output: array<atomic<u32>>;
 @group(0) @binding(3)
 var<storage, read> occluder_mask: array<u32>;
 
@@ -21,9 +21,6 @@ const PI = 3.14159265359;
 
 @compute @workgroup_size(64, 1)
 fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
-    let _o = occluder_mask[0];
-    let _l = lighting_output[0];
-
     let light_idx = gid.y;
 
     if light_idx >= light_count { return; }
@@ -68,8 +65,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         let falloff = exp(-dist * 0.01);
         let cur_intensity = intensity * falloff;
         if cur_intensity <= 0.01 { break; }
-        lighting_output[lightmap_idx] += u32(cur_intensity * 100.0);
-        
+        atomicAdd(&lighting_output[lightmap_idx], u32(cur_intensity * 100.0));
         //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
         //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
         //lighting_output[pos_to_light_idx(cur_pos + vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.5);
