@@ -2,7 +2,7 @@
 @group(0) @binding(0)
 var<uniform> light_count: u32;
 @group(0) @binding(1)
-var<storage, read_write> lights: array<RTPointLight>;
+var<storage, read> lights: array<RTPointLight>;
 @group(0) @binding(2)
 var<storage, read_write> lighting_output: array<u32>;
 @group(0) @binding(3)

@@ -3,9 +3,10 @@ use bevy::{prelude::*, render::{render_resource::Buffer, Extract}};
 use bevy_app_compute::prelude::*;
 use bytemuck::{Pod, Zeroable};
 
-use crate::{ground::Ground, rt_lights::components::PointLight, stage::stage_objects::pressure_spikes::PressureSpike};
+use crate::{ground::Ground, rt_lights::components::{LightOccluder, PointLight}, stage::stage_objects::pressure_spikes::PressureSpike};
 
 const MAX_LIGHTS: u32 = 30;
+const MAX_OCCLUDERS: u32 = 100*100;
 
 #[derive(TypePath)]
 struct RTLComputeShader;
@@ -24,9 +25,18 @@ impl ComputeShader for RTLResetShader {
     }
 }
 
+#[derive(TypePath)]
+struct RTLOccludeFillShader;
+
+impl ComputeShader for RTLOccludeFillShader {
+    fn shader() -> ShaderRef {
+        "shaders/rtl/rtl_occlude_fill.wgsl".into()
+    }
+}
+
 #[repr(C)]
 #[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
-pub struct RTPointLight {
+pub(crate) struct RTPointLight {
     pub pos: Vec2,
     pub packed_light: u32,
     pub _pad: u32
@@ -49,6 +59,32 @@ impl RTPointLight {
     }
 }
 
+#[repr(C)]
+#[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
+pub(crate) struct Occluder {
+    pub pos: Vec2,
+    pub shape_id: u32,
+    pub _pad0: u32,
+    pub shape_params: Vec2,
+    pub _pad1: Vec2
+    
+}
+
+impl Occluder {
+    pub fn new(pos: Vec2, occluder: LightOccluder) -> Self {
+        let (id, params) = match occluder {
+            LightOccluder::Square(size) => (0, Vec2::new(size, size)),
+        };
+        return Self {
+            pos,
+            shape_id: id,
+            shape_params: params,
+            _pad0: 0,
+            _pad1: Vec2::default(),
+        };
+    }
+}
+
 #[derive(Resource)]
 pub(crate) struct RTLComputeWorker;
 
@@ -64,9 +100,13 @@ impl ComputeWorker for RTLComputeWorker {
         let worker = AppComputeWorkerBuilder::new(world)
             .add_storage("lighting_output", &[0u32; 1600*1600])
             .add_storage("occluder_mask", &[0u32; 1600*1600])
+            .add_storage("occluders", &[Occluder::default(); MAX_OCCLUDERS as usize])
+            .add_uniform("occluder_count", &0)
             .add_storage("lights", &[RTPointLight::default(); MAX_LIGHTS as usize])
             .add_uniform("light_count", &0)
             .add_pass::<RTLResetShader>([100, 100, 1], &["lighting_output"])
+            .add_pass::<RTLResetShader>([100, 100, 1], &["occluder_mask"])
+            .add_pass::<RTLOccludeFillShader>([100, 100, 1], &["occluder_count", "occluders", "occluder_mask"])
             .add_pass::<RTLComputeShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "lighting_output", "occluder_mask"])
             .build();
 
@@ -91,43 +131,35 @@ pub(crate) fn extract_lighting_out_buffer(
 
 
 #[derive(Resource)]
-pub(crate) struct OccluderMask(pub Vec<u32>);
+pub(crate) struct Occluders(pub Vec<Occluder>);
 
 pub fn init_occluder_mask(
     mut commands: Commands
 ) {
-    commands.insert_resource(OccluderMask(vec![0u32; 1600*1600]));
+    commands.insert_resource(Occluders(vec![Occluder::default(); MAX_OCCLUDERS as usize]));
 }
 
 /// TODO: Can have an UpdateEvent or I guess just track change diffs myself for this. (will need updates on occluder layout change whether that's mid level from dynamic ones or on new level loaded)
 pub(crate) fn write_occluder_buffer(
-    query: Query<&Transform, With<Ground>>,
+    query: Query<(&Transform, &LightOccluder)>,
     mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
-    mut mask: ResMut<OccluderMask>,
-    input: Res<ButtonInput<KeyCode>>,
+    mut occluders: ResMut<Occluders>,
 
 ) {
 
-    if input.just_pressed(KeyCode::KeyL) {
-        mask.0.fill(0);
+    let mut count = 0;
+    for (i, (t, occluder)) in query.iter().enumerate() {
+        occluders.0[i] = Occluder::new(t.translation.truncate(), *occluder);
 
-        for t in query.iter() {
-            let gx = t.translation.x as i32;
-            let gy = t.translation.y as i32;
-            for y in 0..16 {
-                for x in 0..16 {
-                    let px = gx + x;
-                    let py = gy + y;
+        count += 1;
 
-                    if px >= 0 && px < 1600 && py >= 0 && py < 1600 {
-                        mask.0[(py as usize) * 1600 + (px as usize)] = 1;
-                    }
-                }
-            }
+        if count >= MAX_OCCLUDERS {
+            break;
         }
-
-        worker.write_slice("occluder_mask", &mask.0);
     }
+
+    worker.write_slice("occluders", &occluders.0);
+    worker.write("occluder_count", &count);
 }
 
 pub(crate) fn update_rt_lights(
