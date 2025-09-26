@@ -30,6 +30,12 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
                 occluder_mask[gid.x + (gid.y * 1600)] = 1u;
             }
         }
+        else if occluder.shape_id == 1u {
+            let dist = dist_to_circle(vec2f(f32(gid.x), f32(gid.y)), occluder.shape_params.x, occluder.pos);
+            if dist <= 0.0 {
+                occluder_mask[gid.x + (gid.y * 1600)] = 1u;
+            }
+        }
 
     }
 }
@@ -38,7 +44,11 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
 
 fn dist_to_square(eval_pos: vec2f, dimentions: vec2f, box_pos: vec2f) -> f32
 {
-    let d = abs(eval_pos - box_pos - dimentions) - dimentions;
+    let d = abs(eval_pos - box_pos) - dimentions;
     return length(max(d,vec2f(0.0, 0.0))) + min(max(d.x,d.y),0.0);
+}
+
+fn dist_to_circle(eval_pos: vec2f, radius: f32, circle_pos: vec2f) -> f32 {
+    return length(eval_pos - circle_pos) - radius;
 }
 

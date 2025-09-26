@@ -74,6 +74,7 @@ impl Occluder {
     pub fn new(pos: Vec2, occluder: LightOccluder) -> Self {
         let (id, params) = match occluder {
             LightOccluder::Square(size) => (0, Vec2::new(size, size)),
+            LightOccluder::Circle(radius) => (1, Vec2::new(radius, radius)),
         };
         return Self {
             pos,

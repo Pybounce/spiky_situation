@@ -3,7 +3,7 @@ use std::f32;
 use bevy::{math::VectorSpace, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, rt_lights::components::LightOccluder, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
 
 
 #[derive(Component)]
@@ -77,7 +77,8 @@ impl LaserBuilder {
                 beam_end_particles
             },
             Ground,
-            RayCaster::new(Vec2::Y * 8.1, Dir2::Y).with_ignore_self(true).with_solidness(true).with_query_filter(SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground))
+            RayCaster::new(Vec2::Y * 8.1, Dir2::Y).with_ignore_self(true).with_solidness(true).with_query_filter(SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground)),
+            LightOccluder::Square(16.0)
         ));
 
         if let Some(rail_rider) = &laser.rail_rider {
