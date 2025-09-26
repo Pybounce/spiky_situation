@@ -65,6 +65,7 @@ fn main() {
             meta_check: AssetMetaCheck::Never,
             ..default()
         }).set(ImagePlugin::default_nearest()))
+        .insert_resource(ClearColor(Color::WHITE))
         .add_plugins(StatesPlugin)
         .add_plugins(StageBuilderPlugin)
         .add_plugins(MainMenuPlugin)
