@@ -52,6 +52,18 @@ _Better Data Input_
 - [ ] Baked and Dynamic
   - For the most part, the lighting won't change
   - Therefore you could just bake the nice raytraced light with static occluders, and then add simple lighting for dynamic ones
+- [ ] Light Frame Budget
+  - Create another lightmap and switch between the 2
+  - Instead of doing all rays, split them across 4 frames and do first quater, then second etc
+    - _Reducing race conditions_ could be achieved here by splitting the rays into equal directions still. So instead of doing the first quater, you do 1 every 4.
+    - Only issue might be that the memory access becomes more sparse (hence why it also reduces race conditions)
+    - _Reducing flickering_ would happen if we added yet another lightmap
+      - 1st lightmap is the new target lightmap
+      - 2nd lightmap is the old lightmap (we will lerp from old to new)
+      - 3rd lightmap is the one under construction
+      - Biggest issue here (aside from memory), is that if we take 4 frames to generate a lightmap, then the user wouldn't see it for 8 since we take another 4 to lerp to it
+- [ ] Reducing occluder resolution
+  - Occluder maps don't need great resolution, could probably reduce to 800x800
 
 **Occluder Optimisations**
 
