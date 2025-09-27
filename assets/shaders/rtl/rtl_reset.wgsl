@@ -16,9 +16,6 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     if (idx < buffer_size * buffer_size) {
         buffer[idx] = 0;
     }
-
-   // let idx = gid.x + (1600 * gid.y);
-    //buffer[idx] = 0;
 }
 
 
@@ -29,15 +26,10 @@ fn get_buffer_coords(
     total_frames: u32,
     buffer_size: u32
 ) -> vec2<u32> {
-    // Divide the buffer vertically into slices
-    let slice_height = buffer_size / total_frames; // ceil division
+    let slice_height = buffer_size / total_frames;
     let start_y = current_frame * slice_height;
     let global_y = start_y + gid.y;
 
-    // Clamp to avoid out-of-bounds
-    if (global_y >= buffer_size) {
-        return vec2<u32>(0, 0);
-    }
 
     return vec2<u32>(gid.x, global_y);
 }
