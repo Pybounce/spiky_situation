@@ -52,3 +52,26 @@ _Better Data Input_
 - [ ] Baked and Dynamic
   - For the most part, the lighting won't change
   - Therefore you could just bake the nice raytraced light with static occluders, and then add simple lighting for dynamic ones
+
+**Occluder Optimisations**
+
+- [ ] Only load in nearby occluders
+  - This would mean knowing the max distance a light can travel
+  - Then do a distance check between the camera and the occluder (+ occluder radius)
+  - Only send over occluders that are inside that range.
+- [ ] Dynamic vs Static occluders
+  - Most occluders will not move
+- [ ] Merging occluders
+  - Can merge static square/rect occluders but is fairly annoying to do.
+- [ ] Multi-frame lighting
+  - Lighting doesn't need to be done every frame and can likely be split over multiple frames
+  - Would need all occluders in before we can start ray tracing
+  - Maybe take 4 frames for occluders, 2 for ray tracing etc
+- [ ] Switch back to processing occluders on cpu
+  - Most processing is gpu bound now
+  - Could just process the occluders in a parallel thread on the cpu instead
+- [ ] _Baked vs Realtime_
+  - Can have a setting that does realtime and another setting that just does baked
+  - Baked will only include static occluders (maybe also trigger when key blocks are activated?)
+    - Key blocks complicate things since I might make them activate one by one and that might be too much of a performance hit not sure
+  - Maybe I should just do this...hmm

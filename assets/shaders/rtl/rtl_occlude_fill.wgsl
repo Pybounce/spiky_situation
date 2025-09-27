@@ -28,12 +28,14 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
             let dist = dist_to_square(vec2f(f32(gid.x), f32(gid.y)), occluder.shape_params / 2.0, occluder.pos);
             if dist <= 0.0 {
                 occluder_mask[gid.x + (gid.y * 1600)] = 1u;
+                return;
             }
         }
         else if occluder.shape_id == 1u {
             let dist = dist_to_circle(vec2f(f32(gid.x), f32(gid.y)), occluder.shape_params.x, occluder.pos);
             if dist <= 0.0 {
                 occluder_mask[gid.x + (gid.y * 1600)] = 1u;
+                return;
             }
         }
 
