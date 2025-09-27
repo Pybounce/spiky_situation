@@ -86,6 +86,8 @@ impl Occluder {
     }
 }
 
+const OCCLUDER_FRAME_BUDGET: u32 = 4;
+
 #[derive(Resource)]
 pub(crate) struct RTLComputeWorker;
 
@@ -105,9 +107,14 @@ impl ComputeWorker for RTLComputeWorker {
             .add_uniform("occluder_count", &0)
             .add_storage("lights", &[RTPointLight::default(); MAX_LIGHTS as usize])
             .add_uniform("light_count", &0)
-            .add_pass::<RTLResetShader>([100, 100, 1], &["lighting_output"])
-            .add_pass::<RTLResetShader>([100, 100, 1], &["occluder_mask"])
-            .add_pass::<RTLOccludeFillShader>([100, 100, 1], &["occluder_count", "occluders", "occluder_mask"])
+            .add_uniform("current_occluder_frame", &0)
+            .add_uniform("total_occluder_frames", &OCCLUDER_FRAME_BUDGET)
+            .add_uniform("current_light_frame", &0)
+            .add_uniform("total_light_frames", &1)
+            .add_uniform("buffer_size", &1600)
+            .add_pass::<RTLResetShader>([100, 100, 1], &["lighting_output", "current_light_frame", "total_light_frames", "buffer_size"])
+            .add_pass::<RTLResetShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_mask", "current_occluder_frame", "total_occluder_frames", "buffer_size"])
+            .add_pass::<RTLOccludeFillShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_count", "occluders", "occluder_mask", "current_occluder_frame", "total_occluder_frames"])
             .add_pass::<RTLComputeShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "lighting_output", "occluder_mask"])
             .build();
 
@@ -129,7 +136,16 @@ pub(crate) fn extract_lighting_out_buffer(
     
 }
 
+#[derive(Resource)]
+pub(crate) struct OccluderCurrentFrame(pub u32);
 
+pub fn update_occluder_current_frame(
+    mut current: ResMut<OccluderCurrentFrame>,
+    mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
+) {
+    current.0 = (current.0 + 1) % OCCLUDER_FRAME_BUDGET;
+    worker.write("current_occluder_frame", &current.0);
+}
 
 #[derive(Resource)]
 pub(crate) struct Occluders(pub Vec<Occluder>);
@@ -138,6 +154,7 @@ pub fn init_occluder_mask(
     mut commands: Commands
 ) {
     commands.insert_resource(Occluders(vec![Occluder::default(); MAX_OCCLUDERS as usize]));
+    commands.insert_resource(OccluderCurrentFrame(0));
 }
 
 /// TODO: Can have an UpdateEvent or I guess just track change diffs myself for this. (will need updates on occluder layout change whether that's mid level from dynamic ones or on new level loaded)
