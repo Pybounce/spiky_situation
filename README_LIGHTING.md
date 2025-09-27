@@ -75,3 +75,5 @@ _Better Data Input_
   - Baked will only include static occluders (maybe also trigger when key blocks are activated?)
     - Key blocks complicate things since I might make them activate one by one and that might be too much of a performance hit not sure
   - Maybe I should just do this...hmm
+- [ ] Spatial Partitioning
+  - Can partition the occluders so sdf calcs are far lower per cell.
