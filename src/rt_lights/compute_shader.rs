@@ -7,6 +7,8 @@ use crate::{ground::Ground, rt_lights::components::{LightOccluder, PointLight}, 
 
 const MAX_LIGHTS: u32 = 30;
 const MAX_OCCLUDERS: u32 = 100*100;
+const OCCLUDER_FRAME_BUDGET: u32 = 4;
+const RESOLUTION: u32 = 1600;   // mostly unused at the moment
 
 #[derive(TypePath)]
 struct RTLComputeShader;
@@ -86,7 +88,6 @@ impl Occluder {
     }
 }
 
-const OCCLUDER_FRAME_BUDGET: u32 = 4;
 
 #[derive(Resource)]
 pub(crate) struct RTLComputeWorker;
@@ -162,18 +163,28 @@ pub(crate) fn write_occluder_buffer(
     query: Query<(&Transform, &LightOccluder)>,
     mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
     mut occluders: ResMut<Occluders>,
-
+    occluder_current_frame: Res<OccluderCurrentFrame>
 ) {
+    let h = RESOLUTION as f32 / OCCLUDER_FRAME_BUDGET as f32;
+    let min_y = occluder_current_frame.0 as f32 * h;
+    let max_y = min_y + h;
 
-    let mut count = 0;
-    for (i, (t, occluder)) in query.iter().enumerate() {
-        occluders.0[i] = Occluder::new(t.translation.truncate(), *occluder);
-
-        count += 1;
-
-        if count >= MAX_OCCLUDERS {
-            break;
+    let mut count: u32 = 0;
+    for (t, occluder) in query.iter() {
+        let (occ_min_y, occ_max_y) = match occluder {
+            LightOccluder::Square(s) => (t.translation.y - (s / 2.0), t.translation.y + (s / 2.0)),
+            LightOccluder::Circle(r) => (t.translation.y - r, t.translation.y + r),
+        };
+        if occ_min_y <= max_y && occ_max_y >= min_y {
+            occluders.0[count as usize] = Occluder::new(t.translation.truncate(), *occluder);
+            
+            count += 1;
+            
+            if count >= MAX_OCCLUDERS {
+                break;
+            }
         }
+
     }
 
     worker.write_slice("occluders", &occluders.0);

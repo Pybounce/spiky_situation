@@ -19,8 +19,8 @@ impl Plugin for RTLightPlugin {
         .add_plugins(AppComputeWorkerPlugin::<RTLComputeWorker>::default())
         .add_plugins(RTLPostProcessPlugin)
         .add_systems(Startup, (init_occluder_mask).chain())
-        .add_systems(Update, update_occluder_current_frame)
-        .add_systems(PostUpdate, (write_occluder_buffer, update_rt_lights));
+        .add_systems(PreUpdate, update_occluder_current_frame)
+        .add_systems(Update, (write_occluder_buffer, update_rt_lights));
 
     app.sub_app_mut(RenderApp)
        .add_systems(ExtractSchedule, extract_lighting_out_buffer);
