@@ -89,3 +89,10 @@ _Better Data Input_
   - Maybe I should just do this...hmm
 - [ ] Spatial Partitioning
   - Can partition the occluders so sdf calcs are far lower per cell.
+
+**Blur + ContructionLightmap**
+
+- Can have 2 lightmaps, the output and the construction
+- Takes x frames to build the construction
+- On the final pass once it's built, the blur shader will perform 2 passes and write the blurred output to the output lightmap
+- Output can then be used wherever
