@@ -96,3 +96,14 @@ _Better Data Input_
 - Takes x frames to build the construction
 - On the final pass once it's built, the blur shader will perform 2 passes and write the blurred output to the output lightmap
 - Output can then be used wherever
+
+**Emission**
+
+- Can probably make each cell in the emissionmap 16x16 (so total just 100x100)
+  - Since emission light is very basic and just needs to go across the room
+  - Then that is applied to lighting and we blur
+  - Otherwise the amount of passes would be far too many given that it's 1 pass per 1 cell movement
+    - So even with 16x16 cells, we would probably need 8 passes
+- Can emission be done separately? (maybe)
+  - It can be updated over multiple frames, same as the occluders.
+  - _however_ since it's cells are larger, differences will be more apparent
