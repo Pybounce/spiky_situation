@@ -110,10 +110,10 @@ _Better Data Input_
 
 **Guassian Blur**
 
-- Can do horizontal/vertical separately by having 3 lightmaps
-- Original lightmap, intermediary lightmap (ie horizontal), output lightmap
+- Can do horizontal/vertical separately by having 2 lightmaps
+- Original/output lightmap, intermidiary lightmap
 - Take in original and apply horizontal blur, write to intermediary
-- Take in intermediary and apply vertical blur, write to output
+- Take in intermediary and apply vertical blur, write to output/original again
 - Since horizontal and vertical should be the same, when we write to intermediary, we can probably just rotate it by 90 and store it at a rotation
   - Then when we apply vertical, we actually just apply horizontally but to this other buffer (so just 2 passes of the same shader with different buffers)
   - Once again the output lightmap will be rotated 90 (ie flipped)

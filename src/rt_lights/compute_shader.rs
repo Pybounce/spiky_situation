@@ -36,6 +36,16 @@ impl ComputeShader for RTLOccludeFillShader {
     }
 }
 
+#[derive(TypePath)]
+struct RTLBlurShader;
+
+impl ComputeShader for RTLBlurShader {
+    fn shader() -> ShaderRef {
+        "shaders/rtl/rtl_blur.wgsl".into()
+    }
+}
+
+
 #[repr(C)]
 #[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
 pub(crate) struct RTPointLight {
@@ -113,10 +123,16 @@ impl ComputeWorker for RTLComputeWorker {
             .add_uniform("current_light_frame", &0)
             .add_uniform("total_light_frames", &1)
             .add_uniform("buffer_size", &1600)
+            .add_storage("intermediate_blur", &[0u32; 1600*1600])
+                    .add_uniform("y", &1)
+            .add_uniform("noy", &0)
+
             .add_pass::<RTLResetShader>([100, 100, 1], &["lighting_output", "current_light_frame", "total_light_frames", "buffer_size"])
             .add_pass::<RTLResetShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_mask", "current_occluder_frame", "total_occluder_frames", "buffer_size"])
             .add_pass::<RTLOccludeFillShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_count", "occluders", "occluder_mask", "current_occluder_frame", "total_occluder_frames"])
             .add_pass::<RTLComputeShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "lighting_output", "occluder_mask"])
+            .add_pass::<RTLBlurShader>([100, 100, 1], &["lighting_output", "intermediate_blur", "buffer_size", "noy"])
+            .add_pass::<RTLBlurShader>([100, 100, 1], &["intermediate_blur", "lighting_output", "buffer_size", "y"])
             .build();
 
             worker

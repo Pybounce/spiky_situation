@@ -26,7 +26,8 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let x = u32(real_world_pos.x);
     let y = u32(real_world_pos.y);
 
-    var light_col = get_gaussian_blur_11x11(x, y);
+    var light_col = unpack_rgbi(lighting_output[x + y * 1600u]);
+    //var light_col = get_gaussian_blur_11x11(x, y);
     let ambient = 0.05;
 
     let ambient_color = vec3<f32>(1.0, 1.0, 1.0);
