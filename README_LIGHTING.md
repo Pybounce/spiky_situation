@@ -107,3 +107,14 @@ _Better Data Input_
 - Can emission be done separately? (maybe)
   - It can be updated over multiple frames, same as the occluders.
   - _however_ since it's cells are larger, differences will be more apparent
+
+**Guassian Blur**
+
+- Can do horizontal/vertical separately by having 3 lightmaps
+- Original lightmap, intermediary lightmap (ie horizontal), output lightmap
+- Take in original and apply horizontal blur, write to intermediary
+- Take in intermediary and apply vertical blur, write to output
+- Since horizontal and vertical should be the same, when we write to intermediary, we can probably just rotate it by 90 and store it at a rotation
+  - Then when we apply vertical, we actually just apply horizontally but to this other buffer (so just 2 passes of the same shader with different buffers)
+  - Once again the output lightmap will be rotated 90 (ie flipped)
+  - We could therefore read it flipped to ensure the output orientation matches input
