@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::gravity::Gravity, ground::Grounded, wall::TouchingWall};
+use crate::{common::{player_input::{PlayerInput, PlayerInputController}, physics::gravity::Gravity}, ground::Grounded, wall::TouchingWall};
 
 use super::wall_jump_controller::WallJumpController;
 
@@ -9,7 +9,6 @@ use super::wall_jump_controller::WallJumpController;
 
 #[derive(Component)]
 pub struct JumpController {
-    pub key: KeyCode,
     pub force: f32,
     pub duration: f64,
     pub last_jump_pressed_time: f64,
@@ -40,12 +39,11 @@ pub fn apply_wall_friction(
 }
 
 pub fn maintain_player_jump(
-    mut query: Query<(&mut JumpController, &mut Gravity)>,
+    mut query: Query<(&mut JumpController, &mut Gravity, &PlayerInputController)>,
     time: Res<Time>,
-    input: Res<ButtonInput<KeyCode>>
 ) {
-    for (mut jc, mut g) in &mut query {
-        if input.pressed(jc.key) 
+    for (mut jc, mut g, input) in &mut query {
+        if input.pressed(PlayerInput::Jump)
         && time.elapsed_secs_f64() - jc.last_jump_pressed_time < jc.duration 
         && jc.last_jump_released_time < jc.last_jump_pressed_time {
 
@@ -53,19 +51,18 @@ pub fn maintain_player_jump(
         else {
             g.current_force = g.max_force;
         }
-        if input.just_released(jc.key) {
+        if input.just_released(PlayerInput::Jump) {//input.just_released(jc.key) {
             jc.last_jump_released_time = time.elapsed_secs_f64(); //todo: wrapped??
         }
     }
 }
 
 pub fn begin_player_jump(
-    mut query: Query<(&mut LinearVelocity, &mut JumpController, &mut Gravity), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
+    mut query: Query<(&mut LinearVelocity, &mut JumpController, &mut Gravity, &PlayerInputController), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
     time: Res<Time>,
-    input: Res<ButtonInput<KeyCode>>
 ) {
-    for (mut v, mut jc, mut g) in &mut query {
-        if input.pressed(jc.key) {
+    for (mut v, mut jc, mut g, input) in &mut query {
+        if input.pressed(PlayerInput::Jump) {
             g.current_force = 0.0;
             v.0.y = jc.force;
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time

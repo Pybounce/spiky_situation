@@ -1,7 +1,7 @@
 use bevy::{ecs::system::EntityCommands, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{death::{DelayedDeathMarker, Killable}, player_input::{gamepad::PlayerGamepadInput, keyboard::PlayerKeyboardInput, PlayerInputController}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::local_player::*;
 
 #[derive(Resource)]
@@ -62,7 +62,6 @@ impl PlayerBuilder {
                 min_velocity: PLAYER_MIN_VELOCITY,
             },
             JumpController {
-                key: KeyCode::KeyW,
                 force: PLAYER_JUMP_SPEED,
                 duration: PLAYER_JUMP_DURATION,
                 last_jump_pressed_time: 0.0,
@@ -79,15 +78,11 @@ impl PlayerBuilder {
                 wall_stick_time: PLAYER_WALL_STICK_DURATION,
             },
             GroundedHorizontalMovementController {
-                left_key: KeyCode::KeyA,
-                right_key: KeyCode::KeyD,
                 acceleration: PLAYER_ACCELERATION,
                 deceleration: PLAYER_DECELERATION,
                 max_speed: MAX_HORIZONTAL_SPEED,
             },
             AirbourneHorizontalMovementController {
-                left_key: KeyCode::KeyA,
-                right_key: KeyCode::KeyD,
                 acceleration: PLAYER_ACCELERATION / 1.0,
                 deceleration: PLAYER_DECELERATION,
                 max_speed: MAX_HORIZONTAL_SPEED,
@@ -104,6 +99,20 @@ impl PlayerBuilder {
             Sensor,
             SplatOnDeath,
             CollisionLayers::new(GamePhysicsLayer::Player, LayerMask::ALL),
+            PlayerInputController::default(),
+            PlayerGamepadInput {
+                l_stick_deadzone: 0.3,
+                move_left_button: GamepadButton::DPadLeft,
+                move_right_button: GamepadButton::DPadRight,
+                jump_button: GamepadButton::South,
+                dash_button: GamepadButton::RightTrigger2,
+            },
+            PlayerKeyboardInput {
+                move_left_key: KeyCode::KeyA,
+                move_right_key: KeyCode::KeyD,
+                jump_key: KeyCode::KeyW,
+                dash_key: KeyCode::Space,
+            }
         )));
 
     }
