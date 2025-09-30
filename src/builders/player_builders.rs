@@ -101,11 +101,11 @@ impl PlayerBuilder {
             CollisionLayers::new(GamePhysicsLayer::Player, LayerMask::ALL),
             PlayerInputController::default(),
             PlayerGamepadInput {
-                l_stick_deadzone: 0.5,
+                l_stick_deadzone: 0.3,
                 move_left_button: GamepadButton::DPadLeft,
                 move_right_button: GamepadButton::DPadRight,
                 jump_button: GamepadButton::South,
-                dash_button: GamepadButton::West,
+                dash_button: GamepadButton::RightTrigger2,
             },
             PlayerKeyboardInput {
                 move_left_key: KeyCode::KeyA,
