@@ -2,14 +2,12 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{ground::Grounded, wall::TouchingWall};
+use crate::{common::player_input::{PlayerInput, PlayerInputController}, ground::Grounded, wall::TouchingWall};
 
 use super::wall_jump_controller::WallStuck;
 
 #[derive(Component)]
 pub struct GroundedHorizontalMovementController {
-    pub left_key: KeyCode,
-    pub right_key: KeyCode,
     pub acceleration: f32,
     pub max_speed: f32,
     pub deceleration: f32
@@ -17,17 +15,16 @@ pub struct GroundedHorizontalMovementController {
 
 
 pub fn move_ground_horizontal_controller(
-    mut query: Query<(&mut LinearVelocity, &GroundedHorizontalMovementController), With<Grounded>>,
-    input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(&mut LinearVelocity, &GroundedHorizontalMovementController, &PlayerInputController), With<Grounded>>,
     time: Res<Time>
 ) {
-    for (mut vel, con) in &mut query {
+    for (mut vel, con, input) in &mut query {
 
         let mut change: f32 = 0.0;
-        if input.pressed(con.right_key) {
+        if input.pressed(PlayerInput::Right) {
             change += con.acceleration * time.delta_secs();
         }
-        if input.pressed(con.left_key) {
+        if input.pressed(PlayerInput::Left) {
             change -= con.acceleration * time.delta_secs();
         }
 
@@ -50,8 +47,6 @@ pub fn move_ground_horizontal_controller(
 
 #[derive(Component)]
 pub struct AirbourneHorizontalMovementController {
-    pub left_key: KeyCode,
-    pub right_key: KeyCode,
     pub acceleration: f32,
     pub max_speed: f32,
     pub deceleration: f32
@@ -59,17 +54,16 @@ pub struct AirbourneHorizontalMovementController {
 
 
 pub fn move_airbourne_horizontal_controller(
-    mut query: Query<(&mut LinearVelocity, &AirbourneHorizontalMovementController, Option<&WallStuck>), Without<Grounded>>,    //todo: need an airbourne state, right now there are seaprate states for jumping
-    input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(&mut LinearVelocity, &AirbourneHorizontalMovementController, Option<&WallStuck>, &PlayerInputController), Without<Grounded>>,    //todo: need an airbourne state, right now there are seaprate states for jumping
     time: Res<Time>
 ) {
-    for (mut vel, con, ws_opt) in &mut query {
+    for (mut vel, con, ws_opt, input) in &mut query {
 
         let mut change: f32 = 0.0;
-        if input.pressed(con.right_key) {
+        if input.pressed(PlayerInput::Right) {
             change += con.acceleration * time.delta_secs();
         }
-        if input.pressed(con.left_key) {
+        if input.pressed(PlayerInput::Left) {
             change -= con.acceleration * time.delta_secs();
         }
 

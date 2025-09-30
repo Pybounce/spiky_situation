@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::gravity::Gravity, ground::Grounded, wall::TouchingWall};
+use crate::{common::{player_input::{PlayerInput, PlayerInputController}, physics::gravity::Gravity}, ground::Grounded, wall::TouchingWall};
 
 use super::{horizontal_movement_controller::AirbourneHorizontalMovementController, jump_controller::{CoyoteGrounded, JumpController}};
 
@@ -29,16 +29,15 @@ pub struct WallJumpController {
 }
 
 pub fn begin_player_wall_jump(
-    mut query: Query<(&mut Gravity, &mut LinearVelocity, &mut JumpController, &TouchingWall, &WallJumpController, &AirbourneHorizontalMovementController), 
+    mut query: Query<(&mut Gravity, &mut LinearVelocity, &mut JumpController, &TouchingWall, &WallJumpController, &AirbourneHorizontalMovementController, &PlayerInputController), 
         (Without<Grounded>, Without<CoyoteGrounded>)>,
     time: Res<Time>,
-    input: Res<ButtonInput<KeyCode>>
 ) {
-    for (mut g, mut v, mut jc, w, wjc, ahmc) in &mut query {
-        if input.just_pressed(jc.key) {
+    for (mut g, mut v, mut jc, w, wjc, ahmc, input) in &mut query {
+        if input.just_pressed(PlayerInput::Jump) {
             v.0 = match w {
                 TouchingWall::Left => {
-                    if input.pressed(ahmc.left_key) {
+                    if input.pressed(PlayerInput::Left) {
                         wjc.force_out * Vec2::new(-1.0, 1.0)
                     }
                     else {
@@ -46,7 +45,7 @@ pub fn begin_player_wall_jump(
                     }
                 },
                 TouchingWall::Right => {
-                    if input.pressed(ahmc.right_key) {
+                    if input.pressed(PlayerInput::Right) {
                         wjc.force_out
                     }
                     else {
@@ -61,17 +60,16 @@ pub fn begin_player_wall_jump(
     }
 } 
 pub fn update_wall_stuck_time(
-    mut query: Query<(Entity, &mut WallStuck, &AirbourneHorizontalMovementController, &WallStickable)>,
-    input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(Entity, &mut WallStuck, &AirbourneHorizontalMovementController, &WallStickable, &PlayerInputController)>,
     time: Res<Time>,
     mut commands: Commands
 ) {
-    for (e, mut wall_stuck, mc, wall_stickable) in &mut query {
-        let push_away_key = match wall_stuck.touching_wall {
-            TouchingWall::Left => mc.left_key,
-            TouchingWall::Right => mc.right_key,
+    for (e, mut wall_stuck, mc, wall_stickable, input) in &mut query {
+        let push_away = match wall_stuck.touching_wall {
+            TouchingWall::Left => input.pressed(PlayerInput::Left),
+            TouchingWall::Right => input.pressed(PlayerInput::Right),
         };
-        if !input.pressed(push_away_key) {
+        if !push_away {
             wall_stuck.last_unstuck_time = time.elapsed_secs_f64();
         }
         else if time.elapsed_secs_f64() - wall_stuck.last_unstuck_time >= wall_stickable.wall_stick_time {
