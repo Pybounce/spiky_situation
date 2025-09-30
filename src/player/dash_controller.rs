@@ -4,7 +4,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::gravity::Gravity, local_player::{FORCE_MUL, MAX_HORIZONTAL_SPEED}, wall::TouchingWall};
+use crate::{common::{player_input::{PlayerInput, PlayerInputController}, physics::gravity::Gravity}, local_player::{FORCE_MUL, MAX_HORIZONTAL_SPEED}, wall::TouchingWall};
 
 use super::look_state::PlayerLookState;
 
@@ -12,11 +12,9 @@ pub const DASH_COOLDOWN: f32 = 1.0;
 pub const DASH_SPEED: f32 = 400.0 * FORCE_MUL;
 pub const DASH_DURATION: f32 = 0.2;
 pub const DASH_END_SPEED: f32 = MAX_HORIZONTAL_SPEED * FORCE_MUL;
-pub const DASH_KEY: KeyCode = KeyCode::Space;
 
 #[derive(Component)]
 pub struct DashController {
-    pub key: KeyCode,
     pub dash_speed: f32,
     pub cooldown_timer: Timer,
     pub duration_timer: Timer,
@@ -29,7 +27,6 @@ impl Default for DashController {
         let mut duration_timer = Timer::from_seconds(DASH_DURATION, TimerMode::Once);
         duration_timer.tick(Duration::from_secs(234));
         Self { 
-            key: DASH_KEY,
             dash_speed: DASH_SPEED,
             cooldown_timer: Timer::from_seconds(DASH_COOLDOWN, TimerMode::Once),
             duration_timer: duration_timer,
@@ -40,14 +37,13 @@ impl Default for DashController {
 }
 
 pub fn start_dashing(
-    mut query: Query<(&mut DashController, &PlayerLookState)>,
+    mut query: Query<(&mut DashController, &PlayerLookState, &PlayerInputController)>,
     time: Res<Time>,
-    input: Res<ButtonInput<KeyCode>>,
 
 ) {
-    for (mut dash_controller, player_look_state) in &mut query {
+    for (mut dash_controller, player_look_state, input) in &mut query {
         dash_controller.cooldown_timer.tick(time.delta());
-        if input.pressed(dash_controller.key) && dash_controller.cooldown_timer.finished() {
+        if input.pressed(PlayerInput::Dash) && dash_controller.cooldown_timer.finished() {
             dash_controller.cooldown_timer.reset();
             dash_controller.duration_timer.reset();
             dash_controller.dash_direction_sign = match player_look_state {
