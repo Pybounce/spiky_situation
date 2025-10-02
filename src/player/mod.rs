@@ -7,3 +7,4 @@ pub mod common;
 pub mod spawner;
 pub mod death;
 pub mod dash_controller;
+pub mod animation;

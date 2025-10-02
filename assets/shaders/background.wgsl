@@ -25,9 +25,9 @@ fn fragment(in: FragmentInput) -> FragmentOutput {
     let colour_mul = 0.9;
     var color: vec4<f32>;
     if is_coloured {
-        color = vec4<f32>(0.8, 0.8, 0.8, 1.0);
+        color = vec4<f32>(99.0/255.0, 85.0/255.0, 54.0/255.0, 1.0);
     } else {
-        color = vec4<f32>(0.8, 0.8, 0.8, 1.0);
+        color = vec4<f32>(99.0/255.0, 85.0/255.0, 54.0/255.0, 1.0);
     }
 
 

@@ -125,6 +125,7 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
     let grid_pos = Vec2::new(stage_creator.stage.grid_width as f32 / 2.0, 
     stage_creator.stage.grid_height as f32 / 2.0);
     
+    /*
     commands.spawn((
         Mesh2d(stage_creator.background_quad_mesh.clone()),
         MeshMaterial2d(stage_creator.background_material.clone()),
@@ -135,6 +136,27 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
         },
         StageObject::Volatile
     ));
+    */
+
+    for x in 0..stage_creator.stage.grid_width {
+        for y in 0..stage_creator.stage.grid_height {
+            commands.spawn((
+                Sprite {
+                    image: stage_creator.object_tilemap.clone(),
+                    custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+                    rect: Some(Rect::new(0.0, TILE_SIZE * 4.0, TILE_SIZE, TILE_SIZE * 5.0)),
+                    ..default() 
+                },
+                Transform::from_translation(Vec3::new(x as f32 * TILE_SIZE, y as f32 * TILE_SIZE, -10.0)),
+                StageObject::Volatile
+            ));
+        }
+    }
+
+
+    
+
+
     return true;
 }
 
