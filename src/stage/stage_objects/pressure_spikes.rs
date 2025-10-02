@@ -2,7 +2,7 @@
 use avian2d::prelude::Collider;
 use bevy::prelude::*;
 use avian2d::prelude::*;
-use crate::{common::{animated_sprite::SpriteAnimator, physics::{avian_ex::ManyCollidingEntities, layers::GamePhysicsLayer}, splat::SplatProvider}, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::{avian_ex::ManyCollidingEntities, layers::GamePhysicsLayer}, splat::SplatProvider}, obstacles::InstantKiller, rt_lights::components::PointLight, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
 
 
 const PRESSURE_SPIKE_DELAY: f32 = 0.3;
@@ -36,6 +36,10 @@ impl PressureSpikeBuilder {
             RigidBody::Static,
             SplatProvider {
                 translation_offset: Vec2::new(0.0, -(TILE_SIZE_HALF * 0.6)),
+            },
+            PointLight {
+                intensity: 255,
+                colour: Color::srgb_u8(255, 190, 90),
             },
             children![(
                 Transform::from_translation(Vec3::new(0.0, -TILE_SIZE_HALF * 0.6, 0.0)),

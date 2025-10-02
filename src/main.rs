@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, common::{animation_controller::update_animation_states, mouse::WorldMouseMotion, physics::avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{builders::player_builders::init_player_builder, common::{animation_controller::update_animation_states, mouse::WorldMouseMotion, physics::avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::RTLightPlugin, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
 
 mod common;
 
@@ -37,6 +37,7 @@ mod debugging;
 pub mod builders;
 pub mod databases;
 pub mod shaders;
+pub mod rt_lights;
 
 fn main() {
     let winit_settings = WinitSettings {
@@ -64,6 +65,7 @@ fn main() {
             meta_check: AssetMetaCheck::Never,
             ..default()
         }).set(ImagePlugin::default_nearest()))
+        .insert_resource(ClearColor(Color::WHITE))
         .add_plugins(StatesPlugin)
         .add_plugins(StageBuilderPlugin)
         .add_plugins(MainMenuPlugin)
@@ -71,6 +73,7 @@ fn main() {
         .add_plugins(GamePlugin)
         //.add_plugins(CCTVPostProcessPlugin)
         .add_plugins(PhysicsPlugins::default())//.add_plugins(avian2d::prelude::PhysicsDebugPlugin::default())
+        .add_plugins(RTLightPlugin)
         .insert_resource(PhysicsLengthUnit(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
@@ -81,6 +84,7 @@ fn main() {
         .init_resource::<SaveDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
         .add_systems(FixedUpdate, apply_physics_controller_limits)
+        .add_systems(PreUpdate, (reset_player_inputs, handle_player_gamepad_input, handle_player_keyboard_input).chain())
         .add_systems(Update, (handle_zoom_change, move_camera, move_pixel_perfect_translations).chain())
         .add_systems(Update, (add_wall_stuck, update_wall_stuck, remove_wall_stuck))
         .add_systems(Update, (shake, spawn_local_players, check_insta_kill_collisions, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))

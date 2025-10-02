@@ -2,7 +2,7 @@ use std::{env, fs, path::PathBuf};
 
 use bevy::prelude::*;
 
-use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction}, stage::stage_builder::events::{BuildStageEvent}, stage_editor::StageEditorLoadDetails};
+use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction, check_new_game_interaction_TEMP_GAMEPAD_SUPPORT}, stage::stage_builder::events::BuildStageEvent, stage_editor::StageEditorLoadDetails};
 
 pub mod ui;
 
@@ -13,7 +13,7 @@ impl Plugin for MainMenuPlugin {
         app
         .add_event::<StartGame>()
         .add_systems(OnEnter(AppState::MainMenu), build_main_menu_ui)
-        .add_systems(Update, (try_start_game, check_new_game_interaction, check_continue_game_interaction, try_enter_stage_editor).run_if(in_state(AppState::MainMenu)));
+        .add_systems(Update, (try_start_game, check_new_game_interaction_TEMP_GAMEPAD_SUPPORT, check_new_game_interaction, check_continue_game_interaction, try_enter_stage_editor).run_if(in_state(AppState::MainMenu)));
     }
 }
 
@@ -51,8 +51,8 @@ pub fn try_enter_stage_editor(
 ) {
     if input.just_released(KeyCode::KeyE) {
         commands.insert_resource(StageEditorLoadDetails {
-            template_stage_id: 2.into(),
-            new_stage_id: 2,
+            template_stage_id: 1.into(),
+            new_stage_id: 1,
             template_stage_handle: None
         });
         app_state.set(AppState::StageEditor);

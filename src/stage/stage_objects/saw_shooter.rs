@@ -1,7 +1,7 @@
 use bevy::{math::{Rect, Vec2, Vec3}, prelude::{Commands, Component, Query, Res}, sprite::Sprite, time::{Time, Timer, TimerMode}, transform::components::Transform, utils::default};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::{fragile::{Fragile, FragileShield}, layers::GamePhysicsLayer}}, ground::Ground, obstacles::InstantKiller, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::{fragile::{Fragile, FragileShield}, layers::GamePhysicsLayer}}, ground::Ground, obstacles::InstantKiller, rt_lights::components::LightOccluder, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -54,13 +54,13 @@ pub fn tick_saw_shooters(
                 Fragile, 
                 FragileShield, 
                 InstantKiller, 
-                Collider::circle(0.3 * 16.0), 
+                (Collider::circle(0.3 * 16.0), 
                 LinearVelocity((transform.rotation * Vec2::new(0.0, 100.0).extend(0.0)).truncate()),
                 Sensor,
                 RigidBody::Dynamic,
                 GravityScale(0.0),
                 CollisionEventsEnabled,
-                LockedAxes::ROTATION_LOCKED,
+                LockedAxes::ROTATION_LOCKED),
                 Sprite {
                     image: stage_assets.stage_objects_handle.clone(),
                     custom_size: Some(Vec2::new(16.0, 16.0)),
@@ -69,7 +69,8 @@ pub fn tick_saw_shooters(
                 },
                 Transform::from_translation(transform.translation - Vec3::new(0.0, 0.0, 1.0)),
                 SpriteAnimator::new(30, atlas_rects.clone()),
-                StageObject::Volatile
+                StageObject::Volatile,
+                LightOccluder::Circle(4.0)
             ));
         }
     }

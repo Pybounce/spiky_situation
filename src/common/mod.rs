@@ -12,3 +12,4 @@ pub mod splat;
 pub mod math_ex;
 pub mod rails;
 pub mod animation_controller;
+pub mod player_input;

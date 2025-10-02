@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::layers::GamePhysicsLayer, ground::Ground, stage::{stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, stage_objects::StageObject}, wall::Wall};
+use crate::{common::physics::layers::GamePhysicsLayer, ground::Ground, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, stage_objects::StageObject}, wall::Wall};
 
 
 
@@ -30,6 +30,7 @@ pub struct GroundTileBundle {
     physical_tile_bundle: PhysicalTileBundle,
     ground_marker: Ground,
     wall_marker: Wall,
+    occluder: LightOccluder
 }
 
 
@@ -74,6 +75,7 @@ impl GroundTileBundle {
             physical_tile_bundle: PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             ground_marker: Ground,
             wall_marker: Wall,
+            occluder: LightOccluder::Square(16.0)
         }
     }
 }

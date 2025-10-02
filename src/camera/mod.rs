@@ -2,7 +2,7 @@
 use bevy::{core_pipeline::tonemapping::Tonemapping, input::mouse::MouseWheel, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{local_player::LocalPlayer, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
+use crate::{local_player::LocalPlayer, rt_lights::post_process_shader::RTLPostProcessSettings, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
 
 const CAMERA_ZOOM: u32 = 3;
 const CAMERA_ZOOM_MAX: u32 = 10;
@@ -40,6 +40,9 @@ pub fn spawn_camera(mut commands: Commands) {
                 scanline_speed: 0.7,
                 scanline_gap: 7.0,
             },
+            RTLPostProcessSettings {
+                something: 1.0
+            }
         ));
 }
 

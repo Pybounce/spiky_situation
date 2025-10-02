@@ -9,6 +9,21 @@ pub struct ContinueGameButton;
 #[derive(Component)]
 pub struct NewGameButton;
 
+pub fn check_new_game_interaction_TEMP_GAMEPAD_SUPPORT(
+    gamepad_query: Query<&Gamepad>,
+    mut start_game_writer: EventWriter<StartGame>,
+    save_db: Res<SaveDb>
+) {
+    for gamepad in gamepad_query {
+        if gamepad.just_pressed(GamepadButton::South) {
+            let stage_ids = get_stage_ids();
+            let new_run = EndlessRun::new(stage_ids, 100);
+            start_game_writer.write(StartGame::Endless(new_run));
+            save_db.delete_game_save();
+            return;
+        }
+    }
+}
 
 pub fn check_new_game_interaction(
     mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>, With<NewGameButton>)>,

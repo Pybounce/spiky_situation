@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::ground::Grounded;
+use crate::{common::player_input::{PlayerInput, PlayerInputController}, ground::Grounded};
 
 use super::horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController};
 
@@ -15,15 +15,14 @@ pub enum PlayerLookState {
 
 
 pub fn update_player_airborn_look_state(
-    query: Query<(Entity, &AirbourneHorizontalMovementController), Without<Grounded>>,
-    input: Res<ButtonInput<KeyCode>>,
+    query: Query<(Entity, &AirbourneHorizontalMovementController, &PlayerInputController), Without<Grounded>>,
     mut commands: Commands
 ) {
-    for (e, con) in &query {
-        if input.pressed(con.right_key) {
+    for (e, con, input) in &query {
+        if input.pressed(PlayerInput::Right) {
             commands.entity(e).try_insert(PlayerLookState::LookingRight);
         }
-        if input.pressed(con.left_key) {
+        if input.pressed(PlayerInput::Left) {
             commands.entity(e).try_insert(PlayerLookState::LookingLeft);
         }
 
@@ -31,15 +30,14 @@ pub fn update_player_airborn_look_state(
 }
 
 pub fn update_player_grounded_look_state(
-    query: Query<(Entity, &GroundedHorizontalMovementController), With<Grounded>>,
-    input: Res<ButtonInput<KeyCode>>,
+    query: Query<(Entity, &GroundedHorizontalMovementController, &PlayerInputController), With<Grounded>>,
     mut commands: Commands
 ) {
-    for (e, con) in &query {
-        if input.pressed(con.right_key) {
+    for (e, con, input) in &query {
+        if input.pressed(PlayerInput::Right) {
             commands.entity(e).try_insert(PlayerLookState::LookingRight);
         }
-        if input.pressed(con.left_key) {
+        if input.pressed(PlayerInput::Left) {
             commands.entity(e).try_insert(PlayerLookState::LookingLeft);
         }
 
