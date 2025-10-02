@@ -32,11 +32,17 @@ pub fn check_goal_reached(
 pub fn skip_stage(
     mut event_writer: EventWriter<GoalReached>,
     stage_data_opt: Option<Res<CurrentStageData>>,
-    input: Res<ButtonInput<KeyCode>>
+    input: Res<ButtonInput<KeyCode>>,
+    gamepad_query: Query<&Gamepad>
 ) {
     let Some(stage_data) = stage_data_opt else { return; };
     if input.just_pressed(KeyCode::KeyN) {
         event_writer.write(GoalReached { stage_id: stage_data.stage_id });
+    }
+    for gamepad in &gamepad_query {
+        if gamepad.just_pressed(GamepadButton::LeftTrigger) {
+            event_writer.write(GoalReached { stage_id: stage_data.stage_id });
+        }
     }
 }
 
