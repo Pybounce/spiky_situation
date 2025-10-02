@@ -27,7 +27,6 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let y = u32(real_world_pos.y);
 
     var light_col = unpack_rgbi(lighting_output[x + y * 1600u]);
-    //var light_col = get_gaussian_blur_11x11(x, y);
     let ambient = 0.05;
 
     let ambient_color = vec3<f32>(1.0, 1.0, 1.0);
@@ -41,50 +40,6 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
 
 }
 
-fn get_gaussian_blur_11x11(x: u32, y: u32) -> vec4<f32> {
-    let width: u32 = 1600u;
-    let height: u32 = 1600u;
-
-    var sum_rgb: vec3<f32> = vec3<f32>(0.0, 0.0, 0.0);
-    var sum_intensity: f32 = 0.0;
-    var weight_sum: f32 = 0.0;
-
-    let weights = array<array<f32, 11>, 11>(
-        array<f32, 11>(0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5),
-        array<f32, 11>(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0),
-        array<f32, 11>(1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 7.5, 6.0, 4.5, 3.0, 1.5),
-        array<f32, 11>(2.0, 4.0, 6.0, 8.0,10.0,12.0,10.0, 8.0, 6.0, 4.0, 2.0),
-        array<f32, 11>(2.5, 5.0, 7.5,10.0,12.5,15.0,12.5,10.0, 7.5, 5.0, 2.5),
-        array<f32, 11>(3.0, 6.0, 9.0,12.0,15.0,18.0,15.0,12.0, 9.0, 6.0, 3.0),
-        array<f32, 11>(2.5, 5.0, 7.5,10.0,12.5,15.0,12.5,10.0, 7.5, 5.0, 2.5),
-        array<f32, 11>(2.0, 4.0, 6.0, 8.0,10.0,12.0,10.0, 8.0, 6.0, 4.0, 2.0),
-        array<f32, 11>(1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 7.5, 6.0, 4.5, 3.0, 1.5),
-        array<f32, 11>(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0),
-        array<f32, 11>(0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5)
-    );
-    for (var dy: i32 = -5; dy <= 5; dy = dy + 1) {
-        for (var dx: i32 = -5; dx <= 5; dx = dx + 1) {
-            let ix = clamp(i32(x) + dx, 0, i32(width) - 1);
-            let iy = clamp(i32(y) + dy, 0, i32(height) - 1);
-            let idx = u32(ix) + u32(iy) * width;
-
-            let w = weights[(dy + 5)][(dx + 5)];
-            let rgbi = unpack_rgbi(lighting_output[idx]);
-
-            sum_rgb += rgbi.xyz * rgbi.w * w;
-            sum_intensity += rgbi.w * w;
-            weight_sum += w;
-        }
-    }
-
-    let final_rgb = sum_rgb / max(sum_intensity, 1.0);
-    let final_intensity = sum_intensity / weight_sum;
-
-    return vec4<f32>(final_rgb, final_intensity);
-}
-
-
-
 fn unpack_rgbi(packed: u32) -> vec4<f32> {
     var r = f32((packed >> 24) & 0x000000FF);
     var g = f32((packed >> 16) & 0x000000FF);
@@ -92,3 +47,14 @@ fn unpack_rgbi(packed: u32) -> vec4<f32> {
     var intensity = f32(packed & 0x000000FF);
     return vec4f(r, g, b, intensity) / 255.0;
 }
+
+fn pack_rgbi(rgbi: vec4<f32>) -> u32 {
+    var packed = u32(0);
+    packed |= u32(clamp(rgbi.x * 255.0, 0.0, 255.0)) << 24;
+    packed |= u32(clamp(rgbi.y * 255.0, 0.0, 255.0)) << 16;
+    packed |= u32(clamp(rgbi.z * 255.0, 0.0, 255.0)) << 8;
+    packed |= u32(clamp(rgbi.w * 255.0, 0.0, 255.0));
+    return packed;
+}
+
+

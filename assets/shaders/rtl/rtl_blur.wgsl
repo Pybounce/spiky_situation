@@ -12,19 +12,6 @@ var<uniform> is_y: u32;
 fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
 
     let idx = gid.x + gid.y * buffer_size;
-    let w2 = array<f32, 11>(
-        0.009300040045324049, 
-        0.028001560233780885, 
-        0.06598396774984912, 
-        0.12170274650962626, 
-        0.17571363439579307, 
-        0.19859610213125314, 
-        0.17571363439579307, 
-        0.12170274650962626, 
-        0.06598396774984912, 
-        0.028001560233780885, 
-        0.009300040045324049
-    );
     let w = array<f32, 11>(0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5);
 
     var sum_rgb = vec3f(0.0);
@@ -51,15 +38,9 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
             sum_w += w;
         }
     }
-
-    //let dst_xy = vec2(buffer_size - 1 - gid.y, gid.x);
-    //let dst_idx = dst_xy.x + dst_xy.y * buffer_size;
-    //dest[idx] = pack_rgbi(vec4f(sum_rgb, sum_i)); 
-
-
-
     dest[idx] = pack_rgbi(vec4f(sum_rgb / max(1.0, sum_i), sum_i / sum_w)); 
 }
+
 
 
 fn unpack_rgbi(packed: u32) -> vec4<f32> {

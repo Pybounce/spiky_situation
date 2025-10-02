@@ -49,15 +49,7 @@ fn main(@builtin(global_invocation_id) old_gid : vec3<u32>) {
 
 
 
-fn dist_to_square(eval_pos: vec2f, dimentions: vec2f, box_pos: vec2f) -> f32
-{
-    let d = abs(eval_pos - box_pos) - dimentions;
-    return length(max(d,vec2f(0.0, 0.0))) + min(max(d.x,d.y),0.0);
-}
 
-fn dist_to_circle(eval_pos: vec2f, radius: f32, circle_pos: vec2f) -> f32 {
-    return length(eval_pos - circle_pos) - radius;
-}
 
 fn get_buffer_coords(
     gid: vec2<u32>,
@@ -71,4 +63,17 @@ fn get_buffer_coords(
 
 
     return vec2<u32>(gid.x, global_y);
+}
+
+
+
+
+fn dist_to_square(eval_pos: vec2f, dimentions: vec2f, box_pos: vec2f) -> f32
+{
+    let d = abs(eval_pos - box_pos) - dimentions;
+    return length(max(d,vec2f(0.0, 0.0))) + min(max(d.x,d.y),0.0);
+}
+
+fn dist_to_circle(eval_pos: vec2f, radius: f32, circle_pos: vec2f) -> f32 {
+    return length(eval_pos - circle_pos) - radius;
 }

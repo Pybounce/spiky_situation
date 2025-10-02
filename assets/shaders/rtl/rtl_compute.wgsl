@@ -76,17 +76,6 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         //atomicAdd(&lighting_output[lightmap_idx], u32(cur_intensity * 100.0));
         lighting_output[lightmap_idx] = new_packed;
 
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 0.0))] += u32(intensity * 100.0 * falloff * 0.5);
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.5);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(0.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.5);
-    ////
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
-        //lighting_output[pos_to_light_idx(cur_pos + vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
-        //lighting_output[pos_to_light_idx(cur_pos - vec2f(-1.0, 1.0))] += u32(intensity * 100.0 * falloff * 0.3);
-
-
         last_pos = vec2<i32>(i32(cur_pos.x), i32(cur_pos.y));
 
         cur_pos += ray_dir;
@@ -99,6 +88,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
 fn pos_to_light_idx(pos: vec2f) -> u32 {
     return u32(pos.x) + (1600 * u32(pos.y));
 }
+
 
 fn unpack_rgbi(packed: u32) -> vec4<f32> {
     var r = f32((packed >> 24) & 0x000000FF);

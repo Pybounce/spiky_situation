@@ -3,7 +3,7 @@ use bevy::{prelude::*, render::{render_resource::Buffer, Extract}};
 use bevy_app_compute::prelude::*;
 use bytemuck::{Pod, Zeroable};
 
-use crate::{ground::Ground, rt_lights::components::{LightOccluder, PointLight}, stage::stage_objects::pressure_spikes::PressureSpike};
+use crate::rt_lights::components::{LightOccluder, PointLight};
 
 const MAX_LIGHTS: u32 = 30;
 const MAX_OCCLUDERS: u32 = 100*100;

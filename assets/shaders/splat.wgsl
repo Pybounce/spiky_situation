@@ -32,7 +32,7 @@ fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
         tex_color.a = 0.0;
     }
 
-    return vec4f(colour.r, colour.g, colour.b, tex_color.a);
+    return vec4f(colour.r, colour.g, colour.b, 0.0);    // temp disabling splats
 
 }
 
