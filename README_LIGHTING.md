@@ -118,3 +118,9 @@ _Better Data Input_
   - Then when we apply vertical, we actually just apply horizontally but to this other buffer (so just 2 passes of the same shader with different buffers)
   - Once again the output lightmap will be rotated 90 (ie flipped)
   - We could therefore read it flipped to ensure the output orientation matches input
+
+**Normals**
+
+- If we found a FAST way to populate a map with info (such as normals - could just be screenspace), then when adding light to the lightmap, we could use those normals and specular etc since we would have direction
+  - Note this can be _screenspace_
+  - This might also mean we just keep the lightmap as screenspace too (occluders and such will remain full map very likely)
