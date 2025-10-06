@@ -3,7 +3,7 @@ use bevy::{prelude::*, render::{render_resource::Buffer, Extract}};
 use bevy_app_compute::prelude::*;
 use bytemuck::{Pod, Zeroable};
 
-use crate::rt_lights::components::{LightOccluder, PointLight};
+use crate::rt_lights::{components::{LightOccluder, PointLight}, occluders::OccluderMap};
 
 const MAX_LIGHTS: u32 = 30;
 const MAX_OCCLUDERS: u32 = 100*100;
@@ -105,6 +105,7 @@ pub(crate) struct RTLComputeWorker;
 impl ComputeWorker for RTLComputeWorker {
     fn build(world: &mut World) -> AppComputeWorker<Self> {
 
+        //let occluder_map = world.get_resource::<OccluderMap>().expect("could not find occluder map res when building RTLComputeWorker");
 
         let rays_per_light = 320;
         let ray_workgroup_size = 64;
@@ -113,6 +114,7 @@ impl ComputeWorker for RTLComputeWorker {
 
         let worker = AppComputeWorkerBuilder::new(world)
             .add_storage("lighting_output", &[0u32; 1600*1600])
+        //.add_texture("occluder_texture", &texture_handle)   // WHAT IF I made the torch handle much darker so multiplying by 4 just makes that normal but flame emissive??
             .add_storage("occluder_mask", &[0u32; 1600*1600])
             .add_storage("occluders", &[Occluder::default(); MAX_OCCLUDERS as usize])
             .add_uniform("occluder_count", &0)
