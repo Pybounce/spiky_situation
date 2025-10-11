@@ -124,3 +124,20 @@ _Better Data Input_
 - If we found a FAST way to populate a map with info (such as normals - could just be screenspace), then when adding light to the lightmap, we could use those normals and specular etc since we would have direction
   - Note this can be _screenspace_
   - This might also mean we just keep the lightmap as screenspace too (occluders and such will remain full map very likely)
+
+**Occluder Materials**
+
+- Can easily bit-pack the occluder u32 with a MaterialId
+- Then the GPU will have some pre defined materials that contain info on how much light they absorb (ie reflectiveness) and MAYBE even what colour is mixed in
+- Drawback means we need to pass over more info.
+  - If we don't, then we can bit-pack the entire occluder buffer (can still do if ids only take up less than 31 bits etc)
+  - _Important to note_ that I don't think the memory size is an issue and so bitpacking probably will do next to nothing to help
+
+**Dynamic vs Static Occluders**
+
+- Can have an event that causes a complete occluder rewrite
+  - This will clear both dynamic and static, and send them all over to be written
+  - Could potentially optimise by partitioning and then only clearing dirty partitions
+- Will need a system that checks whether or not to do a complete rewrite
+  - With<StaticOccluder> && (Changed<Transform> || Added<StaticOccluder>)
+  - If any match this, raise a single event
