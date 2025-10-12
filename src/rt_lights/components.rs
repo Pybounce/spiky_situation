@@ -14,3 +14,6 @@ pub enum LightOccluder {
     Circle(f32)
 }
 
+
+#[derive(Component)]
+pub struct StaticLightOccluder;

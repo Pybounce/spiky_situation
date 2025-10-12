@@ -14,7 +14,7 @@ pub fn spawn_camera(mut commands: Commands) {
         .spawn((
             Camera2d::default(),
             Camera {
-                hdr: true,
+                //hdr: true,
                 ..default()
             },
             Projection::Orthographic(OrthographicProjection {
@@ -47,7 +47,7 @@ pub fn spawn_camera(mut commands: Commands) {
             RTLPostProcessSettings {
                 something: 1.0
             },
-            Bloom::NATURAL
+            //Bloom::NATURAL
         ));
 }
 

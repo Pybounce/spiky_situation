@@ -1,7 +1,7 @@
 use bevy::{math::{Rect, Vec2, Vec3}, prelude::{Commands, Component, Query, Res}, sprite::Sprite, time::{Time, Timer, TimerMode}, transform::components::Transform, utils::default};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::{fragile::{Fragile, FragileShield}, layers::GamePhysicsLayer}}, ground::Ground, obstacles::InstantKiller, rt_lights::components::LightOccluder, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::{fragile::{Fragile, FragileShield}, layers::GamePhysicsLayer}}, ground::Ground, obstacles::InstantKiller, rt_lights::components::{StaticLightOccluder, LightOccluder}, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
 
 use super::tiles::PhysicalTileBundle;
 
