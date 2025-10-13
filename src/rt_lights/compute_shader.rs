@@ -9,16 +9,19 @@ const MAX_LIGHTS: u32 = 30;
 const MAX_OCCLUDERS: u32 = 100*100;
 const OCCLUDER_FRAME_BUDGET: u32 = 4;
 const RESOLUTION: u32 = 1600;   // mostly unused at the moment
+const MAX_TEMPORAL_LIGHTMAP_COUNT: usize = 4;
+
+
 
 #[derive(TypePath)]
-struct RTLComputeShader;
+struct RTLRaytraceShader;
 
 #[derive(TypePath)]
 struct RTLResetShader;
 
-impl ComputeShader for RTLComputeShader {
+impl ComputeShader for RTLRaytraceShader {
     fn shader() -> ShaderRef {
-        "shaders/rtl/rtl_compute.wgsl".into()
+        "shaders/rtl/rtl_raytrace.wgsl".into()
     }
 }
 impl ComputeShader for RTLResetShader {
@@ -51,6 +54,15 @@ struct RTLBlurShader;
 impl ComputeShader for RTLBlurShader {
     fn shader() -> ShaderRef {
         "shaders/rtl/rtl_blur.wgsl".into()
+    }
+}
+
+#[derive(TypePath)]
+struct RTLTemporalAccumulation;
+
+impl ComputeShader for RTLTemporalAccumulation {
+    fn shader() -> ShaderRef {
+        "shaders/rtl/rtl_temporal_accumulation.wgsl".into()
     }
 }
 
@@ -135,18 +147,23 @@ impl ComputeWorker for RTLComputeWorker {
             .add_uniform("light_count", &0)
             .add_uniform("current_occluder_frame", &0)
             .add_uniform("total_occluder_frames", &OCCLUDER_FRAME_BUDGET)
-            .add_uniform("current_light_frame", &0)
-            .add_uniform("total_light_frames", &1)
             .add_uniform("buffer_size", &1600)
             .add_storage("intermediate_blur", &[0u32; 1600*1600])
                     .add_uniform("y", &1)
             .add_uniform("noy", &0)
             .add_uniform("is_static_occluder_reset", &0)
 
-            .add_pass::<RTLResetShader>([100, 100, 1], &["lighting_output", "current_light_frame", "total_light_frames", "buffer_size"])
+            .add_uniform("temporal_lightmap_index", &0) // current temporal lightmap to edit
+            .add_uniform("temporal_lightmap_count", &(MAX_TEMPORAL_LIGHTMAP_COUNT as u32)) // current temporal lightmaps being filled
+            .add_storage("temporal_lightmaps", &[0u32; 1600 * 1600 * MAX_TEMPORAL_LIGHTMAP_COUNT])
+
+            //.add_pass::<RTLResetShader>([100, 100, 1], &["lighting_output", "current_light_frame", "total_light_frames", "buffer_size"])
+            .add_pass::<RTLResetShader>([100, 100, 1], &["temporal_lightmaps", "temporal_lightmap_index"])
             .add_pass::<RTLOccluderResetShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_mask", "current_occluder_frame", "total_occluder_frames", "buffer_size", "is_static_occluder_reset"])
             .add_pass::<RTLOccludeFillShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_count", "occluders", "occluder_mask", "current_occluder_frame", "total_occluder_frames"])
-            .add_pass::<RTLComputeShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "lighting_output", "occluder_mask"])
+            //.add_pass::<RTLRaytraceShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "lighting_output", "occluder_mask"])
+            .add_pass::<RTLRaytraceShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "temporal_lightmaps", "temporal_lightmap_index", "occluder_mask"])
+            .add_pass::<RTLTemporalAccumulation>([100, 100, 1], &["temporal_lightmaps", "temporal_lightmap_count", "buffer_size", "lighting_output"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["lighting_output", "intermediate_blur", "buffer_size", "noy"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["intermediate_blur", "lighting_output", "buffer_size", "y"])
             .build();
@@ -155,6 +172,16 @@ impl ComputeWorker for RTLComputeWorker {
     }
 }
 
+#[derive(Resource, Default)]
+pub(crate) struct TemporalLightmapIndex(pub u32);
+
+pub(crate) fn increment_temporal_lightmap_index(
+    mut temporal_lightmap_index: ResMut<TemporalLightmapIndex>,
+    mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
+) {
+    temporal_lightmap_index.0 = (temporal_lightmap_index.0 + 1) % MAX_TEMPORAL_LIGHTMAP_COUNT as u32;
+    worker.write("temporal_lightmap_index", &temporal_lightmap_index.0);
+}
 
 #[derive(Resource)]
 pub(crate) struct SharedRTLOutputBuffer(pub Buffer);

@@ -141,3 +141,22 @@ _Better Data Input_
 - Will need a system that checks whether or not to do a complete rewrite
   - With<StaticOccluder> && (Changed<Transform> || Added<StaticOccluder>)
   - If any match this, raise a single event
+
+**Temporal Filter**
+// every frame
+// clear lightmap
+// clear occluder partition
+// fill occludermap
+// calc lighting via raytracing -> write to temporal buffer
+// average temporal buffer -> write to lightmap
+// blur lightmap horizontal -> write to intermediary lightmap
+// blur intermediary lightmap vertical -> write to lightmap
+
+// every frame
+//_ clear lightmap partition
+// clear occluder partition
+// fill occludermap
+// calc lighting via raytracing -> write to temporal buffer
+//_ average temporal buffer -> write to temporal*output
+//* blur temporal*output horizontal -> write to intermediary lightmap
+//* blur intermediary lightmap vertical -> write to lightmap partition
