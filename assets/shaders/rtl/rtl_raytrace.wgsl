@@ -46,9 +46,10 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     var dist = 0.0;
     while dist < 500.0 {
 
-        let lightmap_idx = pos_to_light_idx(cur_pos);
+        let lightmap_idx = pos_to_light_idx(cur_pos) + (temporal_lightmap_index * 1600 * 1600);
+        let occluder_idx = pos_to_light_idx(cur_pos);
 
-        if occluder_mask[lightmap_idx] > 0 {
+        if occluder_mask[occluder_idx] > 0 {
             if last_was_occ { return; }
             else { last_was_occ = true; }
             light_rgbi.w *= 0.7;
@@ -88,7 +89,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
 }
 
 fn pos_to_light_idx(pos: vec2f) -> u32 {
-    return u32(pos.x) + (1600 * u32(pos.y)) + (temporal_lightmap_index * 1600 * 1600);
+    return u32(pos.x) + (1600 * u32(pos.y));
 }
 
 
