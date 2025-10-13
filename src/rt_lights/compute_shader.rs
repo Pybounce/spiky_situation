@@ -66,6 +66,15 @@ impl ComputeShader for RTLTemporalAccumulation {
     }
 }
 
+#[derive(TypePath)]
+struct RTLLightPacker;
+
+impl ComputeShader for RTLLightPacker {
+    fn shader() -> ShaderRef {
+        "shaders/rtl/rtl_lightpacker.wgsl".into()
+    }
+}
+
 
 #[repr(C)]
 #[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
@@ -157,11 +166,19 @@ impl ComputeWorker for RTLComputeWorker {
             .add_uniform("temporal_lightmap_count", &(MAX_TEMPORAL_LIGHTMAP_COUNT as u32)) // current temporal lightmaps being filled
             .add_storage("temporal_lightmaps", &[0u32; 1600 * 1600 * MAX_TEMPORAL_LIGHTMAP_COUNT])
 
-            .add_pass::<RTLResetShader>([100, 100, 1], &["temporal_lightmaps", "temporal_lightmap_index"])
+            .add_storage("red_lightmap", &[0u32; 1600*1600])
+            .add_storage("green_lightmap", &[0u32; 1600*1600])
+            .add_storage("blue_lightmap", &[0u32; 1600*1600])
+
+
+            .add_pass::<RTLResetShader>([100, 100, 1], &["red_lightmap"])//, "temporal_lightmap_index"])
+            .add_pass::<RTLResetShader>([100, 100, 1], &["green_lightmap"])//, "temporal_lightmap_index"])
+            .add_pass::<RTLResetShader>([100, 100, 1], &["blue_lightmap"])//, "temporal_lightmap_index"])
             .add_pass::<RTLOccluderResetShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_mask", "current_occluder_frame", "total_occluder_frames", "buffer_size", "is_static_occluder_reset"])
             .add_pass::<RTLOccludeFillShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_count", "occluders", "occluder_mask", "current_occluder_frame", "total_occluder_frames"])
-            .add_pass::<RTLRaytraceShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "temporal_lightmaps", "temporal_lightmap_index", "occluder_mask"])
-            .add_pass::<RTLTemporalAccumulation>([100, 100, 1], &["temporal_lightmaps", "temporal_lightmap_count", "buffer_size", "lighting_output", "temporal_lightmap_index"])
+            .add_pass::<RTLRaytraceShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "occluder_mask", "red_lightmap", "green_lightmap", "blue_lightmap"])
+            //.add_pass::<RTLTemporalAccumulation>([100, 100, 1], &["temporal_lightmaps", "temporal_lightmap_count", "buffer_size", "lighting_output", "temporal_lightmap_index"])
+            .add_pass::<RTLLightPacker>([100, 100, 1], &["lighting_output", "red_lightmap", "green_lightmap", "blue_lightmap"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["lighting_output", "intermediate_blur", "buffer_size", "noy"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["intermediate_blur", "lighting_output", "buffer_size", "y"])
             .build();
