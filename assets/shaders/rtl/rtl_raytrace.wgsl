@@ -118,10 +118,10 @@ fn unpack_rgbi(packed: u32) -> vec4<f32> {
 
 fn pack_rgbi(rgbi: vec4<f32>) -> u32 {
     var packed = u32(0);
-    packed |= u32(clamp(rgbi.x * 255.0, 0.0, 255.0)) << 24;
-    packed |= u32(clamp(rgbi.y * 255.0, 0.0, 255.0)) << 16;
-    packed |= u32(clamp(rgbi.z * 255.0, 0.0, 255.0)) << 8;
-    packed |= u32(clamp(rgbi.w * 255.0, 0.0, 255.0));
+    packed |= u32(clamp(rgbi.x, 0.0, 255.0)) << 24;
+    packed |= u32(clamp(rgbi.y, 0.0, 255.0)) << 16;
+    packed |= u32(clamp(rgbi.z, 0.0, 255.0)) << 8;
+    packed |= u32(clamp(rgbi.w, 0.0, 255.0));
     return packed;
 
 }

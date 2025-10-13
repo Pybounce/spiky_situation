@@ -16,7 +16,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     let idx = gid.x + (1600 * gid.y);
     let rgb = vec3f(f32(red_lightmap[idx]), f32(green_lightmap[idx]), f32(blue_lightmap[idx]));
     let i = length(rgb);
-    let rgbi = vec4f(normalize(rgb), i / 100000.0);
+    let rgbi = vec4f(normalize(rgb), i / 150000.0);
     buffer[idx] = pack_rgbi(rgbi);
 }
 
