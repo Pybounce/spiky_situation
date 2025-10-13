@@ -7,16 +7,20 @@ var<uniform> temporal_buffer_count: u32;
 var<uniform> buffer_size: u32;
 @group(0) @binding(3)
 var<storage, read_write> output_buffer: array<u32>;
+@group(0) @binding(4)
+var<uniform> temporal_lightmap_index: u32;
 
 @compute @workgroup_size(16, 16)
 fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
 
     let base_idx = gid.x + gid.y * buffer_size;
     var rgbi_sum = vec4f(0.0, 0.0, 0.0, 0.0);
+    var current_rgbi = unpack_rgbi(temporal_buffers[base_idx + (buffer_size * buffer_size * temporal_lightmap_index)]);
 
     for (var i: u32 = 0u; i < temporal_buffer_count; i = i + 1u) {
         let idx = base_idx + (buffer_size * buffer_size * i);
-        rgbi_sum += unpack_rgbi(temporal_buffers[idx]);
+        rgbi_sum += clamp(unpack_rgbi(temporal_buffers[idx]), current_rgbi - 100.0, current_rgbi + 100.0);
+        //rgbi_sum += unpack_rgbi(temporal_buffers[idx]);
     }
 
     rgbi_sum = rgbi_sum / f32(temporal_buffer_count);

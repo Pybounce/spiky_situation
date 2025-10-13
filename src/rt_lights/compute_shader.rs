@@ -9,7 +9,7 @@ const MAX_LIGHTS: u32 = 30;
 const MAX_OCCLUDERS: u32 = 100*100;
 const OCCLUDER_FRAME_BUDGET: u32 = 4;
 const RESOLUTION: u32 = 1600;   // mostly unused at the moment
-const MAX_TEMPORAL_LIGHTMAP_COUNT: usize = 8;
+const MAX_TEMPORAL_LIGHTMAP_COUNT: usize = 16;
 
 
 
@@ -161,7 +161,7 @@ impl ComputeWorker for RTLComputeWorker {
             .add_pass::<RTLOccluderResetShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_mask", "current_occluder_frame", "total_occluder_frames", "buffer_size", "is_static_occluder_reset"])
             .add_pass::<RTLOccludeFillShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_count", "occluders", "occluder_mask", "current_occluder_frame", "total_occluder_frames"])
             .add_pass::<RTLRaytraceShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "temporal_lightmaps", "temporal_lightmap_index", "occluder_mask"])
-            .add_pass::<RTLTemporalAccumulation>([100, 100, 1], &["temporal_lightmaps", "temporal_lightmap_count", "buffer_size", "lighting_output"])
+            .add_pass::<RTLTemporalAccumulation>([100, 100, 1], &["temporal_lightmaps", "temporal_lightmap_count", "buffer_size", "lighting_output", "temporal_lightmap_index"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["lighting_output", "intermediate_blur", "buffer_size", "noy"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["intermediate_blur", "lighting_output", "buffer_size", "y"])
             .build();
