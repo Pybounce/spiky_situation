@@ -1,4 +1,4 @@
-use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, torch::TorchFactory, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
 use bevy::{platform::collections::HashMap, prelude::*};
@@ -58,6 +58,10 @@ pub enum ObjectAtlasIndices {
     BeamEndParticles1 = 57,
     BeamEndParticles2 = 58,
     BeamEndParticles3 = 59,
+    Torch0 = 90,
+    Torch1 = 91,
+    Torch2 = 92,
+    Torch3 = 93,
 }
 
 
@@ -92,6 +96,7 @@ impl<'a> StageCreator<'a> {
         && build_pressure_spikes(self, commands)
         && build_lasers(self, commands)
         && add_rails(self, commands)
+        && build_toches(self, commands)
     }
 
 
@@ -338,6 +343,20 @@ fn build_phantom_blocks(stage_creator: &StageCreator, commands: &mut Commands) -
     ];
     for phantom_block in &stage_creator.stage.phantom_blocks {
         PhantomBlockFactory::spawn(commands, stage_creator, atlas_rects.clone(), phantom_block);
+    }
+    return true;
+}
+
+fn build_toches(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+    let atlas_rects = vec![
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::Torch0),
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::Torch1),
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::Torch2),
+        get_object_tilemap_rect_from_index(ObjectAtlasIndices::Torch3),
+    ];
+
+    for torch in stage_creator.stage.torches.as_ref().into_iter().flatten() {
+        TorchFactory::spawn(commands, stage_creator, atlas_rects.clone(), &torch);
     }
     return true;
 }

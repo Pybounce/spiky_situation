@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, RailRider, SawShooterBlock, Spike, Spring, Stage, TerrainTheme}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
+use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, RailRider, SawShooterBlock, Spike, Spring, Stage, TerrainTheme, Torch}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -241,6 +241,10 @@ impl EditorController {
         for laser in &stage.lasers {
             self.stage_grid.insert(laser.grid_pos.as_ivec2(), EditorItem::Laser { rotation: laser.rotation });
         }
+        for torch in stage.torches.as_ref().into_iter().flatten() {
+            self.stage_grid.insert(torch.grid_pos.as_ivec2(), EditorItem::Torch);
+        }
+
     }
 
     fn build_stage(&self) -> Stage {
@@ -335,6 +339,7 @@ impl EditorController {
                         rail_rider: if let Some((rail_id, waypoint_index)) = self.rail_grid.is_on(*grid_pos) { Some(RailRider::new(rail_id, waypoint_index + 1, false)) } else { None },
                     });
                 }
+                EditorItem::Torch => { stage.torches.get_or_insert_with(|| vec![]).push(Torch { grid_pos: grid_pos.as_vec2() }); },
             }
         }
         return stage;
