@@ -78,7 +78,7 @@ impl LaserBuilder {
             },
             Ground,
             RayCaster::new(Vec2::Y * 8.1, Dir2::Y).with_ignore_self(true).with_solidness(true).with_query_filter(SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground)),
-            LightOccluder::Square(16.0)
+            LightOccluder::Rect(16.0, 16.0)
         ));
 
         if let Some(rail_rider) = &laser.rail_rider {

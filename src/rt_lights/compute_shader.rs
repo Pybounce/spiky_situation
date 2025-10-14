@@ -105,7 +105,7 @@ pub(crate) struct Occluder {
 impl Occluder {
     pub fn new(pos: Vec2, occluder: LightOccluder, is_static: bool) -> Self {
         let (id, params) = match occluder {
-            LightOccluder::Square(size) => (0, Vec2::new(size, size)),
+            LightOccluder::Rect(w, h) => (0, Vec2::new(w, h)),
             LightOccluder::Circle(radius) => (1, Vec2::new(radius, radius)),
         };
         let static_flag: u32 = match is_static {
@@ -237,7 +237,7 @@ pub(crate) fn write_occluder_buffer(
         if static_opt.is_some() && occluder_manager.static_refresh_frames_remaining == 0 { continue; }
         
         let (occ_min_y, occ_max_y) = match occluder {
-            LightOccluder::Square(s) => (t.translation.y - (s / 2.0), t.translation.y + (s / 2.0)),
+            LightOccluder::Rect(_w, h) => (t.translation.y - (h / 2.0), t.translation.y + (h / 2.0)),
             LightOccluder::Circle(r) => (t.translation.y - r, t.translation.y + r),
         };
         if occ_min_y <= max_y && occ_max_y >= min_y {

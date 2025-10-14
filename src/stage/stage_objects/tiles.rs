@@ -76,7 +76,7 @@ impl GroundTileBundle {
             physical_tile_bundle: PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             ground_marker: Ground,
             wall_marker: Wall,
-            occluder: LightOccluder::Square(16.0),
+            occluder: LightOccluder::Rect(16.0, 16.0),
             static_occluder: StaticLightOccluder
         }
     }

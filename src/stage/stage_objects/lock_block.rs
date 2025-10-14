@@ -22,7 +22,7 @@ impl LockBlockFactory {
                 trigger_id: lock_block_asset.trigger_id
             },
             Ground,
-            LightOccluder::Square(16.0)
+            LightOccluder::Rect(16.0, 16.0)
         ));
     }
 }

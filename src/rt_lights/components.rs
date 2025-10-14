@@ -10,7 +10,7 @@ pub struct PointLight {
 
 #[derive(Component, Clone, Copy)]
 pub enum LightOccluder {
-    Square(f32),
+    Rect(f32, f32),
     Circle(f32)
 }
 
