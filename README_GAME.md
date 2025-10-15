@@ -36,3 +36,11 @@
     - Far more interesting, the stage has 2 phases now
   - Drawbacks:
     - Complexity, not even sure how to implement or what would change
+
+**Attention to detail**
+
+- [ ] Fast objects puts out torch
+  - Depending on the type of torch
+  - Fast moving objects will put the flame out on a torch
+  - Player dashing/falling, fast saws etc
+  - Maybe just playing dashing to keep things simple
