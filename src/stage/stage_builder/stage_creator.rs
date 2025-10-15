@@ -58,10 +58,10 @@ pub enum ObjectAtlasIndices {
     BeamEndParticles1 = 57,
     BeamEndParticles2 = 58,
     BeamEndParticles3 = 59,
-    Torch0 = 90,
-    Torch1 = 91,
-    Torch2 = 92,
-    Torch3 = 93,
+    Torch0 = 80,
+    Torch1 = 81,
+    Torch2 = 82,
+    Torch3 = 83,
 }
 
 

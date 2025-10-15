@@ -9,7 +9,7 @@ impl TorchFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, torch: &stage_asset::Torch) {
         commands.spawn((
             TileBundle::new(stage_creator, torch.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap),
-            SpriteAnimator::new(50, atlas_rects),
+            SpriteAnimator::new(200, atlas_rects),
             PointLight {
                 intensity: 255,
                 colour: Color::srgb_u8(255, 190, 90),
