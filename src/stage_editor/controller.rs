@@ -112,7 +112,14 @@ impl EditorController {
         self.stage_grid.insert(grid_pos, self.current_item);
         self.saved = false;
         self.version += 1;
+        self.grid_size.x = self.grid_size.x.max(grid_pos.x + 1);
+        self.grid_size.y = self.grid_size.y.max(grid_pos.y + 1);
         return true;
+    }
+
+    pub fn try_place_item(&mut self, grid_pos: IVec2, editor_item: EditorItem) -> bool {
+        self.current_item = editor_item;
+        return self.try_place(grid_pos);
     }
 
     pub fn try_place_rail(&mut self, start: IVec2, end: IVec2) -> bool {
@@ -133,9 +140,7 @@ impl EditorController {
     
     pub fn can_place(&self, grid_pos: IVec2) -> bool {
         grid_pos.x >= 0 && 
-        grid_pos.x <= self.grid_size.x as i32 - 1 &&
         grid_pos.y >= 0 && 
-        grid_pos.y <= self.grid_size.y as i32 - 1 &&
         !self.stage_grid.contains_key(&grid_pos)
     }
 
@@ -171,9 +176,7 @@ impl EditorController {
     }
     pub fn can_remove(&self, grid_pos: IVec2) -> bool {
         grid_pos.x >= 0 && 
-        grid_pos.x <= self.grid_size.x as i32 - 1 &&
         grid_pos.y >= 0 && 
-        grid_pos.y <= self.grid_size.y as i32 - 1 &&
         self.stage_grid.contains_key(&grid_pos)
     }
 
@@ -198,61 +201,65 @@ impl EditorController {
         self.stage_grid.insert(stage.goal_grid_pos.as_ivec2(), EditorItem::Goal);
         
         for ground in &stage.ground_tiles {
-            self.stage_grid.insert(ground.grid_pos.as_ivec2(), EditorItem::Ground);
+            self.try_place_item(ground.grid_pos.as_ivec2(), EditorItem::Ground);
         }
         for spike in &stage.spikes {
-            self.stage_grid.insert(spike.grid_pos.as_ivec2(), EditorItem::Spike { rotation: spike.rotation });
+            self.try_place_item(spike.grid_pos.as_ivec2(), EditorItem::Spike { rotation: spike.rotation });
         }
         for half_saw in &stage.half_saws {
-            self.stage_grid.insert(half_saw.grid_pos.as_ivec2(), EditorItem::HalfSaw { rotation: half_saw.rotation });
+            self.try_place_item(half_saw.grid_pos.as_ivec2(), EditorItem::HalfSaw { rotation: half_saw.rotation });
         }
         for spring in &stage.springs {
-            self.stage_grid.insert(spring.grid_pos.as_ivec2(), EditorItem::Spring { rotation: spring.rotation });
+            self.try_place_item(spring.grid_pos.as_ivec2(), EditorItem::Spring { rotation: spring.rotation });
         }
         for lock_block in &stage.lock_blocks {
-            self.stage_grid.insert(lock_block.grid_pos.as_ivec2(), EditorItem::LockBlock { variant: match lock_block.trigger_id {
+            self.try_place_item(lock_block.grid_pos.as_ivec2(), EditorItem::LockBlock { variant: match lock_block.trigger_id {
                 1 => LockBlockVariant::One,
                 2 => LockBlockVariant::Two,
                 _ => LockBlockVariant::Three,
             }});
         }
         for key in &stage.keys {
-            self.stage_grid.insert(key.grid_pos.as_ivec2(), EditorItem::Key { variant: match key.trigger_id {
+            self.try_place_item(key.grid_pos.as_ivec2(), EditorItem::Key { variant: match key.trigger_id {
                 1 => KeyVariant::One,
                 2 => KeyVariant::Two,
                 _ => KeyVariant::Three,
             }});
         }
         for interval_block in &stage.interval_blocks {
-            self.stage_grid.insert(interval_block.grid_pos.as_ivec2(), EditorItem::IntervalBlock { variant: match interval_block.is_active {
+            self.try_place_item(interval_block.grid_pos.as_ivec2(), EditorItem::IntervalBlock { variant: match interval_block.is_active {
                 true => IntervalBlockVariant::On,
                 false => IntervalBlockVariant::Off
             }});
         }
         for saw_shooter in &stage.saw_shooter_blocks {
-            self.stage_grid.insert(saw_shooter.grid_pos.as_ivec2(), EditorItem::SawShooter { rotation: saw_shooter.rotation });
+            self.try_place_item(saw_shooter.grid_pos.as_ivec2(), EditorItem::SawShooter { rotation: saw_shooter.rotation });
         }
         for phantom_block in &stage.phantom_blocks {
-            self.stage_grid.insert(phantom_block.grid_pos.as_ivec2(), EditorItem::PhantomBlock);
+            self.try_place_item(phantom_block.grid_pos.as_ivec2(), EditorItem::PhantomBlock);
         }
         for pressure_spike in &stage.pressure_spikes {
-            self.stage_grid.insert(pressure_spike.grid_pos.as_ivec2(), EditorItem::PressureSpike { rotation: pressure_spike.rotation });
+            self.try_place_item(pressure_spike.grid_pos.as_ivec2(), EditorItem::PressureSpike { rotation: pressure_spike.rotation });
         }
         for laser in &stage.lasers {
-            self.stage_grid.insert(laser.grid_pos.as_ivec2(), EditorItem::Laser { rotation: laser.rotation });
+            self.try_place_item(laser.grid_pos.as_ivec2(), EditorItem::Laser { rotation: laser.rotation });
         }
         for torch in stage.torches.as_ref().into_iter().flatten() {
-            self.stage_grid.insert(torch.grid_pos.as_ivec2(), EditorItem::Torch);
+            self.try_place_item(torch.grid_pos.as_ivec2(), EditorItem::Torch);
         }
 
     }
 
     fn build_stage(&self) -> Stage {
-        let mut stage: Stage = Stage::new(self.new_stage_id, self.grid_size);
+        let mut stage: Stage = Stage::new(self.new_stage_id, IVec2::new(0, 0));
+        let mut stage_size = IVec2::ZERO;
         stage.rail_graph = RailGraph {
             rails: HashMap::<u32, Vec<IVec2>>::from_iter(self.rail_grid.iter_rails().map(|(id, rail)| (*id, rail.iter_points().copied().collect()))),
         };
         for (grid_pos, stage_editor_obj) in &self.stage_grid {
+            stage_size.x = stage_size.x.max(grid_pos.x + 1);
+            stage_size.y = stage_size.y.max(grid_pos.y + 1);
+
             match stage_editor_obj {
                 EditorItem::Spike { rotation } => {
                     stage.spikes.push(Spike {
@@ -342,6 +349,8 @@ impl EditorController {
                 EditorItem::Torch => { stage.torches.get_or_insert_with(|| vec![]).push(Torch { grid_pos: grid_pos.as_vec2() }); },
             }
         }
+        stage.grid_width = stage_size.x as usize;
+        stage.grid_height = stage_size.y as usize;
         return stage;
     }
 }
