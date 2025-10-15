@@ -70,23 +70,22 @@ impl ComputeShader for RTLLightPacker {
 #[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
 pub(crate) struct RTPointLight {
     pub pos: Vec2,
-    pub packed_light: u32,
-    pub _pad: u32
+    pub packed_rgb: u32,
+    pub intensity: f32
 }
 
 impl RTPointLight {
-    pub fn new(pos: Vec2, colour: Color, intensity: u8) -> Self {
+    pub fn new(pos: Vec2, colour: Color, intensity: f32) -> Self {
         let [r, g, b] = colour.to_linear().to_u8_array_no_alpha();
-        let mut packed_light: u32 = 0;
-        packed_light |= (r as u32) << 24;
-        packed_light |= (g as u32) << 16;
-        packed_light |= (b as u32) << 8;
-        packed_light |= intensity as u32;
+        let mut packed_rgb: u32 = 0;
+        packed_rgb |= (r as u32) << 24;
+        packed_rgb |= (g as u32) << 16;
+        packed_rgb |= (b as u32) << 8;
         
         return Self {
-            packed_light,
+            packed_rgb,
             pos,
-            _pad: 0,
+            intensity,
         };
     }
 }
