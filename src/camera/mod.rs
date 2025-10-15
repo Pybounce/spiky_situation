@@ -1,5 +1,5 @@
 
-use bevy::{core_pipeline::{bloom::Bloom, tonemapping::Tonemapping}, input::mouse::MouseWheel, prelude::*};
+use bevy::{core_pipeline::{bloom::Bloom, tonemapping::Tonemapping}, input::mouse::MouseWheel, prelude::*, window::WindowResized};
 use avian2d::prelude::*;
 
 use crate::{local_player::LocalPlayer, rt_lights::post_process_shader::RTLPostProcessSettings, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
@@ -111,6 +111,22 @@ pub fn handle_zoom_change(
                 ortho.scale = 1.0 / (new_zoom as f32);
             };
             pixel_translation.factor = new_zoom;
+        }
+    }
+}
+
+
+pub fn clamp_window_resolution(
+    mut resize_events: EventReader<WindowResized>,
+    mut windows: Query<&mut Window>,
+) {
+    for event in resize_events.read() {
+        if let Ok(mut window) = windows.single_mut() {
+            let tile_size = 16.0;
+            let new_width = (event.width / tile_size).floor() * tile_size;
+            let new_height = (event.height / tile_size).floor() * tile_size;
+
+            window.resolution.set(new_width, new_height);
         }
     }
 }
