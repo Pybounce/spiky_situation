@@ -52,7 +52,7 @@ fn main() {
             fit_canvas_to_parent: true,
             prevent_default_event_handling: true,
             //resolution: (1600.0, 900.0).into(),
-            //present_mode: PresentMode::Immediate,
+            present_mode: PresentMode::Immediate,
             ..default()
         }),
         ..default()

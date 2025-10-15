@@ -1,5 +1,5 @@
 
-use bevy::{core_pipeline::tonemapping::Tonemapping, input::mouse::MouseWheel, prelude::*};
+use bevy::{core_pipeline::{bloom::Bloom, tonemapping::Tonemapping}, input::mouse::MouseWheel, prelude::*};
 use avian2d::prelude::*;
 
 use crate::{local_player::LocalPlayer, rt_lights::post_process_shader::RTLPostProcessSettings, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
@@ -13,6 +13,10 @@ pub fn spawn_camera(mut commands: Commands) {
     commands
         .spawn((
             Camera2d::default(),
+            Camera {
+                //hdr: true,
+                ..default()
+            },
             Projection::Orthographic(OrthographicProjection {
                 far: 1000.,
                 near: -1000.,
@@ -42,7 +46,8 @@ pub fn spawn_camera(mut commands: Commands) {
             },
             RTLPostProcessSettings {
                 something: 1.0
-            }
+            },
+            //Bloom::NATURAL
         ));
 }
 

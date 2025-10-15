@@ -37,10 +37,6 @@ impl PressureSpikeBuilder {
             SplatProvider {
                 translation_offset: Vec2::new(0.0, -(TILE_SIZE_HALF * 0.6)),
             },
-            PointLight {
-                intensity: 255,
-                colour: Color::srgb_u8(255, 190, 90),
-            },
             children![(
                 Transform::from_translation(Vec3::new(0.0, -TILE_SIZE_HALF * 0.6, 0.0)),
                 Collider::rectangle(TILE_SIZE * 0.8, TILE_SIZE * 0.4),

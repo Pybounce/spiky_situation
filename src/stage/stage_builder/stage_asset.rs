@@ -28,7 +28,8 @@ pub struct Stage {
     pub grid_width: usize,
     pub grid_height: usize,
     pub spawn_grid_pos: Vec2,
-    pub goal_grid_pos: Vec2
+    pub goal_grid_pos: Vec2,
+    pub torches: Option<Vec<Torch>>,
 }
 
 impl Stage {
@@ -53,6 +54,7 @@ impl Stage {
             spawn_grid_pos: Vec2::default(),
             goal_grid_pos: Vec2::new(100.0 * TILE_SIZE, 0.0),
             terrain_theme: TerrainTheme::Grass,
+            torches: None,
         }
     }
 }
@@ -90,6 +92,11 @@ pub enum TerrainTheme {
 pub struct GroundTile {
     pub grid_pos: Vec2,
     pub tilemap_index: usize
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Torch {
+    pub grid_pos: Vec2,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

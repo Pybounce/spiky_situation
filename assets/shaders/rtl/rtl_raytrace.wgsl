@@ -4,15 +4,20 @@ var<uniform> light_count: u32;
 @group(0) @binding(1)
 var<storage, read> lights: array<RTPointLight>;
 @group(0) @binding(2)
-var<storage, read_write> lighting_output: array<u32>;
-@group(0) @binding(3)
 var<storage, read> occluder_mask: array<u32>;
+
+@group(0) @binding(3)
+var<storage, read_write> red_lightmap: array<atomic<u32>>;
+@group(0) @binding(4)
+var<storage, read_write> green_lightmap: array<atomic<u32>>;
+@group(0) @binding(5)
+var<storage, read_write> blue_lightmap: array<atomic<u32>>;
 
 
 struct RTPointLight {
     pos: vec2<f32>,
-    packed_light: u32,
-    _pad: u32,
+    packed_rgb: u32,
+    intensity: f32,
 };
 
 
@@ -26,7 +31,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     if light_idx >= light_count { return; }
 
     var cur_pos = lights[light_idx].pos;
-    var light_rgbi = unpack_rgbi(lights[light_idx].packed_light);
+    var light_rgbi = vec4f(unpack_rgb(lights[light_idx].packed_rgb).rgb, lights[light_idx].intensity);
 
     let ray_count = u32(320);
 
@@ -45,8 +50,9 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     while dist < 500.0 {
 
         let lightmap_idx = pos_to_light_idx(cur_pos);
+        let occluder_idx = pos_to_light_idx(cur_pos);
 
-        if occluder_mask[lightmap_idx] > 0 {
+        if occluder_mask[occluder_idx] > 0 {
             if last_was_occ { return; }
             else { last_was_occ = true; }
             light_rgbi.w *= 0.7;
@@ -65,16 +71,19 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         let falloff = exp(-dist * 0.01);
         let cur_intensity = light_rgbi.w * falloff;
         if cur_intensity <= 0.01 { break; }
-        let rgb = light_rgbi.rgb * cur_intensity;
-        let current_rgbi = unpack_rgbi(lighting_output[lightmap_idx]);
-        let current_rgb = current_rgbi.rgb * current_rgbi.w;
+        //let rgb = light_rgbi.rgb * cur_intensity;
+        //let current_rgb = lightmap_idx_to_rgb(lightmap_idx);
         
-        let blended_i = current_rgbi.w + cur_intensity;
-        let blended_rgb = (rgb + current_rgb) / blended_i;
+        //let blended_rgb = (rgb + current_rgb) / blended_i;
 
-        let new_packed = pack_rgbi(vec4f(blended_rgb, blended_i));
-        //atomicAdd(&lighting_output[lightmap_idx], u32(cur_intensity * 100.0));
-        lighting_output[lightmap_idx] = new_packed;
+        //let new_packed = pack_rgbi(vec4f(blended_rgb, blended_i));
+        //atomicAdd(&temporal_lightmaps[lightmap_idx], u32(cur_intensity * 100.0));
+        //temporal_lightmaps[lightmap_idx] = new_packed;
+
+
+        atomicAdd(&red_lightmap[lightmap_idx], u32(cur_intensity * light_rgbi.r));
+        atomicAdd(&green_lightmap[lightmap_idx], u32(cur_intensity * light_rgbi.g));
+        atomicAdd(&blue_lightmap[lightmap_idx], u32(cur_intensity * light_rgbi.b));
 
         last_pos = vec2<i32>(i32(cur_pos.x), i32(cur_pos.y));
 
@@ -89,20 +98,28 @@ fn pos_to_light_idx(pos: vec2f) -> u32 {
     return u32(pos.x) + (1600 * u32(pos.y));
 }
 
+fn lightmap_idx_to_rgb(idx: u32) -> vec3f {
+    return vec3f(f32(red_lightmap[idx]), f32(green_lightmap[idx]), f32(blue_lightmap[idx]));
+}
 
-fn unpack_rgbi(packed: u32) -> vec4<f32> {
+
+
+
+
+
+
+fn unpack_rgb(packed: u32) -> vec3<f32> {
     var r = f32((packed >> 24) & 0x000000FF);
     var g = f32((packed >> 16) & 0x000000FF);
     var b = f32((packed >> 8) & 0x000000FF);
-    var intensity = f32(packed & 0x000000FF);
-    return vec4f(r, g, b, intensity) / 255.0;
+    return vec3f(r, g, b);
 }
 
-fn pack_rgbi(rgbi: vec4<f32>) -> u32 {
+fn pack_rgb(rgb: vec3<f32>) -> u32 {
     var packed = u32(0);
-    packed |= u32(clamp(rgbi.x * 255.0, 0.0, 255.0)) << 24;
-    packed |= u32(clamp(rgbi.y * 255.0, 0.0, 255.0)) << 16;
-    packed |= u32(clamp(rgbi.z * 255.0, 0.0, 255.0)) << 8;
-    packed |= u32(clamp(rgbi.w * 255.0, 0.0, 255.0));
+    packed |= u32(clamp(rgb.x, 0.0, 255.0)) << 24;
+    packed |= u32(clamp(rgb.y, 0.0, 255.0)) << 16;
+    packed |= u32(clamp(rgb.z, 0.0, 255.0)) << 8;
     return packed;
+
 }

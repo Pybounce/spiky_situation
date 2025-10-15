@@ -17,6 +17,7 @@ pub struct EndlessStagesCompleteText;
 pub fn add_endless_mode_ui(
     mut commands: Commands
 ) {
+    return;
     commands
         .spawn((Node {
                 width: Val::Percent(100.0),
