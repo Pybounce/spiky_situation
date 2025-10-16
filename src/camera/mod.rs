@@ -2,7 +2,7 @@
 use bevy::{core_pipeline::{bloom::Bloom, tonemapping::Tonemapping}, input::mouse::MouseWheel, prelude::*, window::WindowResized};
 use avian2d::prelude::*;
 
-use crate::{local_player::LocalPlayer, rt_lights::post_process_shader::RTLPostProcessSettings, shaders::cctv_shader::plugin::CCTVPostProcessSettings};
+use crate::{local_player::LocalPlayer, rt_lights::post_process_shader::RTLPostProcessSettings, shaders::cctv_shader::plugin::CCTVPostProcessSettings, stage::stage_builder::CurrentStageData};
 
 const CAMERA_ZOOM: u32 = 3;
 const CAMERA_ZOOM_MAX: u32 = 10;
@@ -116,6 +116,7 @@ pub fn handle_zoom_change(
 }
 
 
+
 pub fn clamp_window_resolution(
     mut resize_events: EventReader<WindowResized>,
     mut windows: Query<&mut Window>,
@@ -130,3 +131,53 @@ pub fn clamp_window_resolution(
         }
     }
 }
+
+const MIN_STAGE_SIZE: Vec2 = Vec2::new(16.0 * 32.0, 16.0 * 18.0);
+
+
+pub fn clamp_camera_to_stage(
+    windows: Query<&Window>,
+    mut camera_query: Query<(&mut PixelPerfectTranslation, &mut Transform, &mut Projection), With<Camera>>,
+    stage_data: Option<Res<CurrentStageData>>,
+) {
+
+    let Ok(window) = windows.single() else { return ; };
+    let window_res = Vec2::new(window.resolution.width(), window.resolution.height());
+    let Some(stage_data) = stage_data else { return; };
+    
+    let max_scale = (window_res.x / MIN_STAGE_SIZE.x).max(window_res.y / MIN_STAGE_SIZE.y);
+    let min_pixel_factor = max_scale.ceil().max(1.0) as u32;
+    
+    let scale = 1.0 / (min_pixel_factor as f32);
+    
+    //println!("Camera sees: {} x {}", view_size.x, view_size.y);
+    //println!("scale: {}", 1.0 / pixel_factor as f32);
+    //println!("max_scale: {}", max_scale);
+
+
+    for (mut pixel_translation, mut transform, mut projection) in &mut camera_query {
+        
+        if let Projection::Orthographic(ref mut ortho) = *projection {
+            let pixel_factor = min_pixel_factor.max(pixel_translation.factor);
+            ortho.scale = 1.0 / pixel_factor as f32;
+            pixel_translation.factor = pixel_factor;
+        };
+
+        let view_size = window_res * (1.0 / pixel_translation.factor as f32);
+        pixel_translation.translation = pixel_translation.translation.clamp(Vec3::new(view_size.x / 2.0, view_size.y / 2.0, -10000.0), Vec3::new(stage_data.bounds.width() - (view_size.x / 2.0) - 16.0 , stage_data.bounds.height() - (view_size.y / 2.0) - 16.0, 10000.0));
+    }
+}
+
+// THY CLAMPING PLAN
+
+// Make a MIN_STAGE_SIZE
+// Always clamp the scale such that scale * res is smaller than the MIN_STAGE_SIZE
+// Always clamp the camera position such that the edges don't surpass x/y axis and MIN_STAGE_SIZE
+
+
+// TODO 
+
+// Let player zoom in/out within bounds
+// Change some existing stages to fit camera
+
+// HK and C both manage to get it working and looking decent so.

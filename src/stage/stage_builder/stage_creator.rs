@@ -83,7 +83,7 @@ impl<'a> StageCreator<'a> {
         && build_goal(self, commands)
         && build_background(self, commands)
         && build_spikes(self, commands)
-        && build_borders(self, commands)
+        //&& build_borders(self, commands)
         && build_player_spawner(self, commands)
         && build_checkpoints(self, commands)
         && build_half_saws(self, commands)
@@ -152,7 +152,7 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
                     rect: Some(Rect::new(0.0, TILE_SIZE * 4.0, TILE_SIZE, TILE_SIZE * 5.0)),
                     ..default() 
                 },
-                Transform::from_translation(Vec3::new(x as f32 * TILE_SIZE, y as f32 * TILE_SIZE, -10.0)),
+                Transform::from_translation(Vec3::new((x as f32 * TILE_SIZE) + TILE_SIZE_HALF, (y as f32 * TILE_SIZE) + TILE_SIZE_HALF, -10.0)),
                 StageObject::Volatile
             ));
         }

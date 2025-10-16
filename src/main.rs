@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, camera::clamp_window_resolution, common::{animation_controller::update_animation_states, mouse::WorldMouseMotion, physics::avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::RTLightPlugin, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, mouse::WorldMouseMotion, physics::avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::RTLightPlugin, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
 
 mod common;
 
@@ -85,7 +85,7 @@ fn main() {
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
         .add_systems(FixedUpdate, apply_physics_controller_limits)
         .add_systems(PreUpdate, (reset_player_inputs, handle_player_gamepad_input, handle_player_keyboard_input).chain())
-        .add_systems(Update, (handle_zoom_change, move_camera, move_pixel_perfect_translations).chain())
+        .add_systems(Update, (handle_zoom_change, move_camera, clamp_camera_to_stage,  move_pixel_perfect_translations).chain())
         .add_systems(Update, (add_wall_stuck, update_wall_stuck, remove_wall_stuck))
         .add_systems(Update, (shake, spawn_local_players, check_insta_kill_collisions, update_wall_stuck_time, apply_wall_friction, begin_player_wall_jump, check_player_out_of_bounds, update_last_grounded, maintain_player_jump, begin_player_jump, is_coyote_grounded, check_jump_fall_states, despawn_death_marked, delay_death_marked))
         .add_systems(FixedUpdate, (check_grounded, check_touching_wall))
