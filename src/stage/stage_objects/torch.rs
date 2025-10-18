@@ -11,8 +11,8 @@ impl TorchFactory {
             TileBundle::new(stage_creator, torch.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap),
             SpriteAnimator::new(200, atlas_rects),
             PointLight {
-                intensity: 1.0,
-                colour: Color::srgb_u8(255, 176, 55),
+                intensity: 6.0,
+                colour: Color::srgb_u8(255, 0, 0),
             }
         ));
     }

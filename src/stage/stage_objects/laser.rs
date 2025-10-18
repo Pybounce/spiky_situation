@@ -3,7 +3,7 @@ use std::f32;
 use bevy::{math::VectorSpace, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, rt_lights::components::LightOccluder, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, rt_lights::components::{AreaLight, LightOccluder}, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
 
 
 #[derive(Component)]
@@ -47,6 +47,11 @@ impl LaserBuilder {
             InstantKiller,
             StageObject::Volatile,
             CollisionLayers::new(GamePhysicsLayer::StageObject, LayerMask::ALL),
+            AreaLight {
+                intensity: 6.0,
+                colour: Color::srgb_u8(255, 0, 0),
+                rect: Rect::new(16.0, 16.0, 16.0, 16.0),
+            }
         )).id();
 
         let beam_end_particle_rects = vec![
@@ -94,7 +99,7 @@ impl LaserBuilder {
 
 pub fn update_laser_beams(
     laser_query: Query<(&Transform, &Laser, &RayCaster, &RayHits), (Without<LaserBeam>, Without<LaserBeamEndParticles>)>,
-    mut beam_query: Query<&mut Transform, With<LaserBeam>>,
+    mut beam_query: Query<(&mut Transform, &mut AreaLight), With<LaserBeam>>,
     mut end_particles_query: Query<&mut Transform, (With<LaserBeamEndParticles>, Without<LaserBeam>, Without<Laser>)>
 
 ) {
@@ -108,10 +113,14 @@ pub fn update_laser_beams(
 
             let hit_point = ray_origin + (*ray.global_direction() * hit.distance);
 
-            if let Ok(mut beam_transform) = beam_query.get_mut(laser.beam) {
+            if let Ok((mut beam_transform, mut area_light)) = beam_query.get_mut(laser.beam) {
                 beam_transform.translation = (ray_origin + ((hit_point - ray_origin) / 2.0)).extend(90.0);
                 beam_transform.scale.y = hit.distance + 2.0;
                 beam_transform.rotation = laser_transform.rotation;
+
+                area_light.rect = Rect::new(0.0, 0.0, beam_transform.scale.y, 16.0);
+                area_light.rect = Rect::new(0.0, 0.0, 16.0, beam_transform.scale.y);
+
             }
 
             // particles

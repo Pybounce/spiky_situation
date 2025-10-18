@@ -140,7 +140,6 @@ pub fn clamp_camera_to_stage(
     mut camera_query: Query<(&mut PixelPerfectTranslation, &mut Transform, &mut Projection), With<Camera>>,
     stage_data: Option<Res<CurrentStageData>>,
 ) {
-
     let Ok(window) = windows.single() else { return ; };
     let window_res = Vec2::new(window.resolution.width(), window.resolution.height());
     let Some(stage_data) = stage_data else { return; };
