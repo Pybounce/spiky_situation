@@ -95,52 +95,6 @@ impl RTPointLight {
             intensity,
         };
     }
-
-    pub fn lights_from_area(pos: Vec2, area_light: &AreaLight) -> Vec<Self> {
-        let mut lights = Vec::new();
-        let grid_size = 16.0;
-
-        let Rect { min, max } = area_light.rect;
-        let width = max.x - min.x;
-        let height = max.y - min.y;
-
-        let x_count = ((width + grid_size - 1.0) / grid_size).floor() as usize;
-        let y_count = ((height + grid_size - 1.0) / grid_size).floor() as usize;
-
-        for xi in 0..x_count {
-            for yi in 0..y_count {
-                let x = min.x + xi as f32 * grid_size + grid_size / 2.0;
-                let y = min.y + yi as f32 * grid_size + grid_size / 2.0;
-
-                let cell_min_x = min.x + xi as f32 * grid_size;
-                let cell_max_x = (cell_min_x + grid_size).min(max.x);
-                let cell_min_y = min.y + yi as f32 * grid_size;
-                let cell_max_y = (cell_min_y + grid_size).min(max.y);
-
-                let cell_coverage_x = (cell_max_x - cell_min_x) / grid_size;
-                let cell_coverage_y = (cell_max_y - cell_min_y) / grid_size;
-                let coverage = cell_coverage_x * cell_coverage_y;
-
-                let intensity = area_light.intensity * coverage;
-
-                if intensity > 0.0 {
-                    let [r, g, b] = area_light.colour.to_linear().to_u8_array_no_alpha();
-                    let mut packed_rgb: u32 = 0;
-                    packed_rgb |= (r as u32) << 24;
-                    packed_rgb |= (g as u32) << 16;
-                    packed_rgb |= (b as u32) << 8;
-
-                    lights.push(Self {
-                        pos: pos + Vec2::new(x, y) - area_light.rect.half_size(),
-                        packed_rgb,
-                        intensity,
-                    });
-                }
-            }
-        }
-
-        lights
-    }
 }
 
 
@@ -347,8 +301,8 @@ pub(crate) fn update_rt_area_lights(
     let mut lights: Vec<RTPointLight> = vec![];
 
     for (transform, light) in query {
-        for light in RTPointLight::lights_from_area(transform.translation.truncate(), &light) {
-            lights.push(light);
+        for (light_pos, intensity) in light.lights_from_area(transform.translation) {
+            lights.push(RTPointLight::new(light_pos.truncate(), light.colour, intensity));
             current_count += 1;
             if current_count >= MAX_LIGHTS {
                 break;
