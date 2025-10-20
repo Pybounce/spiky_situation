@@ -74,7 +74,7 @@ fn main() {
         //.add_plugins(CCTVPostProcessPlugin)
         .add_plugins(PhysicsPlugins::default())//.add_plugins(avian2d::prelude::PhysicsDebugPlugin::default())
         .add_plugins(RTLightPlugin)
-        .add_plugins(RTLightDebugPlugin)
+        //.add_plugins(RTLightDebugPlugin)
         .insert_resource(PhysicsLengthUnit(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())

@@ -301,7 +301,7 @@ pub(crate) fn update_rt_area_lights(
     let mut lights: Vec<RTPointLight> = vec![];
 
     for (glob_transform, light) in query {
-        for (light_pos, intensity) in light.lights_from_area(glob_transform) {
+        for (light_pos, intensity) in light.iter_pos_intensity(glob_transform) {
             lights.push(RTPointLight::new(light_pos.truncate(), light.colour, intensity));
             current_count += 1;
             if current_count >= MAX_LIGHTS {

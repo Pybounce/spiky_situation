@@ -9,7 +9,7 @@ pub fn debug_lights(
     query: Query<(&GlobalTransform, &AreaLight)>
 ) {
     for (glob_transform, light) in &query {
-        for (pos, intensity) in light.lights_from_area(glob_transform) {
+        for (pos, intensity) in light.iter_pos_intensity(glob_transform) {
             let size = 8.0 * (intensity / light.intensity);
             gizmos.circle_2d(Isometry2d::from_translation(pos.truncate()), size, NAVY).resolution(64);
         }
