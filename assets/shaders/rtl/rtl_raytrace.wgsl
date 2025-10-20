@@ -33,7 +33,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
     var cur_pos = lights[light_idx].pos;
     var light_rgbi = vec4f(unpack_rgb(lights[light_idx].packed_rgb).rgb, lights[light_idx].intensity);
 
-    let ray_count = u32(64);
+    let ray_count = u32(320);
 
     let ray_idx = gid.x % ray_count;
 
@@ -68,7 +68,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         }
         else { last_was_occ = false; }
         
-        let falloff = exp(-dist * 0.04);
+        let falloff = exp(-dist * 0.01);
         let cur_intensity = light_rgbi.w * falloff;
         if cur_intensity <= 0.01 { break; }
         //let rgb = light_rgbi.rgb * cur_intensity;

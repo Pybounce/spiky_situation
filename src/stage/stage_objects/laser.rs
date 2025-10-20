@@ -119,7 +119,7 @@ pub fn update_laser_beams(
                 beam_transform.rotation = laser_transform.rotation;
 
                 area_light.rect = Rect::new(0.0, 0.0, beam_transform.scale.y, 16.0);
-                area_light.rect = Rect::new(0.0, 0.0, 16.0, beam_transform.scale.y);
+                //area_light.rect = Rect::new(0.0, 0.0, 16.0, beam_transform.scale.y);
 
             }
 

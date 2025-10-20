@@ -5,7 +5,7 @@ use bytemuck::{Pod, Zeroable};
 
 use crate::rt_lights::{components::{AreaLight, LightOccluder, PointLight, StaticLightOccluder}, occluders::OccluderMap};
 
-const MAX_LIGHTS: u32 = 30;
+const MAX_LIGHTS: u32 = 200;
 const MAX_OCCLUDERS: u32 = 100*100;
 const OCCLUDER_FRAME_BUDGET: u32 = 4;
 const RESOLUTION: u32 = 1600;   // mostly unused at the moment
@@ -95,33 +95,54 @@ impl RTPointLight {
             intensity,
         };
     }
-}
 
-#[repr(C)]
-#[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
-pub(crate) struct RTAreaLight {
-    pub pos: Vec2,
-    pub packed_rgb: u32,
-    pub intensity: f32,
-    pub rect: Vec4
-}
+    pub fn lights_from_area(pos: Vec2, area_light: &AreaLight) -> Vec<Self> {
+        let mut lights = Vec::new();
+        let grid_size = 16.0;
 
-impl RTAreaLight {
-    pub fn new(pos: Vec2, colour: Color, intensity: f32, rect: Rect) -> Self {
-        let [r, g, b] = colour.to_linear().to_u8_array_no_alpha();
-        let mut packed_rgb: u32 = 0;
-        packed_rgb |= (r as u32) << 24;
-        packed_rgb |= (g as u32) << 16;
-        packed_rgb |= (b as u32) << 8;
-        
-        return Self {
-            packed_rgb,
-            pos,
-            intensity,
-            rect: Vec4::new(rect.min.x, rect.min.y, rect.max.x, rect.max.y)
-        };
+        let Rect { min, max } = area_light.rect;
+        let width = max.x - min.x;
+        let height = max.y - min.y;
+
+        let x_count = ((width + grid_size - 1.0) / grid_size).floor() as usize;
+        let y_count = ((height + grid_size - 1.0) / grid_size).floor() as usize;
+
+        for xi in 0..x_count {
+            for yi in 0..y_count {
+                let x = min.x + xi as f32 * grid_size + grid_size / 2.0;
+                let y = min.y + yi as f32 * grid_size + grid_size / 2.0;
+
+                let cell_min_x = min.x + xi as f32 * grid_size;
+                let cell_max_x = (cell_min_x + grid_size).min(max.x);
+                let cell_min_y = min.y + yi as f32 * grid_size;
+                let cell_max_y = (cell_min_y + grid_size).min(max.y);
+
+                let cell_coverage_x = (cell_max_x - cell_min_x) / grid_size;
+                let cell_coverage_y = (cell_max_y - cell_min_y) / grid_size;
+                let coverage = cell_coverage_x * cell_coverage_y;
+
+                let intensity = area_light.intensity * coverage;
+
+                if intensity > 0.0 {
+                    let [r, g, b] = area_light.colour.to_linear().to_u8_array_no_alpha();
+                    let mut packed_rgb: u32 = 0;
+                    packed_rgb |= (r as u32) << 24;
+                    packed_rgb |= (g as u32) << 16;
+                    packed_rgb |= (b as u32) << 8;
+
+                    lights.push(Self {
+                        pos: pos + Vec2::new(x, y) - area_light.rect.half_size(),
+                        packed_rgb,
+                        intensity,
+                    });
+                }
+            }
+        }
+
+        lights
     }
 }
+
 
 #[repr(C)]
 #[derive(Default, Clone, Copy, ShaderType, Pod, Zeroable)]
@@ -163,10 +184,13 @@ impl ComputeWorker for RTLComputeWorker {
 
         //let occluder_map = world.get_resource::<OccluderMap>().expect("could not find occluder map res when building RTLComputeWorker");
 
-        let rays_per_light = 64;
+        let rays_per_light = 320;
         let ray_workgroup_size = 64;
         let ray_workgroup_count = (rays_per_light + ray_workgroup_size - 1) / ray_workgroup_size;
         
+        let a_rays_per_light = 64;
+        let a_ray_workgroup_size = 64;
+        let a_ray_workgroup_count = (a_rays_per_light + a_ray_workgroup_size - 1) / a_ray_workgroup_size;
 
         let worker = AppComputeWorkerBuilder::new(world)
             .add_storage("lighting_output", &[0u32; 1600*1600])
@@ -188,7 +212,7 @@ impl ComputeWorker for RTLComputeWorker {
             .add_storage("green_lightmap", &[0u32; 1600*1600])
             .add_storage("blue_lightmap", &[0u32; 1600*1600])
 
-            .add_storage("area_lights", &[RTAreaLight::default(); MAX_LIGHTS as usize])
+            .add_storage("area_lights", &[RTPointLight::default(); MAX_LIGHTS as usize])
             .add_uniform("area_light_count", &0)
 
             .add_pass::<RTLResetShader>([100, 100, 1], &["red_lightmap"])
@@ -198,7 +222,7 @@ impl ComputeWorker for RTLComputeWorker {
             .add_pass::<RTLOccludeFillShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_count", "occluders", "occluder_mask", "current_occluder_frame", "total_occluder_frames"])
             .add_pass::<RTLRaytraceShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "occluder_mask", "red_lightmap", "green_lightmap", "blue_lightmap"])
 
-            //.add_pass::<RTLAreaRaytraceShader>([100, 1, 1], &["area_light_count", "area_lights", "occluder_mask", "red_lightmap", "green_lightmap", "blue_lightmap"])
+            .add_pass::<RTLAreaRaytraceShader>([a_ray_workgroup_count, MAX_LIGHTS, 1], &["area_light_count", "area_lights", "occluder_mask", "red_lightmap", "green_lightmap", "blue_lightmap"])
 
             .add_pass::<RTLLightPacker>([100, 100, 1], &["lighting_output", "red_lightmap", "green_lightmap", "blue_lightmap"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["lighting_output", "intermediate_blur", "buffer_size", "noy"])
@@ -320,17 +344,22 @@ pub(crate) fn update_rt_area_lights(
     mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
 ) {
     let mut current_count = 0u32;
-    let mut area_lights: Vec<RTAreaLight> = vec![];
+    let mut lights: Vec<RTPointLight> = vec![];
 
     for (transform, light) in query {
-        area_lights.push(RTAreaLight::new(transform.translation.truncate(), light.colour, light.intensity, light.rect));
-        current_count += 1;
+        for light in RTPointLight::lights_from_area(transform.translation.truncate(), &light) {
+            lights.push(light);
+            current_count += 1;
+            if current_count >= MAX_LIGHTS {
+                break;
+            }
+        }
         if current_count >= MAX_LIGHTS {
             break;
         }
     }
 
-    worker.write_slice("area_lights", &area_lights);
+    worker.write_slice("area_lights", &lights);
     worker.write("area_light_count", &current_count);
 }
 
