@@ -30,7 +30,7 @@ pub struct StaticLightOccluder;
 
 
 impl AreaLight {
-    pub fn lights_from_area(&self, pos: Vec3) -> Vec<(Vec3, f32)> {
+    pub fn lights_from_area(&self, transform: &GlobalTransform) -> Vec<(Vec3, f32)> {
         let mut lights = Vec::new();
         let grid_size = 16.0;
 
@@ -58,7 +58,10 @@ impl AreaLight {
                 let intensity = self.intensity * coverage;
 
                 if intensity > 0.0 {
-                    lights.push((pos + (Vec2::new(x, y) - self.rect.half_size()).extend(0.0), intensity));
+                    let z_rotation = transform.rotation().to_euler(EulerRot::XYZ).2;
+                    let quat_z = Quat::from_rotation_z(z_rotation);
+                    let pos = quat_z * ((Vec2::new(x, y) - self.rect.half_size()).extend(0.0));
+                    lights.push((transform.translation() + pos, intensity));
                 }
             }
         }

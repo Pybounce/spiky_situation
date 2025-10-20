@@ -115,10 +115,10 @@ pub fn update_laser_beams(
 
             if let Ok((mut beam_transform, mut area_light)) = beam_query.get_mut(laser.beam) {
                 beam_transform.translation = (ray_origin + ((hit_point - ray_origin) / 2.0)).extend(90.0);
-                beam_transform.scale.y = hit.distance + 2.0;
+                beam_transform.scale.y = hit.distance;
                 beam_transform.rotation = laser_transform.rotation;
 
-                area_light.rect = Rect::new(0.0, 0.0, beam_transform.scale.y, 16.0);
+                area_light.rect = Rect::new(0.0, 0.0, 16.0, beam_transform.scale.y);
                 //area_light.rect = Rect::new(0.0, 0.0, 16.0, beam_transform.scale.y);
 
             }

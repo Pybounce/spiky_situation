@@ -294,14 +294,14 @@ pub(crate) fn update_rt_lights(
 
 
 pub(crate) fn update_rt_area_lights(
-    query: Query<(&Transform, &AreaLight)>,
+    query: Query<(&GlobalTransform, &AreaLight)>,
     mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
 ) {
     let mut current_count = 0u32;
     let mut lights: Vec<RTPointLight> = vec![];
 
-    for (transform, light) in query {
-        for (light_pos, intensity) in light.lights_from_area(transform.translation) {
+    for (glob_transform, light) in query {
+        for (light_pos, intensity) in light.lights_from_area(glob_transform) {
             lights.push(RTPointLight::new(light_pos.truncate(), light.colour, intensity));
             current_count += 1;
             if current_count >= MAX_LIGHTS {

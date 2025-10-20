@@ -6,10 +6,10 @@ use crate::rt_lights::components::AreaLight;
 
 pub fn debug_lights(
     mut gizmos: Gizmos,
-    query: Query<(&Transform, &AreaLight)>
+    query: Query<(&GlobalTransform, &AreaLight)>
 ) {
-    for (transform, light) in &query {
-        for (pos, intensity) in light.lights_from_area(transform.translation) {
+    for (glob_transform, light) in &query {
+        for (pos, intensity) in light.lights_from_area(glob_transform) {
             let size = 8.0 * (intensity / light.intensity);
             gizmos.circle_2d(Isometry2d::from_translation(pos.truncate()), size, NAVY).resolution(64);
         }
