@@ -14,7 +14,7 @@ impl TorchFactory {
                 intensity: 1.0,
                 colour: Color::srgb_u8(255, 176, 55),
             },
-            Bloomin(5.0)
+            Bloomin(1.0)
         ));
     }
 }

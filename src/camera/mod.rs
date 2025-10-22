@@ -14,7 +14,7 @@ pub fn spawn_camera(mut commands: Commands) {
         .spawn((
             Camera2d::default(),
             Camera {
-                hdr: true,
+                //hdr: true,
                 ..default()
             },
             Projection::Orthographic(OrthographicProjection {
@@ -47,19 +47,19 @@ pub fn spawn_camera(mut commands: Commands) {
             RTLPostProcessSettings {
                 something: 1.0
             },
-            Bloom {
-                intensity: 0.15,
-                low_frequency_boost: 0.2,
-                low_frequency_boost_curvature: 0.3,
-                high_pass_frequency: 0.85,
-                prefilter: BloomPrefilter {
-                    threshold: 0.95,
-                    threshold_softness: 0.4,
-                },
-                composite_mode: BloomCompositeMode::Additive,
-                max_mip_dimension: 256,
-                scale: Vec2::splat(0.5),
-            }
+            //Bloom {
+            //    intensity: 0.15,
+            //    low_frequency_boost: 0.2,
+            //    low_frequency_boost_curvature: 0.3,
+            //    high_pass_frequency: 0.85,
+            //    prefilter: BloomPrefilter {
+            //        threshold: 0.95,
+            //        threshold_softness: 0.4,
+            //    },
+            //    composite_mode: BloomCompositeMode::Additive,
+            //    max_mip_dimension: 256,
+            //    scale: Vec2::splat(1.5),
+            //}
         ));
 }
 
