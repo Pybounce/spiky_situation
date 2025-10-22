@@ -18,6 +18,8 @@ struct RTPointLight {
     pos: vec2<f32>,
     packed_rgb: u32,
     intensity: f32,
+    angle_offset: f32,
+    falloff: f32
 };
 
 
@@ -30,14 +32,16 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
 
     if light_idx >= light_count { return; }
 
-    var cur_pos = lights[light_idx].pos;
-    var light_rgbi = vec4f(unpack_rgb(lights[light_idx].packed_rgb).rgb, lights[light_idx].intensity);
+    let light = lights[light_idx];
 
-    let ray_count = u32(320);
+    var cur_pos = light.pos;
+    var light_rgbi = vec4f(unpack_rgb(light.packed_rgb).rgb, light.intensity);
+
+    let ray_count = u32(64);
 
     let ray_idx = gid.x % ray_count;
 
-    var ray_angle = f32(ray_idx) * (2.0 * PI) / f32(ray_count);
+    var ray_angle = (f32(ray_idx) * (2.0 * PI) / f32(ray_count)) + light.angle_offset;
     var ray_dir = vec2f(cos(ray_angle), sin(ray_angle));
 
     
@@ -68,7 +72,7 @@ fn main(@builtin(global_invocation_id) gid : vec3<u32>) {
         }
         else { last_was_occ = false; }
         
-        let falloff = exp(-dist * 0.01);
+        let falloff = exp(-dist * light.falloff);
         let cur_intensity = light_rgbi.w * falloff;
         if cur_intensity <= 0.01 { break; }
         //let rgb = light_rgbi.rgb * cur_intensity;

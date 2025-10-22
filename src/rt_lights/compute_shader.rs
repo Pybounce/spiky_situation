@@ -1,4 +1,6 @@
 
+use std::f32::consts::PI;
+
 use bevy::{prelude::*, render::{render_resource::Buffer, Extract}};
 use bevy_app_compute::prelude::*;
 use bytemuck::{Pod, Zeroable};
@@ -10,14 +12,6 @@ const MAX_OCCLUDERS: u32 = 100*100;
 const OCCLUDER_FRAME_BUDGET: u32 = 4;
 const RESOLUTION: u32 = 1600;   // mostly unused at the moment
 
-#[derive(TypePath)]
-struct RTLAreaRaytraceShader;
-
-impl ComputeShader for RTLAreaRaytraceShader {
-    fn shader() -> ShaderRef {
-        "shaders/rtl/rtl_area_raytrace.wgsl".into()
-    }
-}
 
 #[derive(TypePath)]
 struct RTLRaytraceShader;
@@ -78,23 +72,56 @@ impl ComputeShader for RTLLightPacker {
 pub(crate) struct RTPointLight {
     pub pos: Vec2,
     pub packed_rgb: u32,
-    pub intensity: f32
+    pub intensity: f32,
+    pub angle_offset: f32,
+    pub falloff: f32
 }
 
 impl RTPointLight {
-    pub fn new(pos: Vec2, colour: Color, intensity: f32) -> Self {
-        let [r, g, b] = colour.to_linear().to_u8_array_no_alpha();
+    pub fn many_from_point_light(light: &PointLight, pos: Vec2) -> impl Iterator<Item = Self> + '_ {
+
+        let [r, g, b] = light.colour.to_linear().to_u8_array_no_alpha();
         let mut packed_rgb: u32 = 0;
         packed_rgb |= (r as u32) << 24;
         packed_rgb |= (g as u32) << 16;
         packed_rgb |= (b as u32) << 8;
-        
-        return Self {
-            packed_rgb,
-            pos,
-            intensity,
-        };
+
+        let intensity = light.intensity;
+
+        return (0..5).map(move |i| {
+
+            Self {
+                pos,
+                packed_rgb,
+                intensity,
+                angle_offset: (i as f32) * (PI * 2.0 / 5.0),
+                falloff: 0.01,
+            }
+        });
     }
+
+    pub fn many_from_area_light<'a>(light: &'a AreaLight, transform: &'a GlobalTransform) -> impl Iterator<Item = Self> + 'a {
+
+        let colour =  light.colour;
+        light.iter_pos_intensity(transform).map(move |(pos, intensity)| {
+            let [r, g, b] = colour.to_linear().to_u8_array_no_alpha();
+            let mut packed_rgb: u32 = 0;
+            packed_rgb |= (r as u32) << 24;
+            packed_rgb |= (g as u32) << 16;
+            packed_rgb |= (b as u32) << 8;
+
+            Self {
+                pos: pos.truncate(),
+                packed_rgb,
+                intensity,
+                angle_offset: 0.0,
+                falloff: 0.04,
+            }
+        })
+
+
+    }
+
 }
 
 
@@ -138,13 +165,9 @@ impl ComputeWorker for RTLComputeWorker {
 
         //let occluder_map = world.get_resource::<OccluderMap>().expect("could not find occluder map res when building RTLComputeWorker");
 
-        let rays_per_light = 320;
+        let rays_per_light = 64;
         let ray_workgroup_size = 64;
         let ray_workgroup_count = (rays_per_light + ray_workgroup_size - 1) / ray_workgroup_size;
-        
-        let a_rays_per_light = 64;
-        let a_ray_workgroup_size = 64;
-        let a_ray_workgroup_count = (a_rays_per_light + a_ray_workgroup_size - 1) / a_ray_workgroup_size;
 
         let worker = AppComputeWorkerBuilder::new(world)
             .add_storage("lighting_output", &[0u32; 1600*1600])
@@ -166,18 +189,12 @@ impl ComputeWorker for RTLComputeWorker {
             .add_storage("green_lightmap", &[0u32; 1600*1600])
             .add_storage("blue_lightmap", &[0u32; 1600*1600])
 
-            .add_storage("area_lights", &[RTPointLight::default(); MAX_LIGHTS as usize])
-            .add_uniform("area_light_count", &0)
-
             .add_pass::<RTLResetShader>([100, 100, 1], &["red_lightmap"])
             .add_pass::<RTLResetShader>([100, 100, 1], &["green_lightmap"])
             .add_pass::<RTLResetShader>([100, 100, 1], &["blue_lightmap"])
             .add_pass::<RTLOccluderResetShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_mask", "current_occluder_frame", "total_occluder_frames", "buffer_size", "is_static_occluder_reset"])
             .add_pass::<RTLOccludeFillShader>([100, 100 / OCCLUDER_FRAME_BUDGET, 1], &["occluder_count", "occluders", "occluder_mask", "current_occluder_frame", "total_occluder_frames"])
             .add_pass::<RTLRaytraceShader>([ray_workgroup_count, MAX_LIGHTS, 1], &["light_count", "lights", "occluder_mask", "red_lightmap", "green_lightmap", "blue_lightmap"])
-
-            .add_pass::<RTLAreaRaytraceShader>([a_ray_workgroup_count, MAX_LIGHTS, 1], &["area_light_count", "area_lights", "occluder_mask", "red_lightmap", "green_lightmap", "blue_lightmap"])
-
             .add_pass::<RTLLightPacker>([100, 100, 1], &["lighting_output", "red_lightmap", "green_lightmap", "blue_lightmap"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["lighting_output", "intermediate_blur", "buffer_size", "noy"])
             .add_pass::<RTLBlurShader>([100, 100, 1], &["intermediate_blur", "lighting_output", "buffer_size", "y"])
@@ -275,46 +292,32 @@ pub(crate) fn write_occluder_buffer(
 
 pub(crate) fn update_rt_lights(
     query: Query<(&Transform, &PointLight)>,
+    area_query: Query<(&GlobalTransform, &AreaLight)>,
     mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
 ) {
     let mut current_count = 0u32;
     let mut lights: Vec<RTPointLight> = vec![];
 
     for (transform, light) in query {
-        lights.push(RTPointLight::new(transform.translation.truncate(), light.colour, light.intensity));
-        current_count += 1;
-        if current_count >= MAX_LIGHTS {
-            break;
-        }
-    }
-
-    worker.write_slice("lights", &lights);
-    worker.write("light_count", &current_count);
-}
-
-
-pub(crate) fn update_rt_area_lights(
-    query: Query<(&GlobalTransform, &AreaLight)>,
-    mut worker: ResMut<AppComputeWorker<RTLComputeWorker>>,
-) {
-    let mut current_count = 0u32;
-    let mut lights: Vec<RTPointLight> = vec![];
-
-    for (glob_transform, light) in query {
-        for (light_pos, intensity) in light.iter_pos_intensity(glob_transform) {
-            lights.push(RTPointLight::new(light_pos.truncate(), light.colour, intensity));
-            current_count += 1;
+        for rt_light in RTPointLight::many_from_point_light(light, transform.translation.truncate()) {
             if current_count >= MAX_LIGHTS {
                 break;
             }
-        }
-        if current_count >= MAX_LIGHTS {
-            break;
+            lights.push(rt_light);
+            current_count += 1;
         }
     }
-
-    worker.write_slice("area_lights", &lights);
-    worker.write("area_light_count", &current_count);
+    for (glob_transform, light) in area_query {
+        for rt_light in RTPointLight::many_from_area_light(light, glob_transform) {
+            if current_count >= MAX_LIGHTS {
+                break;
+            }
+            lights.push(rt_light);
+            current_count += 1;
+        }
+    }
+    worker.write_slice("lights", &lights);
+    worker.write("light_count", &current_count);
 }
 
 
