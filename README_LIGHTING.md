@@ -160,3 +160,13 @@ _Better Data Input_
 //_ average temporal buffer -> write to temporal*output
 //* blur temporal*output horizontal -> write to intermediary lightmap
 //* blur intermediary lightmap vertical -> write to lightmap partition
+
+**NEW SHIT BELOW**
+
+**Light ideas**
+
+- [ ] Many small lights
+  - Instead of sending over a light that does 320 rays, and then in another buffer (or with an index) sending over one that does 64
+  - Could only ever send over 64 but they have a rotation offset for the rays
+  - Now we're sending over many more lights (about 5 times for each normal light, but still a small amount in terms our buffers)
+  - But all lights are done in one buffer, and one shader pass etc

@@ -3,7 +3,7 @@ use std::f32;
 use bevy::{math::VectorSpace, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, rt_lights::components::{AreaLight, LightOccluder}, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
+use crate::{common::{animated_sprite::SpriteAnimator, bloom::Bloomin, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, rt_lights::components::{AreaLight, LightOccluder}, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
 
 
 #[derive(Component)]
@@ -51,7 +51,8 @@ impl LaserBuilder {
                 intensity: 6.0,
                 colour: Color::srgb_u8(255, 0, 0),
                 rect: Rect::new(16.0, 16.0, 16.0, 16.0),
-            }
+            },
+            Bloomin(4.0)
         )).id();
 
         let beam_end_particle_rects = vec![
@@ -71,7 +72,8 @@ impl LaserBuilder {
                 ..default()
             },
             SpriteAnimator::new(100, beam_end_particle_rects.clone()),
-            StageObject::Volatile
+            StageObject::Volatile,
+            Bloomin(4.0)
         )).id();
 
         let mut laser_core = commands.spawn((

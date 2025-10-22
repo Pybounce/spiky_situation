@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, mouse::WorldMouseMotion, physics::avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, bloom::Bloomin, mouse::WorldMouseMotion, physics::avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
 
 mod common;
 
@@ -108,10 +108,24 @@ fn main() {
         .add_systems(PreUpdate, move_rail_riders)
         .add_systems(Update, (update_animation_states, update_player_animation_state))
         .add_systems(Update, clamp_window_resolution)
+        .add_systems(Update, something)
         .run();
   
 }
 
+
+fn something(
+    mut query: Query<(&mut Sprite, &Bloomin), Added<Bloomin>>
+) {
+    for (mut sprite, bloomin) in &mut query {
+                sprite.color = Color::srgba(
+            sprite.color.to_linear().red * bloomin.0,
+            sprite.color.to_linear().green * bloomin.0,
+            sprite.color.to_linear().blue * bloomin.0,
+            sprite.color.to_linear().alpha,
+        );
+    }
+}
 
 // possible fix - just fix the fucking pixel perfect translations
 

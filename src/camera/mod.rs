@@ -1,5 +1,5 @@
 
-use bevy::{core_pipeline::{bloom::Bloom, tonemapping::Tonemapping}, input::mouse::MouseWheel, prelude::*, window::WindowResized};
+use bevy::{core_pipeline::{bloom::{Bloom, BloomCompositeMode, BloomPrefilter}, tonemapping::Tonemapping}, input::mouse::MouseWheel, prelude::*, window::WindowResized};
 use avian2d::prelude::*;
 
 use crate::{local_player::LocalPlayer, rt_lights::post_process_shader::RTLPostProcessSettings, shaders::cctv_shader::plugin::CCTVPostProcessSettings, stage::stage_builder::CurrentStageData};
@@ -14,7 +14,7 @@ pub fn spawn_camera(mut commands: Commands) {
         .spawn((
             Camera2d::default(),
             Camera {
-                //hdr: true,
+                hdr: true,
                 ..default()
             },
             Projection::Orthographic(OrthographicProjection {
@@ -47,7 +47,19 @@ pub fn spawn_camera(mut commands: Commands) {
             RTLPostProcessSettings {
                 something: 1.0
             },
-            //Bloom::NATURAL
+            Bloom {
+                intensity: 0.15,
+                low_frequency_boost: 0.2,
+                low_frequency_boost_curvature: 0.3,
+                high_pass_frequency: 0.85,
+                prefilter: BloomPrefilter {
+                    threshold: 0.95,
+                    threshold_softness: 0.4,
+                },
+                composite_mode: BloomCompositeMode::Additive,
+                max_mip_dimension: 256,
+                scale: Vec2::splat(0.5),
+            }
         ));
 }
 
