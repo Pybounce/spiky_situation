@@ -272,7 +272,7 @@ impl FromWorld for PostProcessPipeline {
                     entry_point: "fragment".into(),
                     targets: vec![Some(ColorTargetState {
                         format: TextureFormat::bevy_default(),
-                        //format: TextureFormat::Rgba16Float,
+                        //format: TextureFormat::Rgba16Float, // for hdr
                         blend: None,
                         write_mask: ColorWrites::ALL,
                     })],

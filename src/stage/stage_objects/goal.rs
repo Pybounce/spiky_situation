@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::layers::GamePhysicsLayer, rt_lights::components::PointLight, stage::stage_builder::stage_creator::StageCreator};
+use crate::{common::{bloom::Bloomin, physics::layers::GamePhysicsLayer}, rt_lights::components::PointLight, stage::stage_builder::stage_creator::StageCreator};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -20,7 +20,8 @@ impl GoalFactory {
             PointLight {
                 intensity: 1.0,
                 colour: Color::srgb_u8(0, 255, 255),
-            }
+            },
+            Bloomin(3.0)
         ));
     }
 }

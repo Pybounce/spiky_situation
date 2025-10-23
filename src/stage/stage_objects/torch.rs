@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{common::animated_sprite::SpriteAnimator, rt_lights::components::PointLight, stage::{stage_builder::{stage_asset, stage_creator::StageCreator}, stage_objects::tiles::TileBundle}};
+use crate::{common::{animated_sprite::SpriteAnimator, bloom::Bloomin}, rt_lights::components::PointLight, stage::{stage_builder::{stage_asset, stage_creator::StageCreator}, stage_objects::tiles::TileBundle}};
 
 
 pub struct TorchFactory;
@@ -13,7 +13,8 @@ impl TorchFactory {
             PointLight {
                 intensity: 1.0,
                 colour: Color::srgb_u8(255, 176, 55),
-            }
+            },
+            Bloomin(1.0)
         ));
     }
 }

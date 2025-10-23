@@ -8,6 +8,13 @@ pub struct PointLight {
     pub colour: Color
 }
 
+#[derive(Component, Default, Clone, Copy)]
+pub struct AreaLight {
+    pub intensity: f32,
+    pub colour: Color,
+    pub rect: Rect
+}
+
 #[derive(Component, Clone, Copy)]
 pub enum LightOccluder {
     Rect(f32, f32),
@@ -17,3 +24,48 @@ pub enum LightOccluder {
 
 #[derive(Component)]
 pub struct StaticLightOccluder;
+
+
+
+
+
+impl AreaLight {
+    pub fn iter_pos_intensity(&self, transform: &GlobalTransform) -> impl Iterator<Item = (Vec3, f32)> + '_  {
+        let grid_size = 16.0;
+
+        let Rect { min, max } = self.rect;
+        let width = max.x - min.x;
+        let height = max.y - min.y;
+
+        let x_count = ((width + grid_size - 1.0) / grid_size).floor() as usize;
+        let y_count = ((height + grid_size - 1.0) / grid_size).floor() as usize;
+
+        let z_rotation = transform.rotation().to_euler(EulerRot::XYZ).2;
+        let quat_z = Quat::from_rotation_z(z_rotation);
+        let translation = transform.translation();
+
+        return (0..x_count*y_count).map(move |i| {
+                let xi = i % x_count;
+                let yi = i / x_count;
+
+                let cell_min_x = min.x + xi as f32 * grid_size;
+                let cell_max_x = (cell_min_x + grid_size).min(max.x);
+                let cell_min_y = min.y + yi as f32 * grid_size;
+                let cell_max_y = (cell_min_y + grid_size).min(max.y);
+
+                let x = (cell_min_x + cell_max_x) / 2.0;
+                let y = (cell_min_y + cell_max_y) / 2.0;
+
+                let cell_coverage_x = (cell_max_x - cell_min_x) / grid_size;
+                let cell_coverage_y = (cell_max_y - cell_min_y) / grid_size;
+                let coverage = cell_coverage_x * cell_coverage_y;
+
+                let intensity = self.intensity * coverage;
+
+                let pos = quat_z * ((Vec2::new(x, y) - self.rect.half_size()).extend(0.0));
+                return (translation + pos, intensity);
+
+        });
+
+    }
+}
