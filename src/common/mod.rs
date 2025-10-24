@@ -14,3 +14,4 @@ pub mod rails;
 pub mod animation_controller;
 pub mod player_input;
 pub mod bloom;
+pub mod pair_map;

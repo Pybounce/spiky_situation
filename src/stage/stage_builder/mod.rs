@@ -3,7 +3,7 @@ use events::{read_stage_build_complete_events, read_stage_build_events, read_sta
 use stage_asset::{Stage, StageLoader};
 use systems::{try_build_stage, unload_old_stage};
 
-use crate::{common::states::AppState, stage::stage_builder::systems::remove_stage_builder_data};
+use crate::{common::states::AppState, stage::stage_builder::{systems::remove_stage_builder_data}};
 
 pub mod events;
 pub mod stage_asset;
