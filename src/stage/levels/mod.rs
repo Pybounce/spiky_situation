@@ -14,11 +14,23 @@ pub struct LevelBuilderPlugin;
 impl Plugin for LevelBuilderPlugin {
     fn build(&self, app: &mut App) {
         app
+        .init_asset::<Level>()
         .init_asset_loader::<LevelLoader>()
+        .init_state::<LevelLoaderState>()
         .add_event::<LoadLevelEvent>()
         .add_event::<LoadLevelFailedEvent>()
-        .add_systems(PreUpdate, (read_level_build_events, check_level_asset_loaded));
+        .add_event::<LoadLevelSuccessEvent>()
+        .add_systems(Update, (try_load_level).run_if(in_state(LevelLoaderState::Loading)))
+        .add_systems(Update, (read_level_load_events, read_level_load_failed_events, read_level_load_success_events));
     }
+}
+
+
+#[derive(States, Debug, Hash, Eq, PartialEq, Clone, Default)]
+pub enum LevelLoaderState {
+    #[default]
+    NotLoading,
+    Loading,
 }
 
 //  Currently...

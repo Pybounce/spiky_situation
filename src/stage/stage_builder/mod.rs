@@ -43,13 +43,14 @@ pub enum StageBuilderState {
 #[derive(Resource, Default)]
 pub struct StageBuilderData {
     stage_id: usize,
+    gateway_id_opt: Option<usize>,
     stage_handle: Handle<Stage>
 }
 
 #[derive(Resource, Default)]
 pub struct CurrentStageData {
     pub stage_id: usize,
-    pub spawn_translation: Vec3,
+    pub gateway_id_opt: Option<usize>,
     pub bounds: Rect
 }
 

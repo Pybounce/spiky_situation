@@ -2,7 +2,7 @@ use std::{env, fs, path::PathBuf};
 
 use bevy::prelude::*;
 
-use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction, check_new_game_interaction_TEMP_GAMEPAD_SUPPORT}, stage::stage_builder::events::BuildStageEvent, stage_editor::StageEditorLoadDetails};
+use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction, check_new_game_interaction_TEMP_GAMEPAD_SUPPORT}, stage::{levels::data::LoadLevelEvent, stage_builder::events::BuildStageEvent}, stage_editor::StageEditorLoadDetails};
 
 pub mod ui;
 
@@ -25,7 +25,8 @@ pub enum StartGame {
 
 pub fn try_start_game(
     mut start_game_reader: EventReader<StartGame>,
-    mut build_event_writer: EventWriter<BuildStageEvent>,
+    //mut build_event_writer: EventWriter<BuildStageEvent>,
+    mut load_level_event_writer: EventWriter<LoadLevelEvent>,
     mut commands: Commands
 ) {
     let mut game_started = false;
@@ -33,7 +34,8 @@ pub fn try_start_game(
         if game_started { continue; }
         match event {
             StartGame::Endless(endless_run) => {
-                build_event_writer.write(BuildStageEvent {stage_id: endless_run.current_stage_id() });
+                //build_event_writer.write(BuildStageEvent {stage_id: endless_run.current_stage_id(), gateway_id_opt: None });
+                load_level_event_writer.write(LoadLevelEvent { level_id: 0 });
 
                 commands.insert_resource(endless_run.clone());
                 game_started = true;
@@ -51,8 +53,8 @@ pub fn try_enter_stage_editor(
 ) {
     if input.just_released(KeyCode::KeyE) {
         commands.insert_resource(StageEditorLoadDetails {
-            template_stage_id: 3.into(),
-            new_stage_id: 3,
+            template_stage_id: 1.into(),
+            new_stage_id: 1,
             template_stage_handle: None
         });
         app_state.set(AppState::StageEditor);

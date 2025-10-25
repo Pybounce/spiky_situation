@@ -4,7 +4,7 @@ use bevy::platform::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PairMap<T: Clone + Copy + Eq + Hash> {
     map: HashMap<T, T>
 }
@@ -22,6 +22,7 @@ impl<T: Eq + Clone + Hash + Copy> PairMap<T> {
         }
     }
 
+    /// Returns the other side of the pair
     pub fn get(&self, item: &T) -> Option<&T> {
         return self.map.get(item);
     }

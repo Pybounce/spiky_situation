@@ -59,7 +59,7 @@ pub fn next_staged_if_goal_reached(
             if event.stage_id == stage_data.stage_id && !build_event_raised {
                 save_writer.write(SaveGame);
                 current_run.complete_stage();
-                build_event_writer.write(BuildStageEvent {stage_id: current_run.current_stage_id() });
+                build_event_writer.write(BuildStageEvent {stage_id: current_run.current_stage_id(), gateway_id_opt: None });
                 build_event_raised = true;
             }
         }

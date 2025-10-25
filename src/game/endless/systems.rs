@@ -42,7 +42,7 @@ pub fn check_death_endless_mode(
                 else {
                     save_event_writer.write(SaveGame);
                     current_run.remove_life();
-                    build_event_writer.write(BuildStageEvent {stage_id: stage_data.stage_id});
+                    build_event_writer.write(BuildStageEvent { stage_id: stage_data.stage_id, gateway_id_opt: stage_data.gateway_id_opt });
                 }
             }
         }

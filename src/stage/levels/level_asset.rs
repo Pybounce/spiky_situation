@@ -9,6 +9,7 @@ use crate::common::pair_map::PairMap;
 
 #[derive(Asset, TypePath, Debug, Deserialize, Serialize)]
 pub struct Level {
+    pub spawn_stage_id: usize,
     /// (stageId, gatewayId)
     pub gateway_pairs: PairMap<(usize, usize)>
 }

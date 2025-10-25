@@ -72,11 +72,11 @@ pub fn try_build_stage(
             let background_mesh = meshes.add(Mesh::from(Rectangle::default()));
             let background_mat = materials.add(BackgroundMaterial {});
 
-            let stage_creator = StageCreator::new(&stage, &ground_tiles_handle, &object_tilemap_handle, &background_mesh, &background_mat);
+            let stage_creator = StageCreator::new(&stage, stage_builder_data.gateway_id_opt, &ground_tiles_handle, &object_tilemap_handle, &background_mesh, &background_mat);
             if stage_creator.build(&mut commands) {
                 commands.insert_resource(CurrentStageData {
                     stage_id: stage.id,
-                    spawn_translation: (stage.spawn_grid_pos * TILE_SIZE).extend(0.0),
+                    gateway_id_opt: stage_builder_data.gateway_id_opt,
                     bounds: Rect::new(-TILE_SIZE, -TILE_SIZE, stage.grid_width as f32 * TILE_SIZE, stage.grid_height as f32 * TILE_SIZE),
                 });
                 complete_event_writer.write(StageBuildCompleteEvent { stage_id: stage_builder_data.stage_id });

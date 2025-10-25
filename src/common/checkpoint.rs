@@ -52,7 +52,7 @@ pub fn check_checkpoint_reached(
             for colliding_entity in ce.iter() {
                 if let Ok((e, t)) = checkpoint_query.get(*colliding_entity) {
                     r.translation = t.translation;
-                    stage_data.spawn_translation = t.translation;
+                    //stage_data.spawn_translation = t.translation;
                     commands.entity(e).despawn();
                 }
             }

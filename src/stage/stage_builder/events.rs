@@ -16,7 +16,8 @@ use super::{StageBuilderData, StageBuilderState};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Event)]
 pub struct BuildStageEvent {
-    pub stage_id: usize
+    pub stage_id: usize,
+    pub gateway_id_opt: Option<usize>
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Event)]
@@ -70,6 +71,7 @@ pub fn read_stage_build_events(
         commands.insert_resource(StageBuilderData {
             stage_id: build_stage_event.stage_id,
             stage_handle: asset_server.load(format!("stages/stage_{}.stage", build_stage_event.stage_id)),
+            gateway_id_opt: build_stage_event.gateway_id_opt
         });
         stage_builder_state.set(StageBuilderState::Building);
     }

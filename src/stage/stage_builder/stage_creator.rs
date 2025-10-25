@@ -1,4 +1,4 @@
-use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, torch::TorchFactory, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{gateway::GatewayFactory, goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, torch::TorchFactory, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
 use bevy::{platform::collections::HashMap, prelude::*};
@@ -16,7 +16,9 @@ pub struct StageCreator<'a> {
     pub object_tilemap: &'a Handle<Image>,
 
     pub background_quad_mesh: &'a Handle<Mesh>,
-    pub background_material: &'a Handle<BackgroundMaterial>
+    pub background_material: &'a Handle<BackgroundMaterial>,
+
+    pub gateway_id_opt: Option<usize>
 }
 
 pub enum ObjectAtlasIndices {
@@ -68,13 +70,14 @@ pub enum ObjectAtlasIndices {
 
 impl<'a> StageCreator<'a> {
 
-    pub fn new(stage: &'a Stage, tilemap: &'a Handle<Image>, object_tilemap: &'a Handle<Image>, background_quad_mesh: &'a Handle<Mesh>, background_material: &'a Handle<BackgroundMaterial>) -> Self {
+    pub fn new(stage: &'a Stage, gateway_id_opt: Option<usize>, tilemap: &'a Handle<Image>, object_tilemap: &'a Handle<Image>, background_quad_mesh: &'a Handle<Mesh>, background_material: &'a Handle<BackgroundMaterial>) -> Self {
         StageCreator {
             stage,
             tilemap,
             object_tilemap,
             background_material,
-            background_quad_mesh
+            background_quad_mesh,
+            gateway_id_opt
         }
     }
 
@@ -97,6 +100,7 @@ impl<'a> StageCreator<'a> {
         && build_lasers(self, commands)
         && add_rails(self, commands)
         && build_toches(self, commands)
+        && build_gateways(self, commands)
     }
 
 
@@ -110,10 +114,31 @@ fn add_rails(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
 }
 
 fn build_player_spawner(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
-    commands.spawn(LocalPlayerSpawner {
-        spawn_time: 0.0,
-        translation: ((stage_creator.stage.spawn_grid_pos * TILE_SIZE) + TILE_SIZE_HALF).extend(0.0),
-    });
+    match stage_creator.gateway_id_opt {
+        Some(gateway_id) => {
+            match &stage_creator.stage.gateways {
+                Some(gateways) => {
+                    for gateway in gateways {
+                        if gateway.gateway_id == gateway_id {
+                            commands.spawn(LocalPlayerSpawner {
+                                spawn_time: 0.0,
+                                translation: ((gateway.grid_pos * TILE_SIZE) + TILE_SIZE_HALF).extend(0.0),
+                            });
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+                None => { return false; },
+            };
+        },
+        None => {
+            commands.spawn(LocalPlayerSpawner {
+                spawn_time: 0.0,
+                translation: ((stage_creator.stage.spawn_grid_pos * TILE_SIZE) + TILE_SIZE_HALF).extend(0.0),
+            });
+        },
+    };
     return true;
 }
 
@@ -357,6 +382,13 @@ fn build_toches(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
 
     for torch in stage_creator.stage.torches.as_ref().into_iter().flatten() {
         TorchFactory::spawn(commands, stage_creator, atlas_rects.clone(), &torch);
+    }
+    return true;
+}
+
+fn build_gateways(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+    for gateway in stage_creator.stage.gateways.as_ref().into_iter().flatten() {
+        GatewayFactory::spawn(commands, &gateway);
     }
     return true;
 }

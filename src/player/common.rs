@@ -13,7 +13,7 @@ pub fn check_player_out_of_bounds(
     if let Some(stage_data) = stage_data_opt {
         for mut t in &mut query {
             if !stage_data.bounds.contains(t.translation.truncate()) {
-                t.translation = stage_data.spawn_translation;
+                //t.translation = stage_data.spawn_translation;
             }
         }
     }

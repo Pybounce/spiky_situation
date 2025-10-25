@@ -17,6 +17,7 @@ pub fn read_game_over_events(
     mut commands: Commands
 ) {
     for _ in event_reader.read() {
+        println!("game over");
         game_state.set(GameState::NA);
         app_state.set(AppState::MainMenu);
         stage_builder_state.set(StageBuilderState::NotBuilding);
