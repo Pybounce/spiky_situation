@@ -38,6 +38,7 @@ pub enum EditorItem {
     PressureSpike { rotation: f32 }= 12,
     Laser { rotation: f32 } = 13,
     Torch = 14,
+    Gateway { rotation: f32, variant: GatewayVariant } = 15,
 
 }
 
@@ -58,13 +59,14 @@ impl EditorItem {
             EditorItem::TerrainTheme { .. } => EditorItem::PressureSpike { rotation: 0.0 },
             EditorItem::PressureSpike { .. } => EditorItem::Laser { rotation: 0.0 },
             EditorItem::Laser { .. } => EditorItem::Torch,
-            EditorItem::Torch => EditorItem::Ground
+            EditorItem::Torch => EditorItem::Gateway { rotation: 0.0, variant: GatewayVariant::One },
+            EditorItem::Gateway { .. } => EditorItem::Ground
         }
     }
     pub fn cycle_prev(&self) -> Self {
         match self {
             EditorItem::SawShooter { .. } => EditorItem::IntervalBlock { variant: IntervalBlockVariant::On },
-            EditorItem::Ground => EditorItem::Torch,
+            EditorItem::Ground => EditorItem::Gateway { rotation: 0.0, variant: GatewayVariant::One },
             EditorItem::IntervalBlock { .. } => EditorItem::LockBlock { variant: LockBlockVariant::One },
             EditorItem::LockBlock { .. } => EditorItem::HalfSaw { rotation: 0.0 },
             EditorItem::HalfSaw { .. } => EditorItem::PhantomBlock,
@@ -77,7 +79,8 @@ impl EditorItem {
             EditorItem::TerrainTheme { .. } => EditorItem::Goal,
             EditorItem::PressureSpike { .. } => EditorItem::TerrainTheme { variant: TerrainThemeVarient::Grass },
             EditorItem::Laser { .. } => EditorItem::PressureSpike { rotation: 0.0 },
-            EditorItem::Torch => EditorItem::Laser { rotation: 0.0 }
+            EditorItem::Torch => EditorItem::Laser { rotation: 0.0 },
+            EditorItem::Gateway { .. } => EditorItem::Torch
         }
     }
     pub fn cycle_next_variant(&self) -> Self {
@@ -97,6 +100,7 @@ impl EditorItem {
             EditorItem::PressureSpike { rotation } => EditorItem::PressureSpike { rotation: *rotation },
             EditorItem::Laser { rotation } => EditorItem::Laser { rotation: *rotation },
             EditorItem::Torch => EditorItem::Torch,
+            EditorItem::Gateway { variant, rotation } => EditorItem::Gateway { variant: variant.cycle_next(), rotation: *rotation },
         }
     }
     pub fn cycle_prev_variant(&self) -> Self {
@@ -116,6 +120,7 @@ impl EditorItem {
             EditorItem::PressureSpike { rotation } => EditorItem::PressureSpike { rotation: *rotation },
             EditorItem::Laser { rotation } => EditorItem::Laser { rotation: *rotation },
             EditorItem::Torch => EditorItem::Torch,
+            EditorItem::Gateway { variant, rotation } => EditorItem::Gateway { variant: variant.cycle_prev(), rotation: *rotation },
         }
     }
 
@@ -137,6 +142,7 @@ impl EditorItem {
             EditorItem::PressureSpike { rotation } => rotate_quater_bounded(rotation),
             EditorItem::Laser { rotation } => rotate_quater_bounded(rotation),
             EditorItem::Torch => return false,
+            EditorItem::Gateway { rotation, .. } => rotate_quater_bounded(rotation),
         };
         return true;
     }
@@ -157,6 +163,7 @@ impl EditorItem {
             EditorItem::PressureSpike { rotation } => *rotation,
             EditorItem::Laser { rotation } => *rotation,
             EditorItem::Torch => 0.0,
+            EditorItem::Gateway { rotation, .. } => *rotation,
         }
     }
 }
@@ -227,6 +234,31 @@ pub enum LockBlockVariant {
     One,
     Two,
     Three,
+}
+
+#[derive(Default, Copy, Clone, Debug)]
+pub enum GatewayVariant {
+    #[default]
+    One,
+    Two,
+    Three,
+}
+
+impl GatewayVariant {
+    pub fn cycle_next(&self) -> Self {
+        match self {
+            GatewayVariant::One => GatewayVariant::Two,
+            GatewayVariant::Two => GatewayVariant::Three,
+            GatewayVariant::Three => GatewayVariant::One,
+        }
+    }
+    pub fn cycle_prev(&self) -> Self {
+        match self {
+            GatewayVariant::One => GatewayVariant::Three,
+            GatewayVariant::Three => GatewayVariant::Two,
+            GatewayVariant::Two => GatewayVariant::One,
+        }
+    }
 }
 
 impl LockBlockVariant {

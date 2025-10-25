@@ -30,6 +30,7 @@ pub struct Stage {
     pub spawn_grid_pos: Vec2,
     pub goal_grid_pos: Vec2,
     pub torches: Option<Vec<Torch>>,
+    pub gateways: Option<Vec<Gateway>>,
 }
 
 impl Stage {
@@ -55,6 +56,7 @@ impl Stage {
             goal_grid_pos: Vec2::new(100.0 * TILE_SIZE, 0.0),
             terrain_theme: TerrainTheme::Grass,
             torches: None,
+            gateways: None,
         }
     }
 }
@@ -97,6 +99,14 @@ pub struct GroundTile {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Torch {
     pub grid_pos: Vec2,
+}
+
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Gateway {
+    pub grid_pos: Vec2,
+    pub rotation: f32,
+    pub gateway_id: usize
 }
 
 #[derive(Debug, Deserialize, Serialize)]

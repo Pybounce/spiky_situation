@@ -1,6 +1,8 @@
 
 use bevy::{platform::collections::HashMap, prelude::*};
 
+use crate::stage_editor::enums::GatewayVariant;
+
 use super::super::{controller::EDITOR_TILEMAP_SIZE, enums::{EditorItem, IntervalBlockVariant, KeyVariant, LockBlockVariant}};
 
 #[derive(Resource)]
@@ -63,6 +65,11 @@ impl EditorRenderer {
             EditorItem::PressureSpike { .. } => (40.0, 16.0),
             EditorItem::Laser { .. } => (47.0, 16.0),
             EditorItem::Torch => (80.0, 16.0),
+            EditorItem::Gateway { variant,.. } => match variant {
+                GatewayVariant::One => (240.0, 16.0),
+                GatewayVariant::Two => (241.0, 16.0),
+                GatewayVariant::Three => (242.0, 16.0),
+            },
         };
 
         let upper_left = Vec2::new(index % EDITOR_TILEMAP_SIZE, (index / EDITOR_TILEMAP_SIZE).trunc()) * tile_size;

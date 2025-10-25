@@ -1,7 +1,7 @@
 
 use bevy::{platform::collections::HashMap, prelude::*, scene::ron};
 
-use crate::{stage::stage_builder::{stage_asset::{GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, RailRider, SawShooterBlock, Spike, Spring, Stage, TerrainTheme, Torch}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
+use crate::{stage::stage_builder::{stage_asset::{Gateway, GroundTile, HalfSaw, IntervalBlock, Key, Laser, LockBlock, PhantomBlock, PressureSpike, RailGraph, RailRider, SawShooterBlock, Spike, Spring, Stage, TerrainTheme, Torch}, stage_creator::TILE_SIZE}, stage_editor::rail_grid::RailGrid};
 
 use super::{enums::*, get_ground_atlas_index};
 
@@ -247,6 +247,13 @@ impl EditorController {
         for torch in stage.torches.as_ref().into_iter().flatten() {
             self.try_place_item(torch.grid_pos.as_ivec2(), EditorItem::Torch);
         }
+        for gateway in stage.gateways.as_ref().into_iter().flatten() {
+            self.try_place_item(gateway.grid_pos.as_ivec2(), EditorItem::Gateway { rotation: gateway.rotation, variant: match gateway.gateway_id {
+                1 => GatewayVariant::One,
+                2 => GatewayVariant::Two,
+                _ => GatewayVariant::Three,
+            } });
+        }
 
     }
 
@@ -347,6 +354,11 @@ impl EditorController {
                     });
                 }
                 EditorItem::Torch => { stage.torches.get_or_insert_with(|| vec![]).push(Torch { grid_pos: grid_pos.as_vec2() }); },
+                EditorItem::Gateway { rotation, variant } => { stage.gateways.get_or_insert_with(|| vec![]).push(Gateway { rotation: *rotation, grid_pos: grid_pos.as_vec2(), gateway_id: match variant {
+                    GatewayVariant::One => 1,
+                    GatewayVariant::Two => 2,
+                    GatewayVariant::Three => 3,
+                } }); },
             }
         }
         stage.grid_width = stage_size.x as usize;
