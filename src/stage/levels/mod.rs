@@ -34,15 +34,17 @@ pub enum LevelLoaderState {
 }
 
 //  Currently...
-//      I can raise level load events
-//      Reading these events triggers the loading of the level asset
+//      I can raise level load events and load the level and first stage
+//      I can setup gateway links in the level file
 
-//  To do...
-//      Once loaded successfully, raise a stagebuild/load event for the spawn room
-//      Add in an editor object for the gateways
-//      Get in some logic to move between them nicely
+//  To do
+//      Make an actual save file that has completed levels? (how does this work with custom not sure) - can just have a hash for completed levels and check myhash.contains(level) etc
+//      Collecting the goal in any stage should trigger a LEVEL complete, not stage complete
+//      Remove goals from stages
+//      Theory craft how things like lock blocks (or dynamic blocks in general) will work
 
 //  To do after...
-//      Make an actual save file that has completed levels? (how does this work with custom not sure)
-//      Collecting the goal in a stage should trigger a LEVEL complete, not stage complete
-//      Remove goals from stages
+//      Ability to have vertical gateways
+//      Screen transition for gateways so it's less jarring
+//      Rework the gamemode bs
+//          An endless is still good if I add a random level generator using rooms
