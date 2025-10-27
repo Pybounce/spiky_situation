@@ -1,7 +1,7 @@
 
 use bevy::{ecs::system::EntityCommands, prelude::*};
 
-use crate::{common::states::{AppState, DespawnOnStateExit}, databases::save_db::{GameSave, SaveDb}, game::story::StorySave, main_menu::{get_stage_ids, LoadSave}};
+use crate::{common::states::{AppState, DespawnOnStateExit}, databases::save_db::{GameSave, SaveDb}, game::story::StorySave, main_menu::LoadSave};
 
 #[derive(Component)]
 pub struct ContinueGameButton;
