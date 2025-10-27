@@ -25,12 +25,11 @@ pub enum LoadSave {
 
 pub fn try_start_game(
     mut start_game_reader: EventReader<LoadSave>,
-    //mut build_event_writer: EventWriter<BuildStageEvent>,
-    mut load_level_event_writer: EventWriter<LoadLevelEvent>,
-    mut commands: Commands
+    //mut load_level_event_writer: EventWriter<LoadLevelEvent>,
+    mut commands: Commands,
+    mut app_state: ResMut<NextState<AppState>>,
 ) {
     let mut game_started = false;
-    if start_game_reader.read().count() > 0 {}
     for event in start_game_reader.read() {
         if game_started { continue; }
         match event {
@@ -38,6 +37,7 @@ pub fn try_start_game(
                 //load_level_event_writer.write(LoadLevelEvent { level_id: 0 });
                 commands.insert_resource(story_save.clone());
                 game_started = true;
+                app_state.set(AppState::StoryOverworld);
             },
         }
     }

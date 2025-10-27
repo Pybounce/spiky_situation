@@ -26,7 +26,8 @@ pub enum AppState {
     Game,
     #[default]
     MainMenu,
-    StageEditor
+    StageEditor,
+    StoryOverworld
 }
 
 #[derive(States, Debug, Hash, Eq, PartialEq, Clone, Default)]

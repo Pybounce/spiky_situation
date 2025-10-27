@@ -1,13 +1,13 @@
 
 use bevy::{ecs::system::EntityCommands, prelude::*};
 
-use crate::{common::states::{AppState, DespawnOnStateExit}, databases::save_db::{GameSave, SaveDb}, game::story::StorySave, main_menu::LoadSave};
+use crate::{common::states::{AppState, DespawnOnStateExit}, databases::{game_db::GameDb, save_db::{GameSave, SaveDb}}, game::story::StorySave, main_menu::LoadSave};
 
 #[derive(Component)]
-pub struct ContinueGameButton;
+pub struct ContinueGamesaveButton(usize);
 
 #[derive(Component)]
-pub struct NewGameButton;
+pub struct NewGameButton(usize);
 
 pub fn check_new_game_interaction_TEMP_GAMEPAD_SUPPORT(
     gamepad_query: Query<&Gamepad>,
@@ -26,18 +26,18 @@ pub fn check_new_game_interaction_TEMP_GAMEPAD_SUPPORT(
 }
 
 pub fn check_new_game_interaction(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>, With<NewGameButton>)>,
+    mut interaction_query: Query<(&NewGameButton, &Interaction), (Changed<Interaction>, With<Button>)>,
     mut start_game_writer: EventWriter<LoadSave>,
-    save_db: Res<SaveDb>
+    game_db: Res<GameDb>
 ) {
-    for interaction in &mut interaction_query {
+    for (new_game_btn, interaction) in &mut interaction_query {
 
         match interaction {
             Interaction::Pressed => {
-                //let stage_ids = get_stage_ids();
-                //let new_run = EndlessRun::new(stage_ids, 100);
-                //start_game_writer.write(LoadSave::Endless(new_run));
-                //save_db.delete_game_save();
+                let new_save = StorySave::new(new_game_btn.0);
+                if game_db.save_story(&new_save) {
+                    start_game_writer.write(LoadSave::Story(new_save));
+                }
             }
             _ => ()
         }
@@ -45,15 +45,14 @@ pub fn check_new_game_interaction(
 }
 
 pub fn check_continue_game_interaction(
-    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>, With<ContinueGameButton>)>,
+    mut interaction_query: Query<(&ContinueGamesaveButton, &Interaction), (Changed<Interaction>, With<Button>)>,
     mut start_game_writer: EventWriter<LoadSave>,
-    save_db: Res<SaveDb>
+    game_db: Res<GameDb>
 ) {
-    for interaction in &mut interaction_query {
-
+    for (story_button, interaction) in &mut interaction_query {
         match interaction {
             Interaction::Pressed => {
-                if let Some(existing_save) = save_db.get_existing_save() {
+                if let Some(existing_save) = game_db.load_gamesave(story_button.0) {
                     match existing_save {
                         GameSave::Story(story_save) => start_game_writer.write(LoadSave::Story(story_save)),
                     };
@@ -69,9 +68,8 @@ pub fn check_continue_game_interaction(
 
 pub fn build_main_menu_ui(
     mut commands: Commands,
-    save_db: Res<SaveDb>
+    game_db: Res<GameDb>
 ) {
-
     commands.spawn(Node {
             justify_content: JustifyContent::Center, 
             align_items: AlignItems::Center,         
@@ -81,42 +79,26 @@ pub fn build_main_menu_ui(
             ..default()
         })
         .with_children(|parent| {
-            if let Some(existing_save) = save_db.get_existing_save() {
+            for i in 0..3 {
                 let mut btn = parent.spawn(());
-                match existing_save {
-                    GameSave::Story(story_save) => build_existing_story_save_button(&mut btn, &story_save),
+                match game_db.load_gamesave(i) {
+                    Some(gamesave) => {
+                        match gamesave {
+                            GameSave::Story(story_save) => build_existing_story_save_button(&mut btn, &story_save),
+                        }
+                    },
+                    None => build_new_gamesave_button(&mut btn, i),
                 }
             }
-
-
-            parent.spawn((
-                Node {
-                    width: Val::Px(150.0),
-                    height: Val::Px(65.0),
-                    margin: UiRect::all(Val::Px(10.0)),
-                    
-                    ..default()
-                },
-                BackgroundColor(Color::srgb_u8(200, 200, 200)),
-                Button,
-                Text::new("New Game"),
-                TextFont {
-                    font_size: 24.0,
-                    ..default()
-                },
-                TextColor(Color::WHITE),
-                DespawnOnStateExit::App(AppState::MainMenu),
-                NewGameButton
-            ));
-        }).insert(DespawnOnStateExit::App(AppState::MainMenu));
+        });        
 }
 
 
 
-pub fn build_existing_story_save_button(entity_commands: &mut EntityCommands, _story_save: &StorySave) {
+pub fn build_existing_story_save_button(entity_commands: &mut EntityCommands, story_save: &StorySave) {
     entity_commands.try_insert((
         Button,
-        ContinueGameButton,
+        ContinueGamesaveButton(story_save.save_id),
         Node {
             width: Val::Px(150.0),
             height: Val::Px(65.0),
@@ -132,4 +114,26 @@ pub fn build_existing_story_save_button(entity_commands: &mut EntityCommands, _s
         TextColor(Color::WHITE),
         DespawnOnStateExit::App(AppState::MainMenu)
     ));
+}
+
+pub fn build_new_gamesave_button(entity_commands: &mut EntityCommands, gamesave_id: usize) {
+    entity_commands.try_insert((
+        Node {
+            width: Val::Px(150.0),
+            height: Val::Px(65.0),
+            margin: UiRect::all(Val::Px(10.0)),
+            
+            ..default()
+        },
+        BackgroundColor(Color::srgb_u8(200, 200, 200)),
+        Button,
+        Text::new("New Game"),
+        TextFont {
+            font_size: 24.0,
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        DespawnOnStateExit::App(AppState::MainMenu),
+        NewGameButton(gamesave_id)
+        )).insert(DespawnOnStateExit::App(AppState::MainMenu));
 }

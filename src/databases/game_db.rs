@@ -9,7 +9,6 @@ use crate::{common::pair_map::PairMap, databases::save_db::GameSave, game::story
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Level {
-    pub id: usize,
     pub name: String,
     /// (stageId, gatewayId)
     pub gateway_pairs: PairMap<(usize, usize)>,
@@ -22,16 +21,19 @@ pub struct GameDb {
 }
 
 impl GameDb {
-    pub fn save_story(&self, story_save: &StorySave) {
+    pub fn save_story(&self, story_save: &StorySave) -> bool {
         let game_save = GameSave::Story(story_save.clone());
         if let Ok(path) = PathHelper::gamesaves_path() {
             let mut bytes: Vec<u8> = vec![];
             ron::ser::to_writer(&mut bytes, &game_save).unwrap();
 
-            if GameDb::write_to_file(&path, &PathHelper::gamesave_filename(story_save.save_id), &bytes) == false {
-                error!("failed to save story");
+            if GameDb::write_to_file(&path, &PathHelper::gamesave_filename(story_save.save_id), &bytes) {
+                return true;
             }
         }
+
+        error!("failed to save story");
+        return false;
     }
 
     pub fn load_gamesave(&self, gamesave_id: usize) -> Option<GameSave> {
