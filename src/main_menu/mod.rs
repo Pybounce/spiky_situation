@@ -2,7 +2,7 @@ use std::{env, fs, path::PathBuf};
 
 use bevy::prelude::*;
 
-use crate::{common::states::AppState, game::endless::components::EndlessRun, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction, check_new_game_interaction_TEMP_GAMEPAD_SUPPORT}, stage::{levels::data::LoadLevelEvent, stage_builder::events::BuildStageEvent}, stage_editor::StageEditorLoadDetails};
+use crate::{common::states::AppState, game::story::StorySave, main_menu::ui::{build_main_menu_ui, check_continue_game_interaction, check_new_game_interaction, check_new_game_interaction_TEMP_GAMEPAD_SUPPORT}, stage::{levels::data::LoadLevelEvent, stage_builder::events::BuildStageEvent}, stage_editor::StageEditorLoadDetails};
 
 pub mod ui;
 
@@ -11,7 +11,7 @@ pub struct MainMenuPlugin;
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_event::<StartGame>()
+        .add_event::<LoadSave>()
         .add_systems(OnEnter(AppState::MainMenu), build_main_menu_ui)
         .add_systems(Update, (try_start_game, check_new_game_interaction_TEMP_GAMEPAD_SUPPORT, check_new_game_interaction, check_continue_game_interaction, try_enter_stage_editor).run_if(in_state(AppState::MainMenu)));
     }
@@ -19,30 +19,27 @@ impl Plugin for MainMenuPlugin {
 
 
 #[derive(Event)]
-pub enum StartGame {
-    Endless(EndlessRun)
+pub enum LoadSave {
+    Story(StorySave)
 }
 
 pub fn try_start_game(
-    mut start_game_reader: EventReader<StartGame>,
+    mut start_game_reader: EventReader<LoadSave>,
     //mut build_event_writer: EventWriter<BuildStageEvent>,
     mut load_level_event_writer: EventWriter<LoadLevelEvent>,
     mut commands: Commands
 ) {
     let mut game_started = false;
+    if start_game_reader.read().count() > 0 {}
     for event in start_game_reader.read() {
         if game_started { continue; }
         match event {
-            StartGame::Endless(endless_run) => {
-                //build_event_writer.write(BuildStageEvent {stage_id: endless_run.current_stage_id(), gateway_id_opt: None });
-                load_level_event_writer.write(LoadLevelEvent { level_id: 0 });
-
-                commands.insert_resource(endless_run.clone());
+            LoadSave::Story(story_save) => {
+                //load_level_event_writer.write(LoadLevelEvent { level_id: 0 });
+                commands.insert_resource(story_save.clone());
                 game_started = true;
             },
         }
-        
-
     }
 }
 

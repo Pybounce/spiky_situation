@@ -18,7 +18,7 @@ impl Plugin for StatesPlugin {
 #[source(AppState = AppState::Game)]
 pub enum GameMode {
     #[default]
-    Endless
+    Story
 }
 
 #[derive(States, Debug, Hash, Eq, PartialEq, Clone, Default)]

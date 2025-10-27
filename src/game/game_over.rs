@@ -1,7 +1,7 @@
 
 use bevy::prelude::*;
 
-use crate::{common::states::{AppState, GameState}, game::endless::components::EndlessRun, stage::stage_builder::StageBuilderState};
+use crate::{common::states::{AppState, GameState}, game::story::StorySave, stage::{levels::data::CurrentLevelData, stage_builder::StageBuilderState}};
 
 
 #[derive(Event)]
@@ -21,6 +21,6 @@ pub fn read_game_over_events(
         game_state.set(GameState::NA);
         app_state.set(AppState::MainMenu);
         stage_builder_state.set(StageBuilderState::NotBuilding);
-        commands.remove_resource::<EndlessRun>();
+        commands.remove_resource::<CurrentLevelData>();
     }
 }

@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::avian_ex::ManyCollidingEntities, databases::save_db::SaveGame, game::endless::components::EndlessRun, local_player::LocalPlayer, stage::{stage_builder::{events::BuildStageEvent, CurrentStageData}, stage_objects::goal::StageGoal}};
+use crate::{common::{physics::avian_ex::ManyCollidingEntities, states::{AppState, GameState}}, databases::save_db::{SaveDb, SaveGame}, game::story::StorySave, local_player::LocalPlayer, stage::{levels::data::CurrentLevelData, stage_builder::{events::BuildStageEvent, CurrentStageData, StageBuilderState}, stage_objects::goal::StageGoal}};
 
 #[derive(Event)]
 pub struct GoalReached {
@@ -46,22 +46,28 @@ pub fn skip_stage(
     }
 }
 
-pub fn next_staged_if_goal_reached(
-    stage_data_opt: Option<Res<CurrentStageData>>,
-    mut build_event_writer: EventWriter<BuildStageEvent>,
+
+pub fn story_save_goal_reached(
+    story_save_opt: Option<ResMut<StorySave>>,
     mut event_reader: EventReader<GoalReached>,
-    mut current_run: ResMut<EndlessRun>,
-    mut save_writer: EventWriter<SaveGame>,
+    mut game_state: ResMut<NextState<GameState>>,
+    mut app_state: ResMut<NextState<AppState>>,
+    mut stage_builder_state: ResMut<NextState<StageBuilderState>>,
+    mut commands: Commands,
+    save_db: Res<SaveDb>,
+    current_level_data_opt: Option<Res<CurrentLevelData>>
+
 ) {
-    if let Some(stage_data) = stage_data_opt {
-        let mut build_event_raised = false;
-        for event in event_reader.read() {
-            if event.stage_id == stage_data.stage_id && !build_event_raised {
-                save_writer.write(SaveGame);
-                current_run.complete_stage();
-                build_event_writer.write(BuildStageEvent {stage_id: current_run.current_stage_id(), gateway_id_opt: None });
-                build_event_raised = true;
-            }
-        }
+    let Some(mut story_save) = story_save_opt else { return; };
+    let Some(current_level_data) = current_level_data_opt else { return; };
+
+    if event_reader.read().count() > 0 {
+        story_save.completed_levels.insert(current_level_data.level_id);
+        save_db.save_story(&story_save);
+        game_state.set(GameState::NA);
+        app_state.set(AppState::MainMenu);
+        stage_builder_state.set(StageBuilderState::NotBuilding);
+        commands.remove_resource::<StorySave>();
     }
+
 }

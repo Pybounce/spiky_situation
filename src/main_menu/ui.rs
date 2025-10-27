@@ -1,7 +1,7 @@
 
 use bevy::{ecs::system::EntityCommands, prelude::*};
 
-use crate::{common::states::{AppState, DespawnOnStateExit}, databases::save_db::{GameSave, SaveDb}, game::endless::components::EndlessRun, main_menu::{get_stage_ids, StartGame}};
+use crate::{common::states::{AppState, DespawnOnStateExit}, databases::save_db::{GameSave, SaveDb}, game::story::StorySave, main_menu::{get_stage_ids, LoadSave}};
 
 #[derive(Component)]
 pub struct ContinueGameButton;
@@ -11,33 +11,33 @@ pub struct NewGameButton;
 
 pub fn check_new_game_interaction_TEMP_GAMEPAD_SUPPORT(
     gamepad_query: Query<&Gamepad>,
-    mut start_game_writer: EventWriter<StartGame>,
+    mut start_game_writer: EventWriter<LoadSave>,
     save_db: Res<SaveDb>
 ) {
     for gamepad in gamepad_query {
         if gamepad.just_pressed(GamepadButton::South) {
-            let stage_ids = get_stage_ids();
-            let new_run = EndlessRun::new(stage_ids, 100);
-            start_game_writer.write(StartGame::Endless(new_run));
-            save_db.delete_game_save();
-            return;
+            //let stage_ids = get_stage_ids();
+            //let new_run = EndlessRun::new(stage_ids, 100);
+            //start_game_writer.write(LoadSave::Endless(new_run));
+            //save_db.delete_game_save();
+            //return;
         }
     }
 }
 
 pub fn check_new_game_interaction(
     mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>, With<NewGameButton>)>,
-    mut start_game_writer: EventWriter<StartGame>,
+    mut start_game_writer: EventWriter<LoadSave>,
     save_db: Res<SaveDb>
 ) {
     for interaction in &mut interaction_query {
 
         match interaction {
             Interaction::Pressed => {
-                let stage_ids = get_stage_ids();
-                let new_run = EndlessRun::new(stage_ids, 100);
-                start_game_writer.write(StartGame::Endless(new_run));
-                save_db.delete_game_save();
+                //let stage_ids = get_stage_ids();
+                //let new_run = EndlessRun::new(stage_ids, 100);
+                //start_game_writer.write(LoadSave::Endless(new_run));
+                //save_db.delete_game_save();
             }
             _ => ()
         }
@@ -46,16 +46,16 @@ pub fn check_new_game_interaction(
 
 pub fn check_continue_game_interaction(
     mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>, With<ContinueGameButton>)>,
-    mut start_game_writer: EventWriter<StartGame>,
+    mut start_game_writer: EventWriter<LoadSave>,
     save_db: Res<SaveDb>
 ) {
     for interaction in &mut interaction_query {
 
         match interaction {
             Interaction::Pressed => {
-                if let Some(existing_run) = save_db.get_existing_save() {
-                    match existing_run {
-                        GameSave::Endless(endless_run) => start_game_writer.write(StartGame::Endless(endless_run)),
+                if let Some(existing_save) = save_db.get_existing_save() {
+                    match existing_save {
+                        GameSave::Story(story_save) => start_game_writer.write(LoadSave::Story(story_save)),
                     };
                 };
                 
@@ -84,7 +84,7 @@ pub fn build_main_menu_ui(
             if let Some(existing_save) = save_db.get_existing_save() {
                 let mut btn = parent.spawn(());
                 match existing_save {
-                    GameSave::Endless(endless_run) => build_existing_endless_save_button(&mut btn, &endless_run),
+                    GameSave::Story(story_save) => build_existing_story_save_button(&mut btn, &story_save),
                 }
             }
 
@@ -113,7 +113,7 @@ pub fn build_main_menu_ui(
 
 
 
-pub fn build_existing_endless_save_button(entity_commands: &mut EntityCommands, _endless_run: &EndlessRun) {
+pub fn build_existing_story_save_button(entity_commands: &mut EntityCommands, _story_save: &StorySave) {
     entity_commands.try_insert((
         Button,
         ContinueGameButton,
