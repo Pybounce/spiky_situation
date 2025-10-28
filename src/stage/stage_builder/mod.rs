@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use events::{read_stage_build_complete_events, read_stage_build_events, read_stage_build_failed_events, BuildStageEvent, StageBuildCompleteEvent, StageBuildFailedEvent};
 use systems::unload_old_stage;
 
-use crate::common::states::AppState;
+use crate::{common::states::AppState, stage::stage_builder::systems::cleanup_old_stage};
 
 pub mod events;
 pub mod stage_asset;
@@ -19,7 +19,7 @@ impl Plugin for StageBuilderPlugin {
         .add_event::<StageBuildFailedEvent>()
         .add_systems(PreUpdate, (unload_old_stage, read_stage_build_events).chain())
         .add_systems(Update, (read_stage_build_complete_events, read_stage_build_failed_events))
-        .add_systems(OnExit(AppState::Game), unload_old_stage);
+        .add_systems(OnExit(AppState::Game), cleanup_old_stage);
     }
 }
 

@@ -26,3 +26,15 @@ pub fn unload_old_stage(
     }
 
 }
+
+pub fn cleanup_old_stage(
+    stage_object_query: Query<Entity, With<StageObject>>,
+    mut commands: Commands,
+) {
+
+    for e in &stage_object_query {
+        commands.entity(e).despawn(); 
+    }
+    commands.remove_resource::<CurrentStageData>();
+
+}
