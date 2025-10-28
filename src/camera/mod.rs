@@ -168,13 +168,13 @@ pub fn clamp_camera_to_stage(
 
     for (mut pixel_translation, mut transform, mut projection) in &mut camera_query {
         
+        let pixel_factor = min_pixel_factor.max(pixel_translation.factor);
         if let Projection::Orthographic(ref mut ortho) = *projection {
-            let pixel_factor = min_pixel_factor.max(pixel_translation.factor);
             ortho.scale = 1.0 / pixel_factor as f32;
             pixel_translation.factor = pixel_factor;
         };
 
-        let view_size = window_res * (1.0 / pixel_translation.factor as f32);
+        let view_size = window_res * (1.0 / pixel_factor as f32);
         pixel_translation.translation = pixel_translation.translation.clamp(Vec3::new(view_size.x / 2.0, view_size.y / 2.0, -10000.0), Vec3::new(stage_data.bounds.width() - (view_size.x / 2.0) - 16.0 , stage_data.bounds.height() - (view_size.y / 2.0) - 16.0, 10000.0));
     }
 }

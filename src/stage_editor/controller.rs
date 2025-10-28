@@ -195,10 +195,14 @@ impl EditorController {
     }
 
     fn set_stage_template(&mut self, stage: &Stage) {
-
-        self.stage_grid.insert(stage.spawn_grid_pos.as_ivec2(), EditorItem::Spawn);
         self.version += 1;
-        self.stage_grid.insert(stage.goal_grid_pos.as_ivec2(), EditorItem::Goal);
+
+        if let Some(spawn_pos) = stage.spawn_grid_pos {
+            self.stage_grid.insert(spawn_pos.as_ivec2(), EditorItem::Spawn);
+        }
+        if let Some(goal_pos) = stage.goal_grid_pos {
+            self.stage_grid.insert(goal_pos.as_ivec2(), EditorItem::Goal);
+        }
         
         for ground in &stage.ground_tiles {
             self.try_place_item(ground.grid_pos.as_ivec2(), EditorItem::Ground);
@@ -266,7 +270,6 @@ impl EditorController {
         for (grid_pos, stage_editor_obj) in &self.stage_grid {
             stage_size.x = stage_size.x.max(grid_pos.x + 1);
             stage_size.y = stage_size.y.max(grid_pos.y + 1);
-
             match stage_editor_obj {
                 EditorItem::Spike { rotation } => {
                     stage.spikes.push(Spike {
@@ -280,7 +283,7 @@ impl EditorController {
                         tilemap_index: get_ground_atlas_index(self, *grid_pos, None),
                     });
                 },
-                EditorItem::Spawn => stage.spawn_grid_pos = grid_pos.as_vec2(),
+                EditorItem::Spawn => stage.spawn_grid_pos = Some(grid_pos.as_vec2()),
                 EditorItem::Spring { rotation } => {
                     stage.springs.push(Spring {
                         grid_pos: grid_pos.as_vec2(),
@@ -334,7 +337,7 @@ impl EditorController {
                         rotation: *rotation,
                     });
                 },
-                EditorItem::Goal => stage.goal_grid_pos = grid_pos.as_vec2(),
+                EditorItem::Goal => stage.goal_grid_pos = Some(grid_pos.as_vec2()),
                 EditorItem::TerrainTheme { variant } => stage.terrain_theme = match variant {
                     TerrainThemeVarient::Grass => TerrainTheme::Grass,
                     TerrainThemeVarient::Snow => TerrainTheme::Snow,

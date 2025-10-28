@@ -2,7 +2,7 @@
 
 use avian2d::{prelude::PhysicsLengthUnit, PhysicsPlugins};
 use bevy::{
-    asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode}, winit::{ UpdateMode, WinitSettings }
+    asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode, WindowMode}, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;
@@ -54,6 +54,10 @@ fn main() {
             prevent_default_event_handling: true,
             //resolution: (1600.0, 900.0).into(),
             present_mode: PresentMode::Immediate,
+            //mode: WindowMode::Fullscreen(
+            //    MonitorSelection::Primary,
+            //    VideoModeSelection::Current
+            //),
             ..default()
         }),
         ..default()

@@ -38,6 +38,8 @@ pub fn refresh_editor_renderer(
 
     if renderer.full_refresh == false { return; }
 
+    println!("stage size: {}", editor_controller.grid_size);
+
     for entity in existing_items.iter() {
         commands.entity(entity).try_despawn();
     }

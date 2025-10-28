@@ -133,10 +133,13 @@ fn build_player_spawner(stage_creator: &StageCreator, commands: &mut Commands) -
             };
         },
         None => {
-            commands.spawn(LocalPlayerSpawner {
-                spawn_time: 0.0,
-                translation: ((stage_creator.stage.spawn_grid_pos * TILE_SIZE) + TILE_SIZE_HALF).extend(0.0),
-            });
+            if let Some(spawn_pos) = stage_creator.stage.spawn_grid_pos {
+                commands.spawn(LocalPlayerSpawner {
+                    spawn_time: 0.0,
+                    translation: ((spawn_pos * TILE_SIZE) + TILE_SIZE_HALF).extend(0.0),
+                });
+            }
+
         },
     };
     return true;
@@ -244,13 +247,14 @@ fn build_borders(stage_creator: &StageCreator, commands: &mut Commands) -> bool 
 fn build_goal(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
 
     let sprite_rect = get_object_tilemap_rect_from_index(ObjectAtlasIndices::Player);
-    
-    GoalFactory::spawn(
-        commands,
-        &stage_creator, 
-        stage_creator.stage.goal_grid_pos, 
-        sprite_rect);
-        
+    if let Some(goal_pos) = stage_creator.stage.goal_grid_pos {
+        GoalFactory::spawn(
+            commands,
+            &stage_creator, 
+            goal_pos, 
+            sprite_rect
+        );
+    }        
     return true;
 }
 
