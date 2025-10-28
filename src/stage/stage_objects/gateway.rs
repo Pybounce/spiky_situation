@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::{avian_ex::ManyCollidingEntities, player_collision::PlayerCollisionEnded}, local_player::LocalPlayer, stage::{levels::data::CurrentLevelData, stage_builder::{events::BuildStageEvent, stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, CurrentStageData}}};
+use crate::{common::physics::{avian_ex::ManyCollidingEntities, player_collision::PlayerCollisionEnded}, local_player::LocalPlayer, rt_lights::components::PointLight, stage::{levels::data::CurrentLevelData, stage_builder::{events::BuildStageEvent, stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, CurrentStageData}, stage_objects::StageObject}};
 
 #[derive(Component)]
 pub struct Gateway(usize);
@@ -19,7 +19,12 @@ impl GatewayFactory {
                 translation: Vec3::new((gateway.grid_pos.x * TILE_SIZE) + TILE_SIZE_HALF, (gateway.grid_pos.y * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
                 ..default()
             },
-            Gateway(gateway.gateway_id)
+            Gateway(gateway.gateway_id),
+            PointLight {
+                intensity: 0.7,
+                colour: Color::srgb_u8(255, 176, 55)
+            },
+            StageObject::Volatile
         ));
     }
 }
