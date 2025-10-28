@@ -2,7 +2,7 @@ use bevy::{input::mouse::MouseMotion, prelude::*};
 use controller::EditorController;
 use item_icon::*;
 use renderer::editor_renderer::EditorRenderer;
-use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit, StageEditorState}}, stage::stage_builder::stage_asset::Stage, stage_editor::enums::EditorTool};
+use crate::{camera::PixelPerfectTranslation, common::{mouse::{MouseData, WorldMouseMotion}, states::{AppState, DespawnOnStateExit}}, databases::game_db::GameDb, stage::stage_builder::stage_asset::Stage, stage_editor::enums::EditorTool};
 
 mod enums;
 mod controller;
@@ -15,70 +15,36 @@ pub struct StageEditorPlugin;
 impl Plugin for StageEditorPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_systems(OnEnter(AppState::StageEditor), load_stage_editor_assets)
-        .add_systems(Update, check_stage_editor_loaded.run_if(in_state(StageEditorState::Loading)).run_if(in_state(AppState::StageEditor)))
-        .add_systems(OnEnter(StageEditorState::InEdit), build_stage_editor)
+        .add_systems(OnEnter(AppState::StageEditor), build_stage_editor)
         .add_systems(OnExit(AppState::StageEditor), teardown_stage_editor)
         .add_systems(Update, (
             (handle_current_item_change, add_item_icon, move_item_icon, update_ground_atlas_indices),
             (handle_rotate, handle_placement, handle_rail_placement, handle_rail_removal, handle_grid_object_removals),
             handle_save, move_camera, switch_tool
-        ).run_if(in_state(StageEditorState::InEdit)));
+        ).run_if(in_state(AppState::StageEditor)));
     }
 }
 
-fn load_stage_editor_assets(
-    mut stage_editor_load_details: ResMut<StageEditorLoadDetails>,
-    asset_server: Res<AssetServer>
-) {
-    stage_editor_load_details.template_stage_handle = match stage_editor_load_details.template_stage_id {
-        Some(template_stage_id) => asset_server.load(format!("stages/stage_{}.stage", template_stage_id)).into(),
-        None => None,
-    };
-}
-
-fn check_stage_editor_loaded(
-    stage_editor_load_details: Res<StageEditorLoadDetails>,
-    asset_server: Res<AssetServer>,
-    mut app_state: ResMut<NextState<AppState>>,
-    mut stage_editor_state: ResMut<NextState<StageEditorState>>,
-) {
-    if let Some(handle) = &stage_editor_load_details.template_stage_handle {
-        match asset_server.load_state(handle) {
-            bevy::asset::LoadState::NotLoaded => {
-                app_state.set(AppState::MainMenu);
-                return;
-            },
-            bevy::asset::LoadState::Loading => { return; },
-            bevy::asset::LoadState::Loaded => (),
-            bevy::asset::LoadState::Failed(_) => {
-                app_state.set(AppState::MainMenu);
-                return;
-            },
-        }
-    }
-    stage_editor_state.set(StageEditorState::InEdit);
-}
 
 fn build_stage_editor(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    stage_assets: Res<Assets<Stage>>,
     stage_editor_load_details: Res<StageEditorLoadDetails>,
     mut app_state: ResMut<NextState<AppState>>,
+    game_db: Res<GameDb>
 ) {
     let object_atlas: Handle<Image> = asset_server.load("object_tilemap.png");
     let ground_atlas: Handle<Image> = asset_server.load("ground_grass.png");
     
     let editor_controller: EditorController;
 
-    if let Some(handle) = &stage_editor_load_details.template_stage_handle {
-        match stage_assets.get(handle) {
-            Some(stage) => {editor_controller = EditorController::from_stage(stage, stage.id, &object_atlas, &ground_atlas); },
-            None => {
-                app_state.set(AppState::MainMenu);
-                return;
-            },
+    if let Some(template_stage_id) = stage_editor_load_details.template_stage_id {
+        if let Some(stage) = game_db.load_stage(template_stage_id) {
+            editor_controller = EditorController::from_stage(&stage, stage.id, &object_atlas, &ground_atlas);
+        }
+        else {
+            app_state.set(AppState::MainMenu);
+            return;
         }
     }
     else {
@@ -96,19 +62,16 @@ fn build_stage_editor(
 
 fn teardown_stage_editor(
     mut commands: Commands,
-    mut editor_state: ResMut<NextState<StageEditorState>>,
 
 ) {
     commands.remove_resource::<EditorController>();
     commands.remove_resource::<EditorRenderer>();
-    editor_state.set(StageEditorState::Loading);
 }
 
 #[derive(Resource)]
 pub struct StageEditorLoadDetails {
     pub template_stage_id: Option<usize>,
     pub new_stage_id: usize,
-    pub template_stage_handle: Option<Handle<Stage>>
 }
 
 fn handle_rail_placement(

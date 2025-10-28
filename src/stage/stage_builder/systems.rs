@@ -1,92 +1,28 @@
 use bevy::prelude::*;
 
-use crate::{shaders::background_shader::BackgroundMaterial, stage::stage_objects::StageObject};
+use crate::stage::{stage_builder::events::BuildStageEvent, stage_objects::StageObject};
 
-use super::{events::{StageBuildCompleteEvent, StageBuildFailedEvent}, stage_asset::Stage, stage_creator::{StageCreator, TILE_SIZE}, CurrentStageData, StageAssets, StageBuilderData};
+use super::CurrentStageData;
 
 
 pub fn unload_old_stage(
     stage_object_query: Query<(Entity, &StageObject)>,
     mut commands: Commands,
-    stage_builder_data: Option<Res<StageBuilderData>>,
-    current_stage_opt: Option<Res<CurrentStageData>>
+    current_stage_opt: Option<Res<CurrentStageData>>,
+    mut event_reader: EventReader<BuildStageEvent>,
 ) {
-    let Some(current_stage) = current_stage_opt else { return };
+    let Some(current_stage) = current_stage_opt else { 
+        let _ = event_reader.read().count();
+        return; 
+    };
 
-    for (e, so) in &stage_object_query {
-        let should_remove = match stage_builder_data {
-            Some(ref new_stage) => StageObject::StagePersistent != *so || new_stage.stage_id != current_stage.stage_id,
-            None => true,
-        };
-        if should_remove { commands.entity(e).despawn(); }
-    }
-    commands.remove_resource::<CurrentStageData>();
-}
-
-pub fn remove_stage_builder_data(
-    mut commands: Commands
-) {
-    commands.remove_resource::<StageBuilderData>();
-}
-
-pub fn try_build_stage(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    stage_builder_data: Res<StageBuilderData>,
-    stage_assets: Res<Assets<Stage>>,
-    mut complete_event_writer: EventWriter<StageBuildCompleteEvent>,
-    mut failed_event_writer: EventWriter<StageBuildFailedEvent>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<BackgroundMaterial>>
-) {
-    match asset_server.load_state(&stage_builder_data.stage_handle) {
-        bevy::asset::LoadState::NotLoaded => {
-            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
-            return;
-        },
-        bevy::asset::LoadState::Loading => { return; },
-        bevy::asset::LoadState::Loaded => (),
-        bevy::asset::LoadState::Failed(_) => {
-            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
-            return;
-        },
+    for build_stage_event in event_reader.read() {
+        println!("teardown stage");
+        for (e, so) in &stage_object_query {
+            let should_remove = StageObject::StagePersistent != *so || build_stage_event.stage_id != current_stage.stage_id;
+            if should_remove { commands.entity(e).despawn(); }
+        }
+        commands.remove_resource::<CurrentStageData>();
     }
 
-    let stage_asset = stage_assets.get(&stage_builder_data.stage_handle);
-    let ground_grass_handle: Handle<Image> = asset_server.load("ground_grass.png");
-    let ground_snow_handle: Handle<Image> = asset_server.load("ground_snow.png");
-    let object_tilemap_handle: Handle<Image> = asset_server.load("object_tilemap.png");
-
-    match stage_asset {
-        Some(stage) => {
-            let ground_tiles_handle = match stage.terrain_theme {
-                super::stage_asset::TerrainTheme::Grass => ground_grass_handle,
-                super::stage_asset::TerrainTheme::Snow => ground_snow_handle,
-                super::stage_asset::TerrainTheme::Sand => ground_grass_handle,
-            };
-            commands.insert_resource(StageAssets {
-                stage_objects_handle: object_tilemap_handle.clone(),
-                ground_tiles_handle: ground_tiles_handle.clone()
-            });
-
-            let background_mesh = meshes.add(Mesh::from(Rectangle::default()));
-            let background_mat = materials.add(BackgroundMaterial {});
-
-            let stage_creator = StageCreator::new(&stage, stage_builder_data.gateway_id_opt, &ground_tiles_handle, &object_tilemap_handle, &background_mesh, &background_mat);
-            if stage_creator.build(&mut commands) {
-                commands.insert_resource(CurrentStageData {
-                    stage_id: stage.id,
-                    gateway_id_opt: stage_builder_data.gateway_id_opt,
-                    bounds: Rect::new(-TILE_SIZE, -TILE_SIZE, stage.grid_width as f32 * TILE_SIZE, stage.grid_height as f32 * TILE_SIZE),
-                });
-                complete_event_writer.write(StageBuildCompleteEvent { stage_id: stage_builder_data.stage_id });
-            }
-            else {
-                failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
-            }
-        },
-        None => {
-            failed_event_writer.write(StageBuildFailedEvent { stage_id: stage_builder_data.stage_id });
-        },
-    }
 }

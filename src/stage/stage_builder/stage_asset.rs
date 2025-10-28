@@ -8,7 +8,7 @@ use thiserror::Error;
 
 use super::stage_creator::TILE_SIZE;
 
-#[derive(Asset, TypePath, Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Stage {
     pub id: usize,
     pub rail_graph: RailGraph,
@@ -178,44 +178,4 @@ pub struct SawShooterBlock {
 pub struct MovementPath {
     pub grid_offsets: Vec<Vec2>,
     pub speed: f32
-}
-
-#[derive(Default)]
-pub struct StageLoader;
-
-#[non_exhaustive]
-#[derive(Debug, Error)]
-pub enum StageLoaderError {
-    /// An [IO](std::io) Error
-    #[error("Could not load asset: {0}")]
-    Io(#[from] std::io::Error),
-    /// A [RON](ron) Error
-    #[error("Could not parse RON: {0}")]
-    RonSpannedError(#[from] ron::error::SpannedError),
-
-}
-
-
-impl AssetLoader for StageLoader {
-    type Asset = Stage;
-    type Settings = ();
-    type Error = StageLoaderError;
-
-    async fn load(
-        &self,
-        reader: &mut dyn Reader,
-        _settings: &(),
-        _load_context: &mut LoadContext<'_>,
-    ) -> Result<Self::Asset, Self::Error> {
-            let mut bytes = Vec::new();
-            reader.read_to_end(&mut bytes).await?;
-
-            let custom_asset = ron::de::from_bytes::<Stage>(&bytes)?;
-            Ok(custom_asset)
-    }
-
-    fn extensions(&self) -> &[&str] {
-        &["stage"]
-    }
-
 }

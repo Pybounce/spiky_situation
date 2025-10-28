@@ -69,8 +69,8 @@ impl GameDb {
         return None;
     }
 
-    pub fn load_stage(&self, level_id: usize) -> Option<Stage> {
-        if let Ok(path) = PathHelper::level_path(level_id) {
+    pub fn load_stage(&self, stage_id: usize) -> Option<Stage> {
+        if let Ok(path) = PathHelper::stage_path(stage_id) {
             if let Ok(bytes) = std::fs::read(path) {
                 if let Ok(data) = ron::de::from_bytes::<Stage>(&bytes) {
                     return Some(data);
@@ -191,7 +191,7 @@ impl PathHelper {
         return format!("level_{}.dat", level_id);
     }
     fn stage_filename(stage_id: usize) -> String {
-        return format!("stage_{}.dat", stage_id);
+        return format!("stage_{}.stage", stage_id);
     }
 }
 

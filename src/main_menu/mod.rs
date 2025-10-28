@@ -52,7 +52,6 @@ pub fn try_enter_stage_editor(
         commands.insert_resource(StageEditorLoadDetails {
             template_stage_id: 1.into(),
             new_stage_id: 1,
-            template_stage_handle: None
         });
         app_state.set(AppState::StageEditor);
     }

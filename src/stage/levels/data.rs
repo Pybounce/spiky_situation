@@ -1,8 +1,7 @@
 
 use bevy::prelude::*;
 
-use crate::{common::pair_map::PairMap, stage::levels::level_asset::Level};
-use serde::{Deserialize, Serialize};
+use crate::common::pair_map::PairMap;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Event)]
 pub struct LoadLevelEvent {
@@ -17,12 +16,6 @@ pub struct LoadLevelFailedEvent {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Event)]
 pub struct LoadLevelSuccessEvent {
     pub level_id: usize
-}
-
-#[derive(Resource)]
-pub struct LevelBuilderData {
-    pub level_id: usize,
-    pub level_handle: Handle<Level>
 }
 
 
