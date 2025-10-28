@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, bloom::Bloomin, mouse::WorldMouseMotion, physics::{avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, player_collision::{raise_player_collision_ended, raise_player_collision_started, PlayerCollisionEnded, PlayerCollisionStarted}}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{game_db::GameDb, save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::{levels::LevelBuilderPlugin, stage_objects::{gateway::check_gateways, laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}}, story_overworld::StoryOverworldPlugin};
+use crate::{builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, bloom::Bloomin, mouse::WorldMouseMotion, physics::{avian_ex::{handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events, CollisionRemapEvent}, player_collision::{raise_player_collision_ended, raise_player_collision_started, PlayerCollisionEnded, PlayerCollisionStarted}}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{apply_splat_on_death, clear_splat_events, ClearSplatsEvent}}, databases::{game_db::GameDb, splat_db::init_splat_db}, debugging::DebugPlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::{levels::LevelBuilderPlugin, stage_objects::{gateway::check_gateways, laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}}, story_overworld::StoryOverworldPlugin};
 
 mod common;
 
@@ -81,11 +81,9 @@ fn main() {
         .insert_resource(PhysicsLengthUnit(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
         .add_plugins(Material2dPlugin::<SplatMaterial>::default())
-        .add_event::<SaveGame>()
         .add_plugins(DebugPlugin)
         .init_resource::<MouseData>()
         .add_event::<WorldMouseMotion>()
-        .init_resource::<SaveDb>()
         .init_resource::<GameDb>()
         .add_systems(PreStartup, (spawn_camera, init_player_builder))
         .add_systems(FixedUpdate, apply_physics_controller_limits)

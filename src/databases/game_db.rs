@@ -5,7 +5,7 @@ use bevy::{prelude::*, scene::ron};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
-use crate::{common::pair_map::PairMap, databases::save_db::GameSave, game::story::StorySave, stage::stage_builder::stage_asset::Stage};
+use crate::{common::pair_map::PairMap, game::story::StorySave, stage::stage_builder::stage_asset::Stage};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Level {
@@ -13,6 +13,11 @@ pub struct Level {
     /// (stageId, gatewayId)
     pub gateway_pairs: PairMap<(usize, usize)>,
     pub spawn_stage_id: usize,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum GameSave {
+    Story(StorySave)
 }
 
 #[derive(Resource, Default)]

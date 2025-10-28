@@ -1,7 +1,7 @@
 
 use bevy::{ecs::system::EntityCommands, prelude::*};
 
-use crate::{common::states::{AppState, DespawnOnStateExit}, databases::{game_db::GameDb, save_db::{GameSave, SaveDb}}, game::story::StorySave, main_menu::LoadSave};
+use crate::{common::states::{AppState, DespawnOnStateExit}, databases::game_db::{GameDb, GameSave}, game::story::StorySave, main_menu::LoadSave};
 
 #[derive(Component)]
 pub struct ContinueGamesaveButton(usize);
@@ -12,7 +12,7 @@ pub struct NewGameButton(usize);
 pub fn check_new_game_interaction_TEMP_GAMEPAD_SUPPORT(
     gamepad_query: Query<&Gamepad>,
     mut start_game_writer: EventWriter<LoadSave>,
-    save_db: Res<SaveDb>
+    //save_db: Res<SaveDb>
 ) {
     for gamepad in gamepad_query {
         if gamepad.just_pressed(GamepadButton::South) {
