@@ -46,9 +46,19 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let ambient = 0.05;
     let ambient_color = vec3<f32>(1.0, 1.0, 1.0);
     let final_rgb = clamp(light_rgb + (ambient_color * ambient), vec3<f32>(0.0), vec3<f32>(1.0));
-
     c *= vec4f(final_rgb, 1.0);
     c.a = 1.0;
+
+
+
+    // so this is a slightly different way of doing lighting
+    // essentially just applying more light to areas that are already light (shitty specular)
+    //let brightness = ((c.r + c.g + c.b) * (c.r + c.g + c.b)) / 1.0;
+    //let ambient = c.rgb * 0.05; 
+    //let light_contribution = light_rgb * c.rgb * brightness * 5.0;
+    //c = vec4f(ambient + light_contribution, 1.0);
+
+
     return c;
 
 
