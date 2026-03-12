@@ -2,6 +2,7 @@ use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::sp
 
 use super::stage_asset::Stage;
 use bevy::{platform::collections::HashMap, prelude::*};
+use rand::Rng;
 
 pub const TILE_SIZE: f32 = 16.0;
 pub const TILE_SIZE_HALF: f32 = TILE_SIZE / 2.0;
@@ -19,6 +20,7 @@ pub struct StageCreator<'a> {
     pub background_material: &'a Handle<BackgroundMaterial>
 }
 
+// probably better to just use consts (input from config file eventually)
 pub enum ObjectAtlasIndices {
     HalfSaw0 = 0,
     HalfSaw1 = 1,
@@ -64,7 +66,14 @@ pub enum ObjectAtlasIndices {
     Torch3 = 83,
 }
 
+impl Into<usize> for ObjectAtlasIndices {
+    fn into(self) -> usize {
+        return self as usize;
+    }
+}
 
+const BACK_WALL_START: usize = 128;
+const BACK_WALL_VARIANT_COUNT: usize = 3;
 
 impl<'a> StageCreator<'a> {
 
@@ -145,11 +154,13 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
 
     for x in 0..stage_creator.stage.grid_width {
         for y in 0..stage_creator.stage.grid_height {
+            let backwall_index = rand::thread_rng().gen_range(BACK_WALL_START..(BACK_WALL_START + BACK_WALL_VARIANT_COUNT + 1));
+            let sprite_rect = get_object_tilemap_rect_from_index(backwall_index);
             commands.spawn((
                 Sprite {
                     image: stage_creator.object_tilemap.clone(),
                     custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
-                    rect: Some(Rect::new(0.0, TILE_SIZE * 4.0, TILE_SIZE, TILE_SIZE * 5.0)),
+                    rect: Some(sprite_rect),
                     ..default() 
                 },
                 Transform::from_translation(Vec3::new((x as f32 * TILE_SIZE) + TILE_SIZE_HALF, (y as f32 * TILE_SIZE) + TILE_SIZE_HALF, -10.0)),
@@ -389,8 +400,8 @@ fn build_ground_tile(commands: &mut Commands, stage_creator: &StageCreator, grid
 
 }
 
-pub fn get_object_tilemap_rect_from_index(atlas_index: ObjectAtlasIndices) -> Rect {
-    let index = atlas_index as usize;
+pub fn get_object_tilemap_rect_from_index<T: Into<usize>>(atlas_index: T) -> Rect {
+    let index = atlas_index.into() as usize;
     let upper_left = Vec2::new((index as f32 % OBJECT_TILEMAP_SIZE as f32) as f32 * OBJECT_TILE_TILEMAP_SIZE, (index / OBJECT_TILEMAP_SIZE) as f32 * OBJECT_TILE_TILEMAP_SIZE);
     let lower_right = Vec2::new(upper_left.x + OBJECT_TILE_TILEMAP_SIZE, upper_left.y + OBJECT_TILE_TILEMAP_SIZE);
     Rect::new(upper_left.x, upper_left.y, lower_right.x, lower_right.y)
