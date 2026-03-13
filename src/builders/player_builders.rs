@@ -90,8 +90,8 @@ impl PlayerBuilder {
             //    ..default()
             //},
             LitSprite {
-                albedo_texture: atlas.clone(),
-                specular_texture: atlas.clone(),
+                albedo_texture: atlas.clone().into(),
+                specular_texture: None,
                 rect: None,
             },
             (SpriteAnimator::new(100, idle_rects),
