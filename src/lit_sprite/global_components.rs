@@ -17,6 +17,8 @@ pub struct LitSpriteMaterial {
     #[texture(2)]
     #[sampler(3)]
     pub specular_texture: Option<Handle<Image>>,
+    #[uniform(4)]
+    pub uv_rect: Vec4
 }
 
 

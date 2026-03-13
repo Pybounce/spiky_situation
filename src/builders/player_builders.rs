@@ -92,7 +92,7 @@ impl PlayerBuilder {
             LitSprite {
                 albedo_texture: atlas.clone().into(),
                 specular_texture: None,
-                rect: None,
+                rect: idle_rects[0].into(),
             },
             (SpriteAnimator::new(100, idle_rects),
             AnimationController::new(state_animations),
