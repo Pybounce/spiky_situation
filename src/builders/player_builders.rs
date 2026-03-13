@@ -1,7 +1,7 @@
 use bevy::{ecs::system::EntityCommands, platform::collections::HashMap, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, lit_sprite::global_components::LitSprite, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::common::player_input::{gamepad::PlayerGamepadInput, keyboard::PlayerKeyboardInput, PlayerInputController};
 use crate::local_player::*;
 
@@ -83,11 +83,16 @@ impl PlayerBuilder {
 
         entity_commands.try_insert(((
             LocalPlayer,
-            Sprite {
-                image: atlas,
-                rect: run_rects[0].into(),
-                custom_size: Vec2::splat(1.0).into(),
-                ..default()
+            //Sprite {
+            //    image: atlas,
+            //    rect: run_rects[0].into(),
+            //    custom_size: Vec2::splat(1.0).into(),
+            //    ..default()
+            //},
+            LitSprite {
+                albedo_texture: atlas.clone(),
+                specular_texture: atlas.clone(),
+                rect: None,
             },
             (SpriteAnimator::new(100, idle_rects),
             AnimationController::new(state_animations),
