@@ -20,7 +20,7 @@ fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
     var tex_color = textureSample(albedo_texture, albedo_sampler, uv);
 
     let spec_color = textureSample(specular_texture, specular_sampler, uv);
-    if spec_color.a > 0.03 {
+    if tex_color.a > 0.03 {
         textureStore(specular_output, vec2<i32>(mesh.position.xy), spec_color);
     }
 

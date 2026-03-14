@@ -63,6 +63,7 @@ pub fn tick_saw_shooters(
                 LockedAxes::ROTATION_LOCKED),
                 LitSprite {
                     albedo_texture: stage_assets.stage_objects_handle.clone().into(),
+                    specular_texture: stage_assets.stage_objects_specular_handle.clone().into(),
                     size: Vec2::new(16.0, 16.0),
                     rect: Some(atlas_rects[0]),
                     ..default()

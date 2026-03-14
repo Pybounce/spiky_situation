@@ -33,6 +33,7 @@ impl PlayerBuilder {
     }
     pub fn build_player(entity_commands: &mut EntityCommands, asset_server: &AssetServer, spawn_pos: Vec3) {
         let atlas: Handle<Image> = asset_server.load("player.png");
+        let specular_handle: Handle<Image> = asset_server.load("player_specular.png");
         let run_rects = vec![
             Rect::new(0.0, 0.0, TILE_SIZE, TILE_SIZE),
             Rect::new(TILE_SIZE, 0.0, TILE_SIZE * 2.0, TILE_SIZE),
@@ -90,7 +91,7 @@ impl PlayerBuilder {
             //},
             LitSprite {
                 albedo_texture: atlas.clone().into(),
-                specular_texture: None,
+                specular_texture: specular_handle.into(),
                 rect: idle_rects[0].into(),
                 ..default()
             },

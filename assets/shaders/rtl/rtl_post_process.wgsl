@@ -51,13 +51,12 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     //c *= vec4f(final_rgb, 1.0);
     //c.a = 1.0;
 
-
-    let specular = textureSample(specular_texture, texture_sampler, in.uv);
-    let brightness = (specular.r + specular.g + specular.b) / 3.0;
-    let ambient = c.rgb * 0.05; 
-    let base_diffuse = c.rgb * light_rgb;
-    let specular_highlight = light_rgb * brightness * 5.0;
-    let light_contribution = base_diffuse + specular_highlight;
+    let pixel_coord = vec2<i32>(floor(in.position.xy));
+    let specular_rgba = textureLoad(specular_texture, pixel_coord, 0);
+    let specular = (specular_rgba.r + specular_rgba.g + specular_rgba.b) / 3.0;
+    let specular_multiplier = pow(specular * 2.0, 1.5) * 4.0;
+    let ambient = c.rgb * 0.04; 
+    let light_contribution = c.rgb * light_rgb * specular_multiplier;
     c = vec4f(ambient + light_contribution, 1.0);
 
     return c;
