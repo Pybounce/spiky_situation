@@ -15,10 +15,9 @@ impl PlayerBuilder {
         let player_corpse_rect = Rect::new(TILE_SIZE * 1.0, TILE_SIZE, TILE_SIZE * 2.0, TILE_SIZE * 2.0);
 
         entity_commands.try_insert((
-            Sprite {
-                custom_size: Some(Vec2::new(1.0, 1.0)),
+            LitSprite {
                 rect: Some(player_corpse_rect),
-                image: self.player_atlas.clone(),
+                albedo_texture: self.player_atlas.clone().into(),
                 ..default()
             },
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(pos),
@@ -93,6 +92,7 @@ impl PlayerBuilder {
                 albedo_texture: atlas.clone().into(),
                 specular_texture: None,
                 rect: idle_rects[0].into(),
+                ..default()
             },
             (SpriteAnimator::new(100, idle_rects),
             AnimationController::new(state_animations),

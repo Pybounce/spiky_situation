@@ -6,8 +6,19 @@ pub struct LitSprite {
     pub albedo_texture: Option<Handle<Image>>,
     pub specular_texture: Option<Handle<Image>>,
     pub rect: Option<Rect>,
+    pub size: Vec2
 }
 
+impl Default for LitSprite {
+    fn default() -> Self {
+        Self { 
+            albedo_texture: Default::default(), 
+            specular_texture: Default::default(), 
+            rect: Default::default(),
+            size: Vec2::ONE
+        }
+    }
+}
 
 #[derive(Component, Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct LitSpriteMaterial {
