@@ -55,7 +55,7 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let specular_rgba = textureLoad(specular_texture, pixel_coord, 0);
     let specular = (specular_rgba.r + specular_rgba.g + specular_rgba.b) / 3.0;
     let specular_multiplier = pow(specular * 2.0, 1.2) * 4.0;
-    let ambient = c.rgb * 0.04; 
+    let ambient = c.rgb * 0.045; 
     let light_contribution = c.rgb * light_rgb * specular_multiplier;
     c = vec4f(ambient + light_contribution, 1.0);
 
