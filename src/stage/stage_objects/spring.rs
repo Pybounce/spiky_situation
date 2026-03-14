@@ -21,7 +21,7 @@ impl SpringFactory {
         mask.add(GamePhysicsLayer::Player.to_bits());
 
         commands.spawn((
-            TileBundle::new(stage_creator, grid_pos, atlas_rects[0], rotation, stage_creator.object_tilemap),
+            TileBundle::new(stage_creator, grid_pos, atlas_rects[0], rotation, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into()),
             SpriteAnimator::new_non_repeating(50, atlas_rects),
             RigidBody::Static,
             Spring,

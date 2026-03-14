@@ -1,4 +1,4 @@
-use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, torch::TorchFactory, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, lit_sprite::global_components::LitSprite, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{StageObject, goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, torch::TorchFactory}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
 use bevy::{platform::collections::HashMap, prelude::*};
@@ -13,11 +13,10 @@ const OBJECT_TILE_TILEMAP_SIZE: f32 = 16.0;
 
 pub struct StageCreator<'a> {
     pub stage: &'a Stage, 
-    pub tilemap: &'a Handle<Image>,
+    pub ground_tilemap: &'a Handle<Image>,
+    pub ground_specular_tilemap: &'a Handle<Image>,
     pub object_tilemap: &'a Handle<Image>,
-
-    pub background_quad_mesh: &'a Handle<Mesh>,
-    pub background_material: &'a Handle<BackgroundMaterial>
+    pub object_specular_tilemap: &'a Handle<Image>,
 }
 
 // probably better to just use consts (input from config file eventually)
@@ -77,13 +76,13 @@ const BACK_WALL_VARIANT_COUNT: usize = 3;
 
 impl<'a> StageCreator<'a> {
 
-    pub fn new(stage: &'a Stage, tilemap: &'a Handle<Image>, object_tilemap: &'a Handle<Image>, background_quad_mesh: &'a Handle<Mesh>, background_material: &'a Handle<BackgroundMaterial>) -> Self {
+    pub fn new(stage: &'a Stage, ground_tilemap: &'a Handle<Image>, ground_specular_tilemap: &'a Handle<Image>, object_tilemap: &'a Handle<Image>, object_specular_tilemap: &'a Handle<Image>) -> Self {
         StageCreator {
             stage,
-            tilemap,
+            ground_tilemap,
+            ground_specular_tilemap,
             object_tilemap,
-            background_material,
-            background_quad_mesh
+            object_specular_tilemap
         }
     }
 
@@ -157,9 +156,10 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
             let backwall_index = rand::thread_rng().gen_range(BACK_WALL_START..(BACK_WALL_START + BACK_WALL_VARIANT_COUNT + 1));
             let sprite_rect = get_object_tilemap_rect_from_index(backwall_index);
             commands.spawn((
-                Sprite {
-                    image: stage_creator.object_tilemap.clone(),
-                    custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+                LitSprite {
+                    albedo_texture: stage_creator.object_tilemap.clone().into(),
+                    specular_texture: stage_creator.object_specular_tilemap.clone().into(),
+                    size: Vec2::new(TILE_SIZE, TILE_SIZE),
                     rect: Some(sprite_rect),
                     ..default() 
                 },
@@ -190,7 +190,7 @@ fn build_borders(stage_creator: &StageCreator, commands: &mut Commands) -> bool 
     let mut left = TileBundle::new(
         stage_creator, 
         Vec2::new(-bground_grid_width / 2.0, stage_grid_size.y / 2.0), 
-        sprite_rect, 0.0, stage_creator.tilemap
+        sprite_rect, 0.0, stage_creator.ground_tilemap, None
     );
     left.transform.translation.z = 20.0;
     left.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);
@@ -199,7 +199,7 @@ fn build_borders(stage_creator: &StageCreator, commands: &mut Commands) -> bool 
     let mut right = TileBundle::new(
         stage_creator, 
         Vec2::new((bground_grid_width / 2.0) + stage_grid_size.x - 1.0, stage_grid_size.y / 2.0), 
-        sprite_rect, 0.0, stage_creator.tilemap
+        sprite_rect, 0.0, stage_creator.ground_tilemap, None
     );
     right.transform.translation.z = 20.0;
     right.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);
@@ -208,7 +208,7 @@ fn build_borders(stage_creator: &StageCreator, commands: &mut Commands) -> bool 
     let mut top = TileBundle::new(
         stage_creator, 
         Vec2::new(stage_grid_size.x / 2.0, (bground_grid_height / 2.0) + stage_grid_size.y - 1.0), 
-        sprite_rect, 0.0, stage_creator.tilemap
+        sprite_rect, 0.0, stage_creator.ground_tilemap, None
     );
     top.transform.translation.z = 20.0;
     top.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);
@@ -217,7 +217,7 @@ fn build_borders(stage_creator: &StageCreator, commands: &mut Commands) -> bool 
     let mut bottom = TileBundle::new(
         stage_creator, 
         Vec2::new(stage_grid_size.x / 2.0, -bground_grid_height / 2.0), 
-        sprite_rect, 0.0, stage_creator.tilemap
+        sprite_rect, 0.0, stage_creator.ground_tilemap, None
     );
     bottom.transform.translation.z = 20.0;
     bottom.transform.scale = Vec3::new(bground_grid_width, bground_grid_height, 1.0);

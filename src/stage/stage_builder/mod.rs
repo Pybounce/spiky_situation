@@ -56,5 +56,6 @@ pub struct CurrentStageData {
 #[derive(Resource, Default)]
 pub struct StageAssets {
     pub stage_objects_handle: Handle<Image>,
+    pub stage_objects_specular_handle: Handle<Image>,
     pub ground_tiles_handle: Handle<Image>,
 }

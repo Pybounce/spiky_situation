@@ -18,7 +18,7 @@ impl SawFactory {
         mask.add(GamePhysicsLayer::Player.to_bits());
         
         let mut parent_e = commands.spawn((
-            TileBundle::new(stage_creator, saw_asset.grid_pos, atlas_rects[0], saw_asset.rotation, stage_creator.object_tilemap),
+            TileBundle::new(stage_creator, saw_asset.grid_pos, atlas_rects[0], saw_asset.rotation, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into()),
             SpriteAnimator::new(50, atlas_rects),
             InstantKiller,
             HalfSaw,

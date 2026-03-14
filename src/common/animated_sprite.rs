@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::common::physics::avian_ex::ManyCollidingEntities;
+use crate::{common::physics::avian_ex::ManyCollidingEntities, lit_sprite::global_components::LitSprite};
 
 
 #[derive(Component)]
@@ -105,7 +105,7 @@ impl SpriteAnimator {
 }
 
 pub fn animate_sprites(
-    mut query: Query<(&mut SpriteAnimator, &mut Sprite)>,
+    mut query: Query<(&mut SpriteAnimator, &mut LitSprite)>,
     time: Res<Time>
 ) {
     for (mut anim_sprite, mut sprite) in &mut query {

@@ -3,7 +3,7 @@ use std::f32;
 use bevy::{math::VectorSpace, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, bloom::Bloomin, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, obstacles::InstantKiller, rt_lights::components::{AreaLight, LightOccluder}, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::{tiles::PhysicalTileBundle, StageObject}}};
+use crate::{common::{animated_sprite::SpriteAnimator, bloom::Bloomin, physics::layers::GamePhysicsLayer, rails::RailRider}, ground::Ground, lit_sprite::global_components::LitSprite, obstacles::InstantKiller, rt_lights::components::{AreaLight, LightOccluder}, stage::{stage_builder::{stage_asset, stage_creator::{ObjectAtlasIndices, StageCreator, TILE_SIZE, TILE_SIZE_HALF, get_object_tilemap_rect_from_index}}, stage_objects::{StageObject, tiles::PhysicalTileBundle}}};
 
 
 #[derive(Component)]
@@ -33,9 +33,10 @@ impl LaserBuilder {
         let beam = commands.spawn((
             LaserBeam,
             Transform::default(),
-            Sprite {
-                image: stage_creator.object_tilemap.clone(),
-                custom_size: Some(Vec2::new(TILE_SIZE, 1.0)),
+            LitSprite {
+                albedo_texture: stage_creator.object_tilemap.clone().into(),
+                specular_texture: stage_creator.object_specular_tilemap.clone().into(),
+                size: Vec2::new(TILE_SIZE, 1.0),
                 rect: Some(beam_atlas_rects[0]),
                 ..default()
             },
@@ -65,9 +66,10 @@ impl LaserBuilder {
         let beam_end_particles = commands.spawn((
             LaserBeamEndParticles,
             Transform::default(),
-            Sprite {
-                image: stage_creator.object_tilemap.clone(),
-                custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+            LitSprite {
+                albedo_texture: stage_creator.object_tilemap.clone().into(),
+                specular_texture: stage_creator.object_specular_tilemap.clone().into(),
+                size: Vec2::new(TILE_SIZE, TILE_SIZE),
                 rect: Some(beam_end_particle_rects[0]),
                 ..default()
             },
@@ -77,7 +79,7 @@ impl LaserBuilder {
         )).id();
 
         let mut laser_core = commands.spawn((
-            PhysicalTileBundle::new(stage_creator, laser.grid_pos, atlas_rects[0], laser.rotation, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
+            PhysicalTileBundle::new(stage_creator, laser.grid_pos, atlas_rects[0], laser.rotation, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             SpriteAnimator::new_non_repeating(50, atlas_rects),
             Laser {
                 beam,

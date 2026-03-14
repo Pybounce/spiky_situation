@@ -1,7 +1,7 @@
 use bevy::{ecs::system::EntityCommands, platform::collections::HashMap, prelude::*};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, lit_sprite::global_components::LitSprite, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::common::player_input::{gamepad::PlayerGamepadInput, keyboard::PlayerKeyboardInput, PlayerInputController};
 use crate::local_player::*;
 
@@ -15,10 +15,9 @@ impl PlayerBuilder {
         let player_corpse_rect = Rect::new(TILE_SIZE * 1.0, TILE_SIZE, TILE_SIZE * 2.0, TILE_SIZE * 2.0);
 
         entity_commands.try_insert((
-            Sprite {
-                custom_size: Some(Vec2::new(1.0, 1.0)),
+            LitSprite {
                 rect: Some(player_corpse_rect),
-                image: self.player_atlas.clone(),
+                albedo_texture: self.player_atlas.clone().into(),
                 ..default()
             },
             Transform::from_scale(PLAYER_SIZE.extend(1.0)).with_translation(pos),
@@ -34,6 +33,7 @@ impl PlayerBuilder {
     }
     pub fn build_player(entity_commands: &mut EntityCommands, asset_server: &AssetServer, spawn_pos: Vec3) {
         let atlas: Handle<Image> = asset_server.load("player.png");
+        let specular_handle: Handle<Image> = asset_server.load("player_specular.png");
         let run_rects = vec![
             Rect::new(0.0, 0.0, TILE_SIZE, TILE_SIZE),
             Rect::new(TILE_SIZE, 0.0, TILE_SIZE * 2.0, TILE_SIZE),
@@ -83,10 +83,16 @@ impl PlayerBuilder {
 
         entity_commands.try_insert(((
             LocalPlayer,
-            Sprite {
-                image: atlas,
-                rect: run_rects[0].into(),
-                custom_size: Vec2::splat(1.0).into(),
+            //Sprite {
+            //    image: atlas,
+            //    rect: run_rects[0].into(),
+            //    custom_size: Vec2::splat(1.0).into(),
+            //    ..default()
+            //},
+            LitSprite {
+                albedo_texture: atlas.clone().into(),
+                specular_texture: specular_handle.into(),
+                rect: idle_rects[0].into(),
                 ..default()
             },
             (SpriteAnimator::new(100, idle_rects),

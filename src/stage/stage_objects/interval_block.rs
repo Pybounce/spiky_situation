@@ -20,7 +20,7 @@ impl IntervalBlockFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, interval_block_asset: &stage_asset::IntervalBlock) {
         
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, interval_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
+            PhysicalTileBundle::new(stage_creator, interval_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             IntervalBlock {
                 timer: Timer::from_seconds(1.0, TimerMode::Repeating),
                 currently_active: interval_block_asset.is_active

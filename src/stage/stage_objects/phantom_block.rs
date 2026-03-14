@@ -19,7 +19,7 @@ impl PhantomBlockFactory {
         let animation_frame_delta: u128 = 50;
 
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, phantom_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
+            PhysicalTileBundle::new(stage_creator, phantom_block_asset.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             PhantomBlock {
                 timer: Timer::from_seconds(atlas_rects.len() as f32 * (animation_frame_delta as f32 / 1000.0), TimerMode::Once),
                 currently_active: false
