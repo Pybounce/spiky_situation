@@ -35,6 +35,7 @@ impl LaserBuilder {
             Transform::default(),
             LitSprite {
                 albedo_texture: stage_creator.object_tilemap.clone().into(),
+                specular_texture: stage_creator.object_specular_tilemap.clone().into(),
                 size: Vec2::new(TILE_SIZE, 1.0),
                 rect: Some(beam_atlas_rects[0]),
                 ..default()
@@ -67,6 +68,7 @@ impl LaserBuilder {
             Transform::default(),
             LitSprite {
                 albedo_texture: stage_creator.object_tilemap.clone().into(),
+                specular_texture: stage_creator.object_specular_tilemap.clone().into(),
                 size: Vec2::new(TILE_SIZE, TILE_SIZE),
                 rect: Some(beam_end_particle_rects[0]),
                 ..default()

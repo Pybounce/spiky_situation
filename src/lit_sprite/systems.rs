@@ -53,7 +53,7 @@ pub fn init_default_specular(
     let black_image = Image::new_fill(
         Extent3d { width: 1, height: 1, depth_or_array_layers: 1 },
         TextureDimension::D2,
-        &[0, 0, 0, 255],
+        &[127, 127, 127, 255],
         TextureFormat::Rgba8UnormSrgb,
         RenderAssetUsages::default(),
     );
