@@ -18,7 +18,7 @@ impl SpikeFactory {
         mask.add(GamePhysicsLayer::Player.to_bits());
         
         commands.spawn((
-            TileBundle::new(stage_creator, grid_pos, atlas_rect, rotation, stage_creator.object_tilemap),
+            TileBundle::new(stage_creator, grid_pos, atlas_rect, rotation, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into()),
             RigidBody::Static,
             InstantKiller,
             Spike,

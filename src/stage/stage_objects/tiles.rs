@@ -36,7 +36,7 @@ pub struct GroundTileBundle {
 
 
 impl TileBundle {
-    pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect, tile_rotation: f32, image_handle: &Handle<Image>) -> Self {
+    pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect, tile_rotation: f32, albedo_handle: &Handle<Image>, specular_handle: Option<&Handle<Image>>) -> Self {
         TileBundle {
             transform: Transform {
                 rotation: Quat::from_rotation_z(tile_rotation),
@@ -44,7 +44,8 @@ impl TileBundle {
                 ..default()
             },
             sprite: LitSprite {
-                albedo_texture: image_handle.clone().into(),
+                albedo_texture: albedo_handle.clone().into(),
+                specular_texture: specular_handle.as_deref().cloned(),
                 size: Vec2::new(TILE_SIZE, TILE_SIZE),
                 rect: Some(atlas_rect),
                 ..default()
@@ -56,9 +57,9 @@ impl TileBundle {
 }
 
 impl PhysicalTileBundle {
-    pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect, tile_rotation: f32, image_handle: &Handle<Image>, collision_layers: CollisionLayers) -> Self {
+    pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect, tile_rotation: f32, albedo_handle: &Handle<Image>, specular_handle: Option<&Handle<Image>>, collision_layers: CollisionLayers) -> Self {
         PhysicalTileBundle {
-            tile_bundle: TileBundle::new(stage_creator, grid_pos, atlas_rect, tile_rotation, image_handle),
+            tile_bundle: TileBundle::new(stage_creator, grid_pos, atlas_rect, tile_rotation, albedo_handle, specular_handle),
             rigidbody: RigidBody::Static,
             collider: Collider::rectangle(TILE_SIZE, TILE_SIZE),
             restitution: Restitution::new(0.0),
@@ -73,7 +74,7 @@ impl PhysicalTileBundle {
 impl GroundTileBundle {
     pub fn new(stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect) -> Self {
         GroundTileBundle {
-            physical_tile_bundle: PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
+            physical_tile_bundle: PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.ground_tilemap, stage_creator.ground_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             ground_marker: Ground,
             wall_marker: Wall,
             occluder: LightOccluder::Rect(16.0, 16.0),

@@ -1,5 +1,5 @@
 
-use bevy::{prelude::*, render::render_resource::{AsBindGroup, ShaderRef}, sprite::{AlphaMode2d, Material2d}};
+use bevy::{prelude::*, render::{extract_resource::ExtractResource, render_resource::{AsBindGroup, ShaderRef}}, sprite::{AlphaMode2d, Material2d}};
 
 #[derive(Component)]
 pub struct LitSprite {
@@ -43,7 +43,9 @@ pub struct LitSpriteMaterial {
     #[sampler(3)]
     pub specular_texture: Option<Handle<Image>>,
     #[uniform(4)]
-    pub uv_rect: Vec4
+    pub uv_rect: Vec4,
+    #[storage_texture(5, image_format = Rgba8Unorm, access = WriteOnly, visibility(fragment))]
+    pub specular_output: Option<Handle<Image>>,
 }
 
 
@@ -54,4 +56,10 @@ impl Material2d for LitSpriteMaterial {
     fn alpha_mode(&self) -> AlphaMode2d {
         AlphaMode2d::Blend
     }
+}
+
+
+#[derive(Resource, Clone, ExtractResource)]
+pub struct SpecularBuffer {
+    pub handle: Handle<Image>,
 }

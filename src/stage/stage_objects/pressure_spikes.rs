@@ -30,7 +30,7 @@ impl PressureSpikeBuilder {
         mask.add(GamePhysicsLayer::Player.to_bits());
 
         commands.spawn((
-            TileBundle::new(stage_creator, pressure_spike.grid_pos, atlas_rects[0], pressure_spike.rotation, stage_creator.object_tilemap),
+            TileBundle::new(stage_creator, pressure_spike.grid_pos, atlas_rects[0], pressure_spike.rotation, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into()),
             SpriteAnimator::new_non_repeating(50, atlas_rects),
             PressureSpike::new(PRESSURE_SPIKE_DELAY),
             RigidBody::Static,

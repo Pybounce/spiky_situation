@@ -8,7 +8,7 @@ pub struct TorchFactory;
 impl TorchFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, torch: &stage_asset::Torch) {
         commands.spawn((
-            TileBundle::new(stage_creator, torch.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap),
+            TileBundle::new(stage_creator, torch.grid_pos, atlas_rects[0], 0.0, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into()),
             SpriteAnimator::new(200, atlas_rects),
             PointLight {
                 intensity: 1.0,

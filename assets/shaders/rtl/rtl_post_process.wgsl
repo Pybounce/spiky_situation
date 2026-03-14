@@ -13,6 +13,8 @@ var<storage, read_write> lighting_output: array<u32>;
 
 @group(0) @binding(4) var<uniform> view: View;
 
+@group(0) @binding(5) var specular_texture: texture_2d<f32>;
+
 @fragment
 fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
 
@@ -43,25 +45,22 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let ix1 = mix(rgb01, rgb11, dx);
     let light_rgb = mix(ix0, ix1, dy);
 
-    let ambient = 0.05;
-    let ambient_color = vec3<f32>(1.0, 1.0, 1.0);
-    let final_rgb = clamp(light_rgb + (ambient_color * ambient), vec3<f32>(0.0), vec3<f32>(1.0));
-    c *= vec4f(final_rgb, 1.0);
-    c.a = 1.0;
+    //let ambient = 0.05;
+    //let ambient_color = vec3<f32>(1.0, 1.0, 1.0);
+    //let final_rgb = clamp(light_rgb + (ambient_color * ambient), vec3<f32>(0.0), vec3<f32>(1.0));
+    //c *= vec4f(final_rgb, 1.0);
+    //c.a = 1.0;
 
 
-
-    // so this is a slightly different way of doing lighting
-    // essentially just applying more light to areas that are already light (shitty specular)
-    //let brightness = ((c.r + c.g + c.b) * (c.r + c.g + c.b)) / 1.0;
-    //let ambient = c.rgb * 0.05; 
-    //let light_contribution = light_rgb * c.rgb * brightness * 5.0;
-    //c = vec4f(ambient + light_contribution, 1.0);
-
+    let specular = textureSample(specular_texture, texture_sampler, in.uv);
+    let brightness = (specular.r + specular.g + specular.b) / 3.0;
+    let ambient = c.rgb * 0.05; 
+    let base_diffuse = c.rgb * light_rgb;
+    let specular_highlight = light_rgb * brightness * 5.0;
+    let light_contribution = base_diffuse + specular_highlight;
+    c = vec4f(ambient + light_contribution, 1.0);
 
     return c;
-
-
 }
 
 fn unpack_rgbi(packed: u32) -> vec4<f32> {

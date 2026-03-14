@@ -44,3 +44,6 @@ impl LitSpriteMeshKey {
         };
     }
 }
+
+#[derive(Resource)]
+pub struct DefaultSpecularTexture(pub Handle<Image>);

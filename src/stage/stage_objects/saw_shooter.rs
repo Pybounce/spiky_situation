@@ -21,7 +21,7 @@ impl SawShooterFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, saw_shooter_block_asset: &stage_asset::SawShooterBlock) {
         
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, saw_shooter_block_asset.grid_pos, atlas_rects[0], saw_shooter_block_asset.rotation, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
+            PhysicalTileBundle::new(stage_creator, saw_shooter_block_asset.grid_pos, atlas_rects[0], saw_shooter_block_asset.rotation, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             SawShooter {
                 timer: Timer::from_seconds(3.0, TimerMode::Repeating)
             },

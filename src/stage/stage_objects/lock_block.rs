@@ -16,7 +16,7 @@ impl LockBlockFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, atlas_rect: Rect, lock_block_asset: &stage_asset::LockBlock) {
         
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, lock_block_asset.grid_pos, atlas_rect, 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
+            PhysicalTileBundle::new(stage_creator, lock_block_asset.grid_pos, atlas_rect, 0.0, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             LockBlock,
             Triggerable {
                 trigger_id: lock_block_asset.trigger_id

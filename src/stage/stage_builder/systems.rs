@@ -36,8 +36,6 @@ pub fn try_build_stage(
     stage_assets: Res<Assets<Stage>>,
     mut complete_event_writer: EventWriter<StageBuildCompleteEvent>,
     mut failed_event_writer: EventWriter<StageBuildFailedEvent>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<BackgroundMaterial>>
 ) {
     match asset_server.load_state(&stage_builder_data.stage_handle) {
         bevy::asset::LoadState::NotLoaded => {
@@ -56,6 +54,8 @@ pub fn try_build_stage(
     let ground_grass_handle: Handle<Image> = asset_server.load("ground_grass.png");
     let ground_snow_handle: Handle<Image> = asset_server.load("ground_snow.png");
     let object_tilemap_handle: Handle<Image> = asset_server.load("object_tilemap.png");
+    let object_tilemap_specular_handle: Handle<Image> = asset_server.load("object_specular.png");
+    let ground_specular_handle: Handle<Image> = asset_server.load("ground_specular.png");
 
     match stage_asset {
         Some(stage) => {
@@ -66,13 +66,11 @@ pub fn try_build_stage(
             };
             commands.insert_resource(StageAssets {
                 stage_objects_handle: object_tilemap_handle.clone(),
-                ground_tiles_handle: ground_tiles_handle.clone()
+                ground_tiles_handle: ground_tiles_handle.clone(),
+                stage_objects_specular_handle: object_tilemap_specular_handle.clone(),
             });
 
-            let background_mesh = meshes.add(Mesh::from(Rectangle::default()));
-            let background_mat = materials.add(BackgroundMaterial {});
-
-            let stage_creator = StageCreator::new(&stage, &ground_tiles_handle, &object_tilemap_handle, &background_mesh, &background_mat);
+            let stage_creator = StageCreator::new(&stage, &ground_tiles_handle, &ground_specular_handle, &object_tilemap_handle, &object_tilemap_specular_handle);
             if stage_creator.build(&mut commands) {
                 commands.insert_resource(CurrentStageData {
                     stage_id: stage.id,

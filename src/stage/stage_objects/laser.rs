@@ -77,7 +77,7 @@ impl LaserBuilder {
         )).id();
 
         let mut laser_core = commands.spawn((
-            PhysicalTileBundle::new(stage_creator, laser.grid_pos, atlas_rects[0], laser.rotation, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
+            PhysicalTileBundle::new(stage_creator, laser.grid_pos, atlas_rects[0], laser.rotation, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::Ground, LayerMask::ALL)),
             SpriteAnimator::new_non_repeating(50, atlas_rects),
             Laser {
                 beam,

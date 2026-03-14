@@ -5,21 +5,21 @@ use bevy::{
     ecs::query::QueryItem,
     prelude::*,
     render::{
-        extract_component::{
+        RenderApp, extract_component::{
             ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin,
             UniformComponentPlugin,
-        }, render_graph::{
+        }, render_asset::RenderAssets, render_graph::{
             NodeRunError, RenderGraphApp, RenderGraphContext, RenderLabel, ViewNode, ViewNodeRunner,
         }, render_resource::{
             binding_types::{sampler, storage_buffer, texture_2d, uniform_buffer},
             *,
-        }, renderer::{RenderContext, RenderDevice}, view::{ViewTarget, ViewUniform, ViewUniformOffset, ViewUniforms}, RenderApp
+        }, renderer::{RenderContext, RenderDevice}, texture::GpuImage, view::{ViewTarget, ViewUniform, ViewUniformOffset, ViewUniforms}
     }, ui::graph::NodeUi,
 };
 
 use bevy_app_compute::prelude::AppComputeWorker;
 
-use crate::rt_lights::compute_shader::{RTLComputeWorker, SharedRTLOutputBuffer};
+use crate::{lit_sprite::global_components::SpecularBuffer, rt_lights::compute_shader::{RTLComputeWorker, SharedRTLOutputBuffer}};
 
 const SHADER_ASSET_PATH: &str = "shaders/rtl/rtl_post_process.wgsl";
 
@@ -158,6 +158,12 @@ impl ViewNode for PostProcessNode {
         let light_output_buffer = world
             .get_resource::<SharedRTLOutputBuffer>()
             .expect("RTL compute worker missing in RenderWorld");
+        
+        let specular_buffer = world.resource::<SpecularBuffer>();
+        let gpu_images = world.resource::<RenderAssets<GpuImage>>();
+        let Some(specular_gpu_image) = gpu_images.get(&specular_buffer.handle) else {
+            return Ok(()); // Image hasn't been uploaded to the GPU yet
+        };
 
         // This will start a new "post process write", obtaining two texture
         // views from the view target - a `source` and a `destination`.
@@ -187,7 +193,8 @@ impl ViewNode for PostProcessNode {
                 // Set the settings binding
                 settings_binding.clone(),
                 light_output_buffer.0.as_entire_binding(),
-                view_uniforms
+                view_uniforms,
+                &specular_gpu_image.texture_view
             )),
         );
 
@@ -246,6 +253,7 @@ impl FromWorld for PostProcessPipeline {
                     uniform_buffer::<RTLPostProcessSettings>(true),
                     storage_buffer::<f32>(false),
                     uniform_buffer::<ViewUniform>(true),
+                    texture_2d(TextureSampleType::Float { filterable: true }),
                 ),
             ),
         );

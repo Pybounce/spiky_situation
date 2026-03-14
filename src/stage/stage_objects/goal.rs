@@ -15,7 +15,7 @@ pub struct GoalFactory;
 impl GoalFactory {
     pub fn spawn(commands: &mut Commands, stage_creator: &StageCreator, grid_pos: Vec2, atlas_rect: Rect) {
         commands.spawn((
-            PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.object_tilemap, CollisionLayers::new(GamePhysicsLayer::StageObject, LayerMask::ALL)),
+            PhysicalTileBundle::new(stage_creator, grid_pos, atlas_rect, 0.0, stage_creator.object_tilemap, stage_creator.object_specular_tilemap.into(), CollisionLayers::new(GamePhysicsLayer::StageObject, LayerMask::ALL)),
             StageGoal,
             PointLight {
                 intensity: 1.0,
