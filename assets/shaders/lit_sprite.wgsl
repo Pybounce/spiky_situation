@@ -15,7 +15,7 @@ var specular_sampler: sampler;
 fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
     let tex_size = vec2<f32>(textureDimensions(albedo_texture));
     let normalised_rect = uv_rect.xyzw / tex_size.xyxy;
-    let uv = normalised_rect.xy + mesh.uv * normalised_rect.zw;
+    let uv = vec2f(mix(normalised_rect.x, normalised_rect.z, mesh.uv.x), mix(normalised_rect.y, normalised_rect.w, mesh.uv.y));
     var tex_color = textureSample(albedo_texture, albedo_sampler, uv);
     return tex_color;
 

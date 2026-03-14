@@ -6,7 +6,8 @@ pub struct LitSprite {
     pub albedo_texture: Option<Handle<Image>>,
     pub specular_texture: Option<Handle<Image>>,
     pub rect: Option<Rect>,
-    pub size: Vec2
+    pub size: Vec2,
+    pub x_flipped: bool
 }
 
 impl Default for LitSprite {
@@ -15,8 +16,21 @@ impl Default for LitSprite {
             albedo_texture: Default::default(), 
             specular_texture: Default::default(), 
             rect: Default::default(),
-            size: Vec2::ONE
+            size: Vec2::ONE,
+            x_flipped: false
         }
+    }
+}
+
+impl LitSprite {
+    pub fn flipped_rect(&self) -> Option<Vec4> {
+        if let Some(rect) = self.rect {
+            return match self.x_flipped {
+                true => Vec4::new(rect.max.x, rect.min.y, rect.min.x, rect.max.y).into(),
+                false => Vec4::new(rect.min.x, rect.min.y, rect.max.x, rect.max.y).into(),
+            };
+        }
+        return None;
     }
 }
 

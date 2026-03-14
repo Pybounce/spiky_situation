@@ -18,15 +18,15 @@ pub struct LitSpriteMaterialKey {
 
 impl LitSpriteMaterialKey {
     pub fn from_sprite(sprite: &LitSprite) -> Self {
-        let rect = sprite.rect.unwrap_or(Rect::new(0.0, 0.0, 1.0, 1.0));
+        let rect = sprite.flipped_rect().unwrap_or(Vec4::new(0.0, 0.0, 1.0, 1.0));
         return LitSpriteMaterialKey {
             albedo_id: sprite.albedo_texture.as_ref().map(|h| h.id()),
             specular_id: sprite.specular_texture.as_ref().map(|h| h.id()),
             rect_bits: [
-                rect.min.x.to_bits(),
-                rect.min.y.to_bits(),
-                rect.width().to_bits(),
-                rect.height().to_bits(),
+                rect.x.to_bits(),
+                rect.y.to_bits(),
+                rect.z.to_bits(),
+                rect.w.to_bits(),
             ]
         };
     }
