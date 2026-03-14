@@ -1,4 +1,4 @@
-use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, torch::TorchFactory, StageObject}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
+use crate::{common::{checkpoint::CheckpointBundle, rails::RailGraph}, lit_sprite::global_components::LitSprite, player::spawner::LocalPlayerSpawner, shaders::background_shader::BackgroundMaterial, stage::stage_objects::{StageObject, goal::GoalFactory, half_saw::SawFactory, interval_block::IntervalBlockFactory, key::KeyFactory, laser::LaserBuilder, lock_block::LockBlockFactory, phantom_block::PhantomBlockFactory, pressure_spikes::PressureSpikeBuilder, saw_shooter::SawShooterFactory, spike::SpikeFactory, spring::SpringFactory, tiles::{GroundTileBundle, TileBundle}, torch::TorchFactory}, stage_editor::map_surrounding_ground_bitmask_to_atlas_index};
 
 use super::stage_asset::Stage;
 use bevy::{platform::collections::HashMap, prelude::*};
@@ -157,9 +157,9 @@ fn build_background(stage_creator: &StageCreator, commands: &mut Commands) -> bo
             let backwall_index = rand::thread_rng().gen_range(BACK_WALL_START..(BACK_WALL_START + BACK_WALL_VARIANT_COUNT + 1));
             let sprite_rect = get_object_tilemap_rect_from_index(backwall_index);
             commands.spawn((
-                Sprite {
-                    image: stage_creator.object_tilemap.clone(),
-                    custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+                LitSprite {
+                    albedo_texture: stage_creator.object_tilemap.clone().into(),
+                    size: Vec2::new(TILE_SIZE, TILE_SIZE),
                     rect: Some(sprite_rect),
                     ..default() 
                 },

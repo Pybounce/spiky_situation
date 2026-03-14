@@ -2,13 +2,13 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::layers::GamePhysicsLayer, ground::Ground, rt_lights::components::{LightOccluder, StaticLightOccluder}, stage::{stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, stage_objects::StageObject}, wall::Wall};
+use crate::{common::physics::layers::GamePhysicsLayer, ground::Ground, lit_sprite::global_components::LitSprite, rt_lights::components::{LightOccluder, StaticLightOccluder}, stage::{stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, stage_objects::StageObject}, wall::Wall};
 
 
 
 #[derive(Bundle)]
 pub struct TileBundle {
-    pub sprite: Sprite,
+    pub sprite: LitSprite,
     pub transform: Transform,
     stage_marker: StageObject
 }
@@ -43,9 +43,9 @@ impl TileBundle {
                 translation: Vec3::new((grid_pos.x * TILE_SIZE) + TILE_SIZE_HALF, (grid_pos.y * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
                 ..default()
             },
-            sprite: Sprite {
-                image: image_handle.clone(),
-                custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+            sprite: LitSprite {
+                albedo_texture: image_handle.clone().into(),
+                size: Vec2::new(TILE_SIZE, TILE_SIZE),
                 rect: Some(atlas_rect),
                 ..default()
             },

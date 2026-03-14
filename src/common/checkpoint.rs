@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::physics::avian_ex::ManyCollidingEntities, local_player::LocalPlayer, player::death::Respawnable, stage::stage_builder::{stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}, CurrentStageData}};
+use crate::{common::physics::avian_ex::ManyCollidingEntities, lit_sprite::global_components::LitSprite, local_player::LocalPlayer, player::death::Respawnable, stage::stage_builder::{CurrentStageData, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}};
 
 
 #[derive(Component)]
@@ -11,7 +11,7 @@ pub struct Checkpoint;
 pub struct CheckpointBundle {
     pub checkpoint_marker: Checkpoint,
     pub transform: Transform,
-    pub sprite: Sprite,
+    pub sprite: LitSprite,
     pub rigidbody: RigidBody,
     pub collider: Collider,
     pub sensor_marker: Sensor,
@@ -31,10 +31,10 @@ impl CheckpointBundle {
                 translation: Vec3::new((grid_pos.x * TILE_SIZE) + TILE_SIZE_HALF, (grid_pos.y * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
                 ..default()
             },
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(1.0, 1.0)),
+            sprite: LitSprite {
+                size: Vec2::new(1.0, 1.0),
                 rect: Some(atlas_rect),
-                image: stage_creator.object_tilemap.clone(),
+                albedo_texture: stage_creator.object_tilemap.clone().into(),
                 ..default()
             },
         }

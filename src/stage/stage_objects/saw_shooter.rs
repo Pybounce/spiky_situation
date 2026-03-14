@@ -1,7 +1,7 @@
 use bevy::{math::{Rect, Vec2, Vec3}, prelude::{Commands, Component, Query, Res}, sprite::Sprite, time::{Time, Timer, TimerMode}, transform::components::Transform, utils::default};
 use avian2d::prelude::*;
 
-use crate::{common::{animated_sprite::SpriteAnimator, physics::{fragile::{Fragile, FragileShield}, layers::GamePhysicsLayer}}, ground::Ground, obstacles::InstantKiller, rt_lights::components::{StaticLightOccluder, LightOccluder}, stage::{stage_builder::{stage_asset, stage_creator::{get_object_tilemap_rect_from_index, ObjectAtlasIndices, StageCreator}, StageAssets}, stage_objects::StageObject}};
+use crate::{common::{animated_sprite::SpriteAnimator, physics::{fragile::{Fragile, FragileShield}, layers::GamePhysicsLayer}}, ground::Ground, lit_sprite::global_components::LitSprite, obstacles::InstantKiller, rt_lights::components::{LightOccluder, StaticLightOccluder}, stage::{stage_builder::{StageAssets, stage_asset, stage_creator::{ObjectAtlasIndices, StageCreator, get_object_tilemap_rect_from_index}}, stage_objects::StageObject}};
 
 use super::tiles::PhysicalTileBundle;
 
@@ -61,9 +61,9 @@ pub fn tick_saw_shooters(
                 GravityScale(0.0),
                 CollisionEventsEnabled,
                 LockedAxes::ROTATION_LOCKED),
-                Sprite {
-                    image: stage_assets.stage_objects_handle.clone(),
-                    custom_size: Some(Vec2::new(16.0, 16.0)),
+                LitSprite {
+                    albedo_texture: stage_assets.stage_objects_handle.clone().into(),
+                    size: Vec2::new(16.0, 16.0),
                     rect: Some(atlas_rects[0]),
                     ..default()
                 },

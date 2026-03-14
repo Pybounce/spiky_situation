@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::{physics::layers::GamePhysicsLayer, splat::SplatProvider}, obstacles::InstantKiller, rt_lights::components::LightOccluder, stage::stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}};
+use crate::{common::{physics::layers::GamePhysicsLayer, splat::SplatProvider}, lit_sprite::global_components::LitSprite, obstacles::InstantKiller, rt_lights::components::LightOccluder, stage::stage_builder::stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}};
 
 use super::tiles::TileBundle;
 
@@ -41,9 +41,9 @@ impl SpikeFactory {
                 translation: Vec3::new((grid_pos.x as f32 * TILE_SIZE) + TILE_SIZE_HALF, (grid_pos.y as f32 * TILE_SIZE) + TILE_SIZE_HALF, 0.0),
                 ..default()
             },
-            Sprite {
-                image: atlas.clone(),
-                custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+            LitSprite {
+                albedo_texture: atlas.clone().into(),
+                size: Vec2::new(TILE_SIZE, TILE_SIZE),
                 rect: Some(atlas_rect),
                 ..default()
             }
