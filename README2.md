@@ -123,6 +123,7 @@
 
 - Dashing when just above ground causes you to hover slightly
   - Since the raycast doesn't then correctly set you (LIKELY WOULD SOLVE THE ABOVE BUG TOO)
+  - Could also increase raycast size based on directional velocity
 - Saw projectiles break when hitting keys.
   - Probably need to add some more collision layers etc
 - Checkpoints do nothing
