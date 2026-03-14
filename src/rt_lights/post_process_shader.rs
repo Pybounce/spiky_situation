@@ -159,7 +159,7 @@ impl ViewNode for PostProcessNode {
             .get_resource::<SharedRTLOutputBuffer>()
             .expect("RTL compute worker missing in RenderWorld");
         
-        let specular_buffer = world.resource::<SpecularBuffer>();
+        let specular_buffer = world.get_resource::<SpecularBuffer>().expect("Specular buffer missing in RenderWorld");
         let gpu_images = world.resource::<RenderAssets<GpuImage>>();
         let Some(specular_gpu_image) = gpu_images.get(&specular_buffer.handle) else {
             return Ok(()); // Image hasn't been uploaded to the GPU yet
