@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, bloom::Bloomin, mouse::WorldMouseMotion, physics::avian_ex::{CollisionRemapEvent, handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{ClearSplatsEvent, apply_splat_on_death, clear_splat_events}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, lit_sprite::LitSpritePlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{audio::AudioPlugin, builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, bloom::Bloomin, mouse::WorldMouseMotion, physics::avian_ex::{CollisionRemapEvent, handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{ClearSplatsEvent, apply_splat_on_death, clear_splat_events}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, lit_sprite::LitSpritePlugin, player::{animation::update_player_animation_state, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
 
 mod common;
 
@@ -39,6 +39,7 @@ pub mod databases;
 pub mod shaders;
 pub mod rt_lights;
 pub mod lit_sprite;
+pub mod audio;
 
 fn main() {
     let winit_settings = WinitSettings {
@@ -76,6 +77,7 @@ fn main() {
         .add_plugins(PhysicsPlugins::default())//.add_plugins(avian2d::prelude::PhysicsDebugPlugin::default())
         .add_plugins(RTLightPlugin)
         .add_plugins(LitSpritePlugin)
+        .add_plugins(AudioPlugin)
         //.add_plugins(RTLightDebugPlugin)
         .insert_resource(PhysicsLengthUnit(100.0))
         .add_plugins(Material2dPlugin::<BackgroundMaterial>::default())
