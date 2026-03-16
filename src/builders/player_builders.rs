@@ -2,7 +2,7 @@ use bevy::{ecs::system::EntityCommands, platform::collections::HashMap, prelude:
 use avian2d::prelude::*;
 use bevy_seedling::{prelude::{SpatialBasicNode, Volume, VolumeNode}, sample::SamplePlayer, sample_effects};
 
-use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, lit_sprite::global_components::LitSprite, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
+use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, lit_sprite::global_components::LitSprite, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, audio::{FootstepAudioEmitter, WallSlideAudioEmitter}, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::common::player_input::{gamepad::PlayerGamepadInput, keyboard::PlayerKeyboardInput, PlayerInputController};
 use crate::local_player::*;
 
@@ -81,6 +81,19 @@ impl PlayerBuilder {
         state_animations.insert(AnimationState(PlayerAnimationState::Hovering as u32), hovering_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::OnWall as u32), wall_grab_rects.clone());
         state_animations.insert(AnimationState(PlayerAnimationState::Dancing as u32), dance_rects.clone());
+
+        let wall_slide_emitter = entity_commands.commands_mut().spawn((SamplePlayer::new(asset_server.load("audio/sfx/wall_slide.ogg")).looping(),
+            sample_effects![VolumeNode {
+                volume: Volume::Linear(0.0),
+                ..default()
+            }]
+        )).id();
+        let running_emitter = entity_commands.commands_mut().spawn((SamplePlayer::new(asset_server.load("audio/sfx/running.ogg")).looping(),
+            sample_effects![VolumeNode {
+                volume: Volume::Linear(0.0),
+                ..default()
+            }]
+        )).id();
 
         entity_commands.try_insert(((
             LocalPlayer,
@@ -170,12 +183,12 @@ impl PlayerBuilder {
                 jump_key: KeyCode::KeyW,
                 dash_key: KeyCode::Space,
             }),
-            (SamplePlayer::new(asset_server.load("audio/sfx/running.ogg")).looping(),
-            sample_effects![VolumeNode {
-                volume: Volume::Linear(0.0),
-                ..default()
-            }])
+            (WallSlideAudioEmitter(wall_slide_emitter),
+            FootstepAudioEmitter(running_emitter))
         ));
+
+        entity_commands.add_child(wall_slide_emitter);
+        entity_commands.add_child(running_emitter);
 
     }
 }
