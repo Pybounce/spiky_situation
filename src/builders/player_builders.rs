@@ -1,5 +1,6 @@
 use bevy::{ecs::system::EntityCommands, platform::collections::HashMap, prelude::*};
 use avian2d::prelude::*;
+use bevy_seedling::{prelude::{SpatialBasicNode, Volume, VolumeNode}, sample::SamplePlayer, sample_effects};
 
 use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, lit_sprite::global_components::LitSprite, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::common::player_input::{gamepad::PlayerGamepadInput, keyboard::PlayerKeyboardInput, PlayerInputController};
@@ -142,7 +143,7 @@ impl PlayerBuilder {
                 acceleration: PLAYER_ACCELERATION / 1.0,
                 deceleration: PLAYER_DECELERATION,
                 max_speed: MAX_HORIZONTAL_SPEED,
-            },
+            }),
             Respawnable {
                 translation: spawn_pos,
                 delay_in_seconds: PLAYER_RESPAWN_DELAY,
@@ -156,7 +157,7 @@ impl PlayerBuilder {
             SplatOnDeath,
             CollisionLayers::new(GamePhysicsLayer::Player, LayerMask::ALL),
             PlayerInputController::default(),
-            PlayerGamepadInput {
+            (PlayerGamepadInput {
                 l_stick_deadzone: 0.3,
                 move_left_button: GamepadButton::DPadLeft,
                 move_right_button: GamepadButton::DPadRight,
@@ -168,8 +169,13 @@ impl PlayerBuilder {
                 move_right_key: KeyCode::KeyD,
                 jump_key: KeyCode::KeyW,
                 dash_key: KeyCode::Space,
-            }
-        )));
+            }),
+            (SamplePlayer::new(asset_server.load("audio/sfx/running.ogg")).looping(),
+            sample_effects![VolumeNode {
+                volume: Volume::Linear(0.0),
+                ..default()
+            }])
+        ));
 
     }
 }
