@@ -35,6 +35,15 @@
 - [ ] Lock blocks unlocking
 - [ ] Saw shooter
 
+### Textures
+
+- [ ] Lock block
+- [ ] Keys
+- [ ] Saw shooter
+- [ ] Phantom blocks
+- [ ] Laser core
+- [ ] Alternates (bloodied spikes, mossy walls etc.)
+
 ## Misc
 
 - [ ] Emission
