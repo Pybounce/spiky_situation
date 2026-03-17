@@ -2,9 +2,9 @@
 
 ## Audio
 
-- [ ] Spring bounce
+- [x] Spring bounce
 - [ ] Death
-- [ ] Movement
+- [x] Movement
 - [ ] Jumping
 - [ ] Hitting wall?
 - [ ] Sawblade breaking
@@ -18,6 +18,7 @@
 ### Particles
 
 - [ ] Player jump
+- [ ] Player coyote jump (little clouds?)
 - [ ] Player hit ground
 - [ ] Player wall slide
 - [ ] Player run
