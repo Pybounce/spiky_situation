@@ -40,7 +40,7 @@ pub fn control_player_wall_slide_audio(
         let Ok(mut volume) = volume_query.get_effect_mut(effects) else { continue; };
 
         let mut target_volume = 0.0;
-        let max_volume = 0.5;
+        let max_volume = 0.4;
         if grounded_opt.is_some() {
             target_volume = 0.0.lerp(max_volume, linvel.y.abs() / MAX_HORIZONTAL_SPEED).min(max_volume);    //TODO: Max horizontal speed should not be here but unlike running, wall slide has no max, it's friction based.
         }
