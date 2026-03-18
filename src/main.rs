@@ -1,6 +1,6 @@
 
 
-use avian2d::{prelude::PhysicsLengthUnit, PhysicsPlugins};
+use avian2d::{PhysicsPlugins, prelude::{LinearVelocity, PhysicsLengthUnit}};
 use bevy::{
     asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode}, winit::{ UpdateMode, WinitSettings }
 };
@@ -21,7 +21,7 @@ use stage_editor::{renderer::systems::{draw_editor, refresh_editor_renderer}, St
 use main_menu::MainMenuPlugin;
 use wall::check_touching_wall;
 
-use crate::{audio::AudioPlugin, builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, bloom::Bloomin, mouse::WorldMouseMotion, physics::avian_ex::{CollisionRemapEvent, handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{ClearSplatsEvent, apply_splat_on_death, clear_splat_events}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, lit_sprite::LitSpritePlugin, player::{animation::update_player_animation_state, audio::{control_player_footstep_audio, control_player_wall_slide_audio}, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}};
+use crate::{audio::AudioPlugin, builders::player_builders::init_player_builder, camera::{clamp_camera_to_stage, clamp_window_resolution}, common::{animation_controller::update_animation_states, bloom::Bloomin, mouse::WorldMouseMotion, physics::avian_ex::{CollisionRemapEvent, handle_collision_remap_events, handle_many_colliding_entities, raise_collision_remap_events}, player_input::{gamepad::handle_player_gamepad_input, keyboard::handle_player_keyboard_input, reset_player_inputs}, rails::move_rail_riders, splat::{ClearSplatsEvent, apply_splat_on_death, clear_splat_events}}, databases::{save_db::{SaveDb, SaveGame}, splat_db::init_splat_db}, debugging::DebugPlugin, ground::Grounded, lit_sprite::LitSpritePlugin, player::{animation::update_player_animation_state, audio::{control_player_footstep_audio, control_player_impact_audio, control_player_wall_slide_audio}, death::spawn_player_corpse}, rt_lights::{RTLightDebugPlugin, RTLightPlugin}, shaders::{background_shader::BackgroundMaterial, cctv_shader::{plugin::CCTVPostProcessPlugin, update_cctv_shader_time}, splat::SplatMaterial}, stage::stage_objects::{laser::update_laser_beams, pressure_spikes::{tick_pressure_spikes, trigger_pressure_spikes}, saw_shooter::SawShooter, spike::Spike}, wall::TouchingWall};
 
 mod common;
 
@@ -114,7 +114,7 @@ fn main() {
         .add_systems(Update, something)
         // audio
         .add_plugins(AudioPlugin)
-        .add_systems(Update, (control_player_footstep_audio, control_player_wall_slide_audio))
+        .add_systems(Update, (control_player_footstep_audio, control_player_wall_slide_audio, control_player_impact_audio))
         .run();
   
 }
@@ -132,7 +132,6 @@ fn something(
         );
     }
 }
-
 // possible fix - just fix the fucking pixel perfect translations
 
 // add a new group of systems

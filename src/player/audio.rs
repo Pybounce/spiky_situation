@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy_seedling::prelude::{EffectsQuery, SampleEffects, Volume, VolumeNode};
 use avian2d::prelude::LinearVelocity;
 
-use crate::{ground::Grounded, local_player::MAX_HORIZONTAL_SPEED, wall::TouchingWall};
+use crate::{audio::{PlaySfxEvent, Sfx}, ground::Grounded, local_player::MAX_HORIZONTAL_SPEED, wall::TouchingWall};
 
 
 #[derive(Component)]
@@ -45,5 +45,20 @@ pub fn control_player_wall_slide_audio(
             target_volume = 0.0.lerp(max_volume, linvel.y.abs() / MAX_HORIZONTAL_SPEED).min(max_volume);    //TODO: Max horizontal speed should not be here but unlike running, wall slide has no max, it's friction based.
         }
         volume.volume = Volume::Linear(target_volume);
+    }
+}
+
+
+// Yes technically the below system apply to all things not just player
+
+pub fn control_player_impact_audio(
+    query: Query<&Transform, Or<((Added<TouchingWall>, Without<Grounded>), Added<Grounded>)>>,
+    mut event_writer: EventWriter<PlaySfxEvent>
+) {
+    for t in query.iter() {
+        event_writer.write(PlaySfxEvent {
+            sfx: Sfx::PlayerSurfaceHit,
+            translation: t.translation,
+        });
     }
 }

@@ -11,13 +11,14 @@ impl Plugin for AudioPlugin {
             .add_plugins(SeedlingPlugin::default())
             .add_event::<PlaySfxEvent>()
             .add_systems(Startup, init_sfx_db)
-            .add_systems(Update, handle_sfx_events);
+            .add_systems(Last, handle_sfx_events);
     }
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Sfx {
     PlayerJump,
+    PlayerSurfaceHit,
     Bounce,
 }
 
@@ -46,6 +47,7 @@ fn init_sfx_db(
     let mut entries = HashMap::<Sfx, SfxEntry>::new();
     entries.insert(Sfx::PlayerJump, SfxEntry { handle: asset_server.load("audio/sfx/player_jump.wav"), last_played: 0.0, cooldown: 0.1 });
     entries.insert(Sfx::Bounce, SfxEntry { handle: asset_server.load("audio/sfx/bounce.wav"), last_played: 0.0, cooldown: 0.1 });
+    entries.insert(Sfx::PlayerSurfaceHit, SfxEntry { handle: asset_server.load("audio/sfx/surface_impact.wav"), last_played: 0.0, cooldown: 0.1 });
     commands.insert_resource(SfxDb {
         entries,
     });
