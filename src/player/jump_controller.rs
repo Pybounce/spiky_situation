@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
+use bevy_seedling::{prelude::SpatialBasicNode, sample::SamplePlayer, sample_effects};
 
 use crate::{common::{player_input::{PlayerInput, PlayerInputController}, physics::gravity::Gravity}, ground::Grounded, wall::TouchingWall};
 
@@ -58,15 +59,29 @@ pub fn maintain_player_jump(
 }
 
 pub fn begin_player_jump(
-    mut query: Query<(&mut LinearVelocity, &mut JumpController, &mut Gravity, &PlayerInputController), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
+    mut query: Query<(&mut LinearVelocity, &mut JumpController, &mut Gravity, &PlayerInputController, &Transform), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
     time: Res<Time>,
+    mut sfx_last_played: Local<f32>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
 ) {
-    for (mut v, mut jc, mut g, input) in &mut query {
+    for (mut v, mut jc, mut g, input, t) in &mut query {
         if input.pressed(PlayerInput::Jump) {
             g.current_force = 0.0;
             v.0.y = jc.force;
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time
             jc.last_jump_pressed_time = time.elapsed_secs_f64(); //todo: wrapped??
+
+
+            let sfx_cooldown = 0.05;
+            if time.elapsed_secs() - *sfx_last_played >= sfx_cooldown {
+                *sfx_last_played = time.elapsed_secs();
+                commands.spawn((
+                    SamplePlayer::new(asset_server.load("audio/sfx/player_jump.wav")),
+                    sample_effects![SpatialBasicNode::default()],
+                    Transform::from_translation(t.translation)
+                ));
+            }
         }
     }
 }
