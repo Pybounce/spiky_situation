@@ -58,10 +58,10 @@ pub fn begin_player_wall_jump(
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time
             jc.last_jump_pressed_time = time.elapsed_secs_f64(); //todo: wrapped??
 
-            sfx_writer.write(PlaySfxEvent {
-                sfx: Sfx::PlayerJump,
-                translation: t.translation,
-            });
+            //sfx_writer.write(PlaySfxEvent {
+            //    sfx: Sfx::PlayerJump,
+            //    translation: t.translation,
+            //});
         }
     }
 } 

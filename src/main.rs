@@ -1,8 +1,8 @@
 
 
-use avian2d::{PhysicsPlugins, prelude::{LinearVelocity, PhysicsLengthUnit}};
+use avian2d::{PhysicsPlugins, prelude::PhysicsLengthUnit};
 use bevy::{
-    asset::AssetMetaCheck, image::ImageFormatSetting, prelude::*, sprite::Material2dPlugin, window::{CursorGrabMode, PresentMode}, winit::{ UpdateMode, WinitSettings }
+    asset::AssetMetaCheck, prelude::*, sprite::Material2dPlugin, window::PresentMode, winit::{ UpdateMode, WinitSettings }
 };
 
 mod local_player;
@@ -114,7 +114,7 @@ fn main() {
         .add_systems(Update, something)
         // audio
         .add_plugins(AudioPlugin)
-        .add_systems(Update, (control_player_footstep_audio, control_player_wall_slide_audio, control_player_impact_audio))
+        .add_systems(PostUpdate, (control_player_footstep_audio, control_player_wall_slide_audio, control_player_impact_audio))
         .run();
   
 }

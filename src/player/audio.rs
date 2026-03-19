@@ -1,5 +1,5 @@
 
-use bevy::prelude::*;
+use bevy::{diagnostic::FrameCount, prelude::*};
 use bevy_seedling::prelude::{EffectsQuery, SampleEffects, Volume, VolumeNode};
 use avian2d::prelude::LinearVelocity;
 
@@ -42,7 +42,7 @@ pub fn control_player_wall_slide_audio(
         let mut target_volume = 0.0;
         let max_volume = 0.4;
         if grounded_opt.is_some() {
-            target_volume = 0.0.lerp(max_volume, linvel.y.abs() / MAX_HORIZONTAL_SPEED).min(max_volume);    //TODO: Max horizontal speed should not be here but unlike running, wall slide has no max, it's friction based.
+            target_volume = 0.0.lerp(max_volume, linvel.y.abs() / (MAX_HORIZONTAL_SPEED + 50.0)).min(max_volume);    //TODO: Max horizontal speed should not be here but unlike running, wall slide has no max, it's friction based.
         }
         volume.volume = Volume::Linear(target_volume);
     }
@@ -53,7 +53,7 @@ pub fn control_player_wall_slide_audio(
 
 pub fn control_player_impact_audio(
     query: Query<&Transform, Or<((Added<TouchingWall>, Without<Grounded>), Added<Grounded>)>>,
-    mut event_writer: EventWriter<PlaySfxEvent>
+    mut event_writer: EventWriter<PlaySfxEvent>,
 ) {
     for t in query.iter() {
         event_writer.write(PlaySfxEvent {

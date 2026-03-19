@@ -1,7 +1,6 @@
 
-use bevy::{platform::collections::HashMap, prelude::*};
-use bevy_seedling::{SeedlingPlugin, prelude::SpatialBasicNode, sample::{AudioSample, SamplePlayer}, sample_effects};
-
+use bevy::{diagnostic::FrameCount, platform::collections::HashMap, prelude::*};
+use bevy_seedling::prelude::*;
 pub struct AudioPlugin;
 
 
@@ -10,7 +9,7 @@ impl Plugin for AudioPlugin {
         app
             .add_plugins(SeedlingPlugin::default())
             .add_event::<PlaySfxEvent>()
-            .add_systems(Startup, init_sfx_db)
+            .add_systems(Startup, (init_sfx_db, init_reverb))
             .add_systems(Last, handle_sfx_events);
     }
 }
@@ -36,7 +35,7 @@ struct SfxEntry {
 #[derive(Event)]
 pub struct PlaySfxEvent {
     pub sfx: Sfx,
-    pub translation: Vec3
+    pub translation: Vec3,
 }
 
 
@@ -57,7 +56,7 @@ fn handle_sfx_events(
     mut events: EventReader<PlaySfxEvent>,
     mut sfxdb: ResMut<SfxDb>,
     mut commands: Commands,
-    time: Res<Time>
+    time: Res<Time>,
 ) {
     for sfx_event in events.read() {
         let Some(entry) = sfxdb.entries.get_mut(&sfx_event.sfx) else { continue; };
@@ -65,10 +64,35 @@ fn handle_sfx_events(
             entry.last_played = time.elapsed_secs();
             commands.spawn((
                 SamplePlayer::new(entry.handle.clone()),
-                sample_effects![SpatialBasicNode::default()],
-                Transform::from_translation(sfx_event.translation)
+                //sample_effects![VolumeNode { volume: Volume::Decibels(-0.6), smooth_seconds: 0.0, ..default() }],
+                Transform::from_translation(sfx_event.translation),
+                RandomPitch::new(0.15),
             ));
         }
 
     }
+}
+
+
+fn init_reverb(
+    pool: Single<Entity, With<SamplerPool<DefaultPool>>>,
+    mut commands: Commands,
+) {
+    let reverb = commands
+        .spawn(FreeverbNode {
+            room_size: 0.7,
+            damping: 0.3,
+            width: 0.2,
+            ..Default::default()
+        })
+        .id();
+
+    commands
+        .entity(*pool)
+        .chain_node(VolumeNode {
+            volume: Volume::Decibels(-6.0),
+            smooth_seconds: 0.0,
+            ..Default::default()
+        })
+        .connect(reverb);
 }
