@@ -5,8 +5,8 @@
 - [x] Spring bounce
 - [ ] Death
 - [x] Movement
-- [ ] Jumping
-- [ ] Hitting wall?
+- [x] Jumping
+- [x] Hitting wall?
 - [ ] Sawblade breaking
 - [ ] Lasers
 - [ ] Lock blocks + key grab

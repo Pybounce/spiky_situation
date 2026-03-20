@@ -19,6 +19,8 @@ pub enum Sfx {
     PlayerJump,
     PlayerSurfaceHit,
     Bounce,
+    Tick,
+    Blade
 }
 
 #[derive(Resource)]
@@ -47,6 +49,8 @@ fn init_sfx_db(
     entries.insert(Sfx::PlayerJump, SfxEntry { handle: asset_server.load("audio/sfx/player_jump.wav"), last_played: 0.0, cooldown: 0.1 });
     entries.insert(Sfx::Bounce, SfxEntry { handle: asset_server.load("audio/sfx/bounce.wav"), last_played: 0.0, cooldown: 0.1 });
     entries.insert(Sfx::PlayerSurfaceHit, SfxEntry { handle: asset_server.load("audio/sfx/surface_impact.wav"), last_played: 0.0, cooldown: 0.1 });
+    entries.insert(Sfx::Tick, SfxEntry { handle: asset_server.load("audio/sfx/tick.wav"), last_played: 0.0, cooldown: 0.01 });
+    entries.insert(Sfx::Blade, SfxEntry { handle: asset_server.load("audio/sfx/blade.wav"), last_played: 0.0, cooldown: 0.1 });
     commands.insert_resource(SfxDb {
         entries,
     });
