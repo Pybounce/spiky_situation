@@ -50,7 +50,7 @@ fn init_sfx_db(
     entries.insert(Sfx::Bounce, SfxEntry { handle: asset_server.load("audio/sfx/bounce.wav"), last_played: 0.0, cooldown: 0.1 });
     entries.insert(Sfx::PlayerSurfaceHit, SfxEntry { handle: asset_server.load("audio/sfx/surface_impact.wav"), last_played: 0.0, cooldown: 0.1 });
     entries.insert(Sfx::Tick, SfxEntry { handle: asset_server.load("audio/sfx/tick.wav"), last_played: 0.0, cooldown: 0.01 });
-    entries.insert(Sfx::Blade, SfxEntry { handle: asset_server.load("audio/sfx/blade.wav"), last_played: 0.0, cooldown: 0.1 });
+    entries.insert(Sfx::Blade, SfxEntry { handle: asset_server.load("audio/sfx/blade.wav"), last_played: 0.0, cooldown: 0.01 });
     commands.insert_resource(SfxDb {
         entries,
     });
@@ -94,7 +94,7 @@ fn init_reverb(
     commands
         .entity(*pool)
         .chain_node(VolumeNode {
-            volume: Volume::Decibels(-6.0),
+            volume: Volume::Decibels(-16.0),
             smooth_seconds: 0.0,
             ..Default::default()
         })

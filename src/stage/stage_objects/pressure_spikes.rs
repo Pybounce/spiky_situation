@@ -62,7 +62,6 @@ pub fn trigger_pressure_spikes(
                         sfx: Sfx::Tick,
                         translation: t.translation,
                     });
-                    println!("tick");
                     pressure_spike.triggered = true;
                 }
             }
@@ -80,10 +79,10 @@ pub fn tick_pressure_spikes(
         if pressure_spike.triggered && !pressure_spike.timer.finished() {
             pressure_spike.timer.tick(time.delta());
             if pressure_spike.timer.remaining() <= animator.duration() {
-                animator.play_or_continue();    // TODO: Click sound here
+                animator.play_or_continue();
             }
             if pressure_spike.timer.just_finished() {
-                commands.entity(e).try_insert(InstantKiller);   // TODO: Blade release sound here
+                commands.entity(e).try_insert(InstantKiller);   // TODO: Blade release sound here - thanks old me, it's done now.
                 sfx_writer.write(PlaySfxEvent {
                     sfx: Sfx::Blade,
                     translation: t.translation,
