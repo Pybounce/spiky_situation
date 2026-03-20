@@ -1,5 +1,5 @@
 
-use bevy::{diagnostic::FrameCount, platform::collections::HashMap, prelude::*};
+use bevy::{platform::collections::HashMap, prelude::*};
 use bevy_seedling::prelude::*;
 pub struct AudioPlugin;
 
@@ -10,7 +10,7 @@ impl Plugin for AudioPlugin {
             .add_plugins(SeedlingPlugin::default())
             .add_event::<PlaySfxEvent>()
             .add_systems(Startup, (init_sfx_db, init_reverb))
-            .add_systems(Last, handle_sfx_events);
+            .add_systems(PostUpdate, handle_sfx_events);
     }
 }
 
