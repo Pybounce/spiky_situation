@@ -49,3 +49,7 @@
 - [ ] Emission
 - [ ] Key float-bobbing
 - [ ] Screen transitions (after death etc)
+
+## Scope Creep Ideas
+
+- [ ] Motivational corperate music when they die over 100 times in a level
