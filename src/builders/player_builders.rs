@@ -185,7 +185,6 @@ impl PlayerBuilder {
             }),
             (WallSlideAudioEmitter(wall_slide_emitter),
             FootstepAudioEmitter(running_emitter)),
-            SpatialListener2D::default()
         ));
 
         entity_commands.add_child(wall_slide_emitter);

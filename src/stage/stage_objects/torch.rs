@@ -16,17 +16,6 @@ impl TorchFactory {
                 colour: Color::srgb_u8(255, 176, 55),
             },
             Bloomin(1.0),
-            SamplePlayer::new(asset_server.load("audio/sfx/fire_crackling.wav")).looping(),
-            sample_effects![SpatialBasicNode {
-                distance_attenuation: DistanceAttenuation {
-                    reference_distance: 32.0, 
-                    max_distance: 160.0, 
-                    max_muffle_distance: 160.0, 
-                    
-                    ..default()
-                },
-                ..default()
-            }],
         ));
     }
 }
