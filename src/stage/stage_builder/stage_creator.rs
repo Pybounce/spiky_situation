@@ -86,7 +86,7 @@ impl<'a> StageCreator<'a> {
         }
     }
 
-    pub fn build(&self, commands: &mut Commands) -> bool {
+    pub fn build(&self, commands: &mut Commands, asset_server: &AssetServer) -> bool {
         build_ground(self, commands)
         && build_goal(self, commands)
         && build_background(self, commands)
@@ -94,7 +94,7 @@ impl<'a> StageCreator<'a> {
         //&& build_borders(self, commands)
         && build_player_spawner(self, commands)
         && build_checkpoints(self, commands)
-        && build_half_saws(self, commands)
+        && build_half_saws(self, commands, asset_server)
         && build_springs(self, commands)
         && build_lock_blocks(self, commands)
         && build_keys(self, commands)
@@ -104,7 +104,7 @@ impl<'a> StageCreator<'a> {
         && build_pressure_spikes(self, commands)
         && build_lasers(self, commands)
         && add_rails(self, commands)
-        && build_toches(self, commands)
+        && build_toches(self, commands, asset_server)
     }
 
 
@@ -252,7 +252,7 @@ fn build_spikes(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
     return true;
 }
 
-fn build_half_saws(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+fn build_half_saws(stage_creator: &StageCreator, commands: &mut Commands, asset_server: &AssetServer) -> bool {
 
     let atlas_rects = vec![
         get_object_tilemap_rect_from_index(ObjectAtlasIndices::HalfSaw0),
@@ -262,7 +262,7 @@ fn build_half_saws(stage_creator: &StageCreator, commands: &mut Commands) -> boo
     ];
 
     for half_saw in &stage_creator.stage.half_saws {
-        SawFactory::spawn_half(commands, stage_creator, atlas_rects.clone(), half_saw);
+        SawFactory::spawn_half(commands, asset_server, stage_creator, atlas_rects.clone(), half_saw);
     }
 
     return true;
@@ -358,7 +358,7 @@ fn build_phantom_blocks(stage_creator: &StageCreator, commands: &mut Commands) -
     return true;
 }
 
-fn build_toches(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
+fn build_toches(stage_creator: &StageCreator, commands: &mut Commands, asset_server: &AssetServer) -> bool {
     let atlas_rects = vec![
         get_object_tilemap_rect_from_index(ObjectAtlasIndices::Torch0),
         get_object_tilemap_rect_from_index(ObjectAtlasIndices::Torch1),
@@ -367,7 +367,7 @@ fn build_toches(stage_creator: &StageCreator, commands: &mut Commands) -> bool {
     ];
 
     for torch in stage_creator.stage.torches.as_ref().into_iter().flatten() {
-        TorchFactory::spawn(commands, stage_creator, atlas_rects.clone(), &torch);
+        TorchFactory::spawn(commands, asset_server, stage_creator, atlas_rects.clone(), &torch);
     }
     return true;
 }

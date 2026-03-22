@@ -1,6 +1,6 @@
 use bevy::{ecs::system::EntityCommands, platform::collections::HashMap, prelude::*};
 use avian2d::prelude::*;
-use bevy_seedling::{prelude::{SpatialBasicNode, Volume, VolumeNode}, sample::SamplePlayer, sample_effects};
+use bevy_seedling::{prelude::{SpatialBasicNode, Volume, VolumeNode}, sample::SamplePlayer, sample_effects, spatial::{SpatialListener2D, SpatialListener3D}};
 
 use crate::{common::{animated_sprite::SpriteAnimator, animation_controller::{AnimationController, AnimationState}, death::{DelayedDeathMarker, Killable}, physics::{avian_ex::ManyCollidingEntities, gravity::Gravity, layers::GamePhysicsLayer}, splat::SplatOnDeath}, ground::Groundable, lit_sprite::global_components::LitSprite, local_player::{LocalPlayer, PLAYER_MAX_GRAVITY, PLAYER_SIZE}, player::{animation::PlayerAnimationState, audio::{FootstepAudioEmitter, WallSlideAudioEmitter}, dash_controller::DashController, death::Respawnable, horizontal_movement_controller::{AirbourneHorizontalMovementController, GroundedHorizontalMovementController}, jump_controller::JumpController, physics_controller::PhysicsController, wall_jump_controller::{WallJumpController, WallStickable}}, rt_lights::components::LightOccluder, stage::{stage_builder::stage_creator::TILE_SIZE, stage_objects::StageObject}, wall::Wallable};
 use crate::common::player_input::{gamepad::PlayerGamepadInput, keyboard::PlayerKeyboardInput, PlayerInputController};
@@ -184,7 +184,8 @@ impl PlayerBuilder {
                 dash_key: KeyCode::Space,
             }),
             (WallSlideAudioEmitter(wall_slide_emitter),
-            FootstepAudioEmitter(running_emitter))
+            FootstepAudioEmitter(running_emitter)),
+            SpatialListener2D::default()
         ));
 
         entity_commands.add_child(wall_slide_emitter);

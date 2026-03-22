@@ -1,6 +1,9 @@
 
 use bevy::{platform::collections::HashMap, prelude::*};
 use bevy_seedling::prelude::*;
+
+pub mod global_audio;
+
 pub struct AudioPlugin;
 
 
@@ -20,7 +23,7 @@ pub enum Sfx {
     PlayerSurfaceHit,
     Bounce,
     Tick,
-    Blade
+    Blade,
 }
 
 #[derive(Resource)]
