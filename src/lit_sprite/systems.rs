@@ -39,7 +39,7 @@ pub fn handle_new_lit_sprites(
             meshes.add(Rectangle::from_size(sprite.size))
         ).clone();
 
-        commands.entity(entity).insert((
+        commands.entity(entity).try_insert((
             Mesh2d(mesh_handle),
             MeshMaterial2d(material_handle)
         ));

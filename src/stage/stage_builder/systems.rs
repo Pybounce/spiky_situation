@@ -71,7 +71,7 @@ pub fn try_build_stage(
             });
 
             let stage_creator = StageCreator::new(&stage, &ground_tiles_handle, &ground_specular_handle, &object_tilemap_handle, &object_tilemap_specular_handle);
-            if stage_creator.build(&mut commands) {
+            if stage_creator.build(&mut commands, &asset_server) {
                 commands.insert_resource(CurrentStageData {
                     stage_id: stage.id,
                     spawn_translation: (stage.spawn_grid_pos * TILE_SIZE).extend(0.0),

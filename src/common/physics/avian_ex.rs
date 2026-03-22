@@ -32,26 +32,27 @@ impl ManyCollidingEntities {
 pub fn handle_many_colliding_entities(
     mut collision_start_events: EventReader<CollisionStarted>,
     mut collision_end_events: EventReader<CollisionEnded>,
-    mut query: Query<(Entity, &mut ManyCollidingEntities)>,
+    mut query: Query<&mut ManyCollidingEntities>,
 ) {
-    for (entity, mut colliding_entities) in &mut query {
-        for collision_started in collision_start_events.read() {
-            if collision_started.0 == entity {
-                colliding_entities.add_entity(&collision_started.1);
-            }
-            else if collision_started.1 == entity {
-                colliding_entities.add_entity(&collision_started.0);
-            }
+    for collision_started in collision_start_events.read() {
+        if let Ok(mut colliding_entities) = query.get_mut(collision_started.0) {
+            colliding_entities.add_entity(&collision_started.1);
         }
-        for collision_ended in collision_end_events.read() {
-            if collision_ended.0 == entity {
-                colliding_entities.remove_entity(&collision_ended.1);
-            }
-            else if collision_ended.1 == entity {
-                colliding_entities.remove_entity(&collision_ended.0);
-            }
+        if let Ok(mut colliding_entities) = query.get_mut(collision_started.1) {
+            colliding_entities.add_entity(&collision_started.0);
         }
     }
+
+    for collision_ended in collision_end_events.read() {
+        if let Ok(mut colliding_entities) = query.get_mut(collision_ended.0) {
+            colliding_entities.remove_entity(&collision_ended.1);
+        }
+        if let Ok(mut colliding_entities) = query.get_mut(collision_ended.1) {
+            colliding_entities.remove_entity(&collision_ended.0);
+        }
+    }
+
+
 }
 
 enum CollisionEvent {

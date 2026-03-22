@@ -1,6 +1,7 @@
 
 use bevy::prelude::*;
 use avian2d::prelude::*;
+use bevy_seedling::{firewheel::dsp::distance_attenuation::DistanceAttenuation, prelude::SpatialBasicNode, sample::SamplePlayer, sample_effects};
 
 use crate::{common::{animated_sprite::SpriteAnimator, offset_mover::OffsetMover, physics::layers::GamePhysicsLayer, splat::SplatProvider}, obstacles::InstantKiller, stage::stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE_HALF}}};
 
@@ -13,7 +14,7 @@ pub struct HalfSaw;
 pub struct SawFactory;
 
 impl SawFactory {
-    pub fn spawn_half(commands: &mut Commands, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, saw_asset: &stage_asset::HalfSaw) {
+    pub fn spawn_half(commands: &mut Commands, asset_server: &AssetServer, stage_creator: &StageCreator, atlas_rects: Vec<Rect>, saw_asset: &stage_asset::HalfSaw) {
         let mut mask = LayerMask(GamePhysicsLayer::StageObject.to_bits());
         mask.add(GamePhysicsLayer::Player.to_bits());
         

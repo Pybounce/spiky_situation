@@ -2,11 +2,11 @@
 
 ## Audio
 
-- [ ] Spring bounce
+- [x] Spring bounce
 - [ ] Death
-- [ ] Movement
-- [ ] Jumping
-- [ ] Hitting wall?
+- [x] Movement
+- [x] Jumping
+- [x] Hitting wall?
 - [ ] Sawblade breaking
 - [ ] Lasers
 - [ ] Lock blocks + key grab
@@ -18,6 +18,7 @@
 ### Particles
 
 - [ ] Player jump
+- [ ] Player coyote jump (little clouds?)
 - [ ] Player hit ground
 - [ ] Player wall slide
 - [ ] Player run
@@ -34,8 +35,21 @@
 - [ ] Lock blocks unlocking
 - [ ] Saw shooter
 
+### Textures
+
+- [ ] Lock block
+- [ ] Keys
+- [ ] Saw shooter
+- [ ] Phantom blocks
+- [ ] Laser core
+- [ ] Alternates (bloodied spikes, mossy walls etc.)
+
 ## Misc
 
 - [ ] Emission
 - [ ] Key float-bobbing
 - [ ] Screen transitions (after death etc)
+
+## Scope Creep Ideas
+
+- [ ] Motivational corperate music when they die over 100 times in a level

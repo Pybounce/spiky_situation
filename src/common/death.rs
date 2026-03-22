@@ -34,9 +34,10 @@ pub struct Killable;
 
 pub fn despawn_death_marked(
     mut commands: Commands,
-    query: Query<Entity, With<DeathMarker>>
+    query: Query<(Entity, Ref<DeathMarker>), With<DeathMarker>>
 ) {
-    for e in &query {
+    for (e, marker) in &query {
+        if marker.is_added() { continue; }
         commands.entity(e).despawn();
     }
 }

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::{player_input::{PlayerInput, PlayerInputController}, physics::gravity::Gravity}, ground::Grounded, wall::TouchingWall};
+use crate::{audio::{PlaySfxEvent, Sfx}, common::{physics::gravity::Gravity, player_input::{PlayerInput, PlayerInputController}}, ground::Grounded, wall::TouchingWall};
 
 use super::{horizontal_movement_controller::AirbourneHorizontalMovementController, jump_controller::{CoyoteGrounded, JumpController}};
 
@@ -29,11 +29,12 @@ pub struct WallJumpController {
 }
 
 pub fn begin_player_wall_jump(
-    mut query: Query<(&mut Gravity, &mut LinearVelocity, &mut JumpController, &TouchingWall, &WallJumpController, &AirbourneHorizontalMovementController, &PlayerInputController), 
+    mut query: Query<(&mut Gravity, &mut LinearVelocity, &mut JumpController, &TouchingWall, &WallJumpController, &AirbourneHorizontalMovementController, &PlayerInputController, &Transform), 
         (Without<Grounded>, Without<CoyoteGrounded>)>,
     time: Res<Time>,
+    mut sfx_writer: EventWriter<PlaySfxEvent>
 ) {
-    for (mut g, mut v, mut jc, w, wjc, ahmc, input) in &mut query {
+    for (mut g, mut v, mut jc, w, wjc, ahmc, input, t) in &mut query {
         if input.just_pressed(PlayerInput::Jump) {
             v.0 = match w {
                 TouchingWall::Left => {
@@ -56,6 +57,11 @@ pub fn begin_player_wall_jump(
             g.current_force = 0.0;
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time
             jc.last_jump_pressed_time = time.elapsed_secs_f64(); //todo: wrapped??
+
+            //sfx_writer.write(PlaySfxEvent {
+            //    sfx: Sfx::PlayerJump,
+            //    translation: t.translation,
+            //});
         }
     }
 } 

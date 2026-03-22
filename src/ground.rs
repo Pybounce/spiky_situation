@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::common::physics::layers::GamePhysicsLayer;
+use crate::{common::physics::layers::GamePhysicsLayer};
 
 
 
@@ -15,10 +15,10 @@ pub struct Grounded;
 
 pub fn check_grounded(
     mut commands: Commands,
-    mut wallable_query: Query<(Entity, &mut Transform, &mut LinearVelocity), With<Groundable>>,
+    mut wallable_query: Query<(Entity, &mut Transform, &mut LinearVelocity, Option<&Grounded>), With<Groundable>>,
     spatial: SpatialQuery,
 ) {
-    for (entity, mut transform, mut velocity) in &mut wallable_query {
+    for (entity, mut transform, mut velocity, grounded_opt) in &mut wallable_query {
         let mut ground_collision = false;
 
         let spatial_filter = SpatialQueryFilter::from_mask(GamePhysicsLayer::Ground).with_excluded_entities([entity]);
@@ -53,8 +53,9 @@ pub fn check_grounded(
                 }
             }
         }
-        if ground_collision {
+        if ground_collision && grounded_opt.is_none() {
             commands.entity(entity).try_insert(Grounded);
+            
         }
         else if !ground_collision {
             commands.entity(entity).remove::<Grounded>();

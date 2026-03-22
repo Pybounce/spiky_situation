@@ -2,7 +2,7 @@
 use avian2d::prelude::Collider;
 use bevy::prelude::*;
 use avian2d::prelude::*;
-use crate::{common::{animated_sprite::SpriteAnimator, physics::{avian_ex::ManyCollidingEntities, layers::GamePhysicsLayer}, splat::SplatProvider}, obstacles::InstantKiller, rt_lights::components::PointLight, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
+use crate::{audio::{PlaySfxEvent, Sfx}, common::{animated_sprite::SpriteAnimator, physics::{avian_ex::ManyCollidingEntities, layers::GamePhysicsLayer}, splat::SplatProvider}, obstacles::InstantKiller, rt_lights::components::PointLight, stage::{stage_builder::{stage_asset, stage_creator::{StageCreator, TILE_SIZE, TILE_SIZE_HALF}}, stage_objects::tiles::TileBundle}};
 
 
 const PRESSURE_SPIKE_DELAY: f32 = 0.3;
@@ -51,12 +51,17 @@ impl PressureSpikeBuilder {
 
 pub fn trigger_pressure_spikes(
     trigger_query: Query<&ManyCollidingEntities>,
-    mut pressure_spike_query: Query<&mut PressureSpike>
+    mut pressure_spike_query: Query<(&mut PressureSpike, &Transform)>,
+    mut sfx_writer: EventWriter<PlaySfxEvent>
 ) {
     for colliding_entities in &trigger_query {
         for colliding_entity in colliding_entities.iter() {
-            if let Ok(mut pressure_spike) = pressure_spike_query.get_mut(*colliding_entity) {
+            if let Ok((mut pressure_spike, t)) = pressure_spike_query.get_mut(*colliding_entity) {
                 if pressure_spike.triggered == false {
+                    sfx_writer.write(PlaySfxEvent {
+                        sfx: Sfx::Tick,
+                        translation: t.translation,
+                    });
                     pressure_spike.triggered = true;
                 }
             }
@@ -65,18 +70,23 @@ pub fn trigger_pressure_spikes(
 }
 
 pub fn tick_pressure_spikes(
-    mut query: Query<(Entity, &mut PressureSpike, &mut SpriteAnimator)>,
+    mut query: Query<(Entity, &mut PressureSpike, &mut SpriteAnimator, &Transform)>,
     mut commands: Commands,
-    time: Res<Time>
+    time: Res<Time>,
+    mut sfx_writer: EventWriter<PlaySfxEvent>
 ) {
-    for (e, mut pressure_spike, mut animator) in &mut query {
+    for (e, mut pressure_spike, mut animator, t) in &mut query {
         if pressure_spike.triggered && !pressure_spike.timer.finished() {
             pressure_spike.timer.tick(time.delta());
             if pressure_spike.timer.remaining() <= animator.duration() {
-                animator.play_or_continue();    // TODO: Click sound here
+                animator.play_or_continue();
             }
             if pressure_spike.timer.just_finished() {
-                commands.entity(e).try_insert(InstantKiller);   // TODO: Blade release sound here
+                commands.entity(e).try_insert(InstantKiller);   // TODO: Blade release sound here - thanks old me, it's done now.
+                sfx_writer.write(PlaySfxEvent {
+                    sfx: Sfx::Blade,
+                    translation: t.translation,
+                });
             }
         }
     }

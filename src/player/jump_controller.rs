@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::{common::{player_input::{PlayerInput, PlayerInputController}, physics::gravity::Gravity}, ground::Grounded, wall::TouchingWall};
+use crate::{audio::{PlaySfxEvent, Sfx}, common::{physics::gravity::Gravity, player_input::{PlayerInput, PlayerInputController}}, ground::Grounded, wall::TouchingWall};
 
 use super::wall_jump_controller::WallJumpController;
 
@@ -58,15 +58,22 @@ pub fn maintain_player_jump(
 }
 
 pub fn begin_player_jump(
-    mut query: Query<(&mut LinearVelocity, &mut JumpController, &mut Gravity, &PlayerInputController), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
+    mut query: Query<(&mut LinearVelocity, &mut JumpController, &mut Gravity, &PlayerInputController, &Transform), Or<(With<Grounded>, With<CoyoteGrounded>)>>,
     time: Res<Time>,
+    mut sfx_writer: EventWriter<PlaySfxEvent>
 ) {
-    for (mut v, mut jc, mut g, input) in &mut query {
+    for (mut v, mut jc, mut g, input, t) in &mut query {
         if input.pressed(PlayerInput::Jump) {
             g.current_force = 0.0;
             v.0.y = jc.force;
             jc.last_grounded -= jc.coyote_time; //todo: this sucks but it fixes being able to jump from the ground, and then jump again during coyote time
             jc.last_jump_pressed_time = time.elapsed_secs_f64(); //todo: wrapped??
+
+
+            //sfx_writer.write(PlaySfxEvent {
+            //    sfx: Sfx::PlayerJump,
+            //    translation: t.translation,
+            //});
         }
     }
 }
